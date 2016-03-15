@@ -51,64 +51,23 @@ static void print_pop_error(duk_context *ctx, FILE *f) {
 static int wrapped_compile_execute(duk_context *ctx) {
 	const char *src_data;
 	duk_size_t src_len;
-	int comp_flags;
 
-	/* XXX: Here it'd be nice to get some stats for the compilation result
-	 * when a suitable command line is given (e.g. code size, constant
-	 * count, function count.  These are available internally but not through
-	 * the public API.
-	 */
-
-	/* Use duk_compile_lstring_filename() variant which avoids interning
-	 * the source code.  This only really matters for low memory environments.
-	 */
-
-	/* [ ... bytecode_filename src_data src_len filename ] */
+	/* [ ... src_data src_len filename ] */
 
 	src_data = (const char *) duk_require_pointer(ctx, -3);
 	src_len = (duk_size_t) duk_require_uint(ctx, -2);
 
 	if (src_data != NULL && src_len >= 2 && src_data[0] == (char) 0xff) {
-		/* Bytecode. */
-		duk_push_lstring(ctx, src_data, src_len);
-		duk_to_buffer(ctx, -1, NULL);
-		duk_load_function(ctx);
+	    /* Bytecode. */
+	    duk_push_lstring(ctx, src_data, src_len);
+	    duk_to_buffer(ctx, -1, NULL);
+	    duk_load_function(ctx);
 	} else {
-		/* Source code. */
-		comp_flags = 0;
-		duk_compile_lstring_filename(ctx, comp_flags, src_data, src_len);
+	    /* Source. */
+	    duk_compile_lstring_filename(ctx, 0, src_data, src_len);
 	}
 
-	/* [ ... bytecode_filename src_data src_len function ] */
-
-	/* Optional bytecode dump. */
-	if (duk_is_string(ctx, -4)) {
-		FILE *f;
-		void *bc_ptr;
-		duk_size_t bc_len;
-		size_t wrote;
-		char fnbuf[256];
-		const char *filename;
-
-		duk_dup_top(ctx);
-		duk_dump_function(ctx);
-		bc_ptr = duk_require_buffer(ctx, -1, &bc_len);
-		filename = duk_require_string(ctx, -5);
-		snprintf(fnbuf, sizeof(fnbuf), "%s", filename);
-		fnbuf[sizeof(fnbuf) - 1] = (char) 0;
-
-		f = fopen(fnbuf, "wb");
-		if (!f) {
-			duk_error(ctx, DUK_ERR_ERROR, "failed to open bytecode output file");
-		}
-		wrote = fwrite(bc_ptr, 1, (size_t) bc_len, f);  /* XXX: handle partial writes */
-		(void) fclose(f);
-		if (wrote != bc_len) {
-			duk_error(ctx, DUK_ERR_ERROR, "failed to write all bytecode");
-		}
-
-		return 0;  /* duk_safe_call() cleans up */
-	}
+	/* [ ... src_data src_len function ] */
 
 	duk_push_global_object(ctx);  /* 'this' binding */
 	duk_call_method(ctx, 0);
@@ -146,7 +105,7 @@ static int wrapped_compile_execute(duk_context *ctx) {
 	return 0;  /* duk_safe_call() cleans up */
 }
 
-static int handle_fh(duk_context *ctx, FILE *f, const char *filename, const char *bytecode_filename) {
+static int handle_fh(duk_context *ctx, FILE *f, const char *filename) {
 	char *buf = NULL;
 	size_t bufsz;
 	size_t bufoff;
@@ -195,14 +154,13 @@ static int handle_fh(duk_context *ctx, FILE *f, const char *filename, const char
 		bufoff += got;
 	}
 
-	duk_push_string(ctx, bytecode_filename);
 	duk_push_pointer(ctx, (void *) buf);
 	duk_push_uint(ctx, (duk_uint_t) bufoff);
 	duk_push_string(ctx, filename);
 
 	interactive_mode = 0;  /* global */
 
-	rc = duk_safe_call(ctx, wrapped_compile_execute, 4 /*nargs*/, 1 /*nret*/);
+	rc = duk_safe_call(ctx, wrapped_compile_execute, 3 /*nargs*/, 1 /*nret*/);
 
 	free(buf);
 	buf = NULL;
@@ -228,7 +186,7 @@ static int handle_fh(duk_context *ctx, FILE *f, const char *filename, const char
 	goto cleanup;
 }
 
-static int handle_file(duk_context *ctx, const char *filename, const char *bytecode_filename) {
+static int handle_file(duk_context *ctx, const char *filename) {
 	FILE *f = NULL;
 	int retval;
 	char fnbuf[256];
@@ -243,7 +201,7 @@ static int handle_file(duk_context *ctx, const char *filename, const char *bytec
 		goto error;
 	}
 
-	retval = handle_fh(ctx, f, filename, bytecode_filename);
+	retval = handle_fh(ctx, f, filename);
 
 	fclose(f);
 	return retval;
@@ -338,7 +296,6 @@ int main(int argc, char *argv[]) {
 	int have_eval = 0;
 	int interactive = 0;
 	int run_stdin = 0;
-	const char *compile_filename = NULL;
 	int i;
 
 	/*
@@ -358,12 +315,6 @@ int main(int argc, char *argv[]) {
 		}
 		if (strcmp(arg, "-i") == 0) {
 			interactive = 1;
-		} else if (strcmp(arg, "-c") == 0) {
-			if (i == argc - 1) {
-				goto usage;
-			}
-			i++;
-			compile_filename = argv[i];
 		} else if (strcmp(arg, "-e") == 0) {
 			have_eval = 1;
 			if (i == argc - 1) {
@@ -415,7 +366,7 @@ int main(int argc, char *argv[]) {
 			continue;
 		}
 
-		if (handle_file(ctx, arg, compile_filename) != 0) {
+		if (handle_file(ctx, arg) != 0) {
 			retval = 1;
 			goto cleanup;
 		}
@@ -426,7 +377,7 @@ int main(int argc, char *argv[]) {
 		 * compiling) is useful with emduk:
 		 * cat test.js | ./emduk --run-stdin
 		 */
-		if (handle_fh(ctx, stdin, "stdin", compile_filename) != 0) {
+		if (handle_fh(ctx, stdin, "stdin") != 0) {
 			retval = 1;
 			goto cleanup;
 		}
@@ -467,7 +418,6 @@ int main(int argc, char *argv[]) {
 	                "\n"
 	                "   -i                 enter interactive mode after executing argument file(s) / eval code\n"
 	                "   -e CODE            evaluate code\n"
-			"   -c FILE            compile into bytecode (use with only one file argument)\n"
 			"   --run-stdin        treat stdin like a file, i.e. compile full input (not line by line)\n"
 	                "\n"
 	                "If <filename> is omitted, interactive mode is started automatically.\n");
