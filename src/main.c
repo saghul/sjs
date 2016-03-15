@@ -8,7 +8,6 @@
 
 #if !defined(DUK_CMDLINE_FANCY)
 #define NO_READLINE
-#define NO_RLIMIT
 #define NO_SIGNAL
 #endif
 
@@ -39,51 +38,15 @@
 #if !defined(NO_SIGNAL)
 #include <signal.h>
 #endif
-#if !defined(NO_RLIMIT)
-#include <sys/resource.h>
-#endif
 #if !defined(NO_READLINE)
 #include <readline/readline.h>
 #include <readline/history.h>
 #endif
 #include "duktape.h"
 
-#define  MEM_LIMIT_NORMAL   (128*1024*1024)   /* 128 MB */
-#define  MEM_LIMIT_HIGH     (2047*1024*1024)  /* ~2 GB */
 #define  LINEBUF_SIZE       65536
 
 static int interactive_mode = 0;
-
-#if !defined(NO_RLIMIT)
-static void set_resource_limits(rlim_t mem_limit_value) {
-	int rc;
-	struct rlimit lim;
-
-	rc = getrlimit(RLIMIT_AS, &lim);
-	if (rc != 0) {
-		fprintf(stderr, "Warning: cannot read RLIMIT_AS\n");
-		return;
-	}
-
-	if (lim.rlim_max < mem_limit_value) {
-		fprintf(stderr, "Warning: rlim_max < mem_limit_value (%d < %d)\n", (int) lim.rlim_max, (int) mem_limit_value);
-		return;
-	}
-
-	lim.rlim_cur = mem_limit_value;
-	lim.rlim_max = mem_limit_value;
-
-	rc = setrlimit(RLIMIT_AS, &lim);
-	if (rc != 0) {
-		fprintf(stderr, "Warning: setrlimit failed\n");
-		return;
-	}
-
-#if 0
-	fprintf(stderr, "Set RLIMIT_AS to %d\n", (int) mem_limit_value);
-#endif
-}
-#endif  /* NO_RLIMIT */
 
 #if !defined(NO_SIGNAL)
 static void my_sighandler(int x) {
@@ -516,7 +479,6 @@ int main(int argc, char *argv[]) {
 	int have_files = 0;
 	int have_eval = 0;
 	int interactive = 0;
-	int memlimit_high = 1;
 	int verbose = 0;
 	int run_stdin = 0;
 	const char *compile_filename = NULL;
@@ -542,9 +504,7 @@ int main(int argc, char *argv[]) {
 		if (!arg) {
 			goto usage;
 		}
-		if (strcmp(arg, "--restrict-memory") == 0) {
-			memlimit_high = 0;
-		} else if (strcmp(arg, "-i") == 0) {
+		if (strcmp(arg, "-i") == 0) {
 			interactive = 1;
 		} else if (strcmp(arg, "-c") == 0) {
 			if (i == argc - 1) {
@@ -571,19 +531,6 @@ int main(int argc, char *argv[]) {
 	if (!have_files && !have_eval && !run_stdin) {
 		interactive = 1;
 	}
-
-	/*
-	 *  Memory limit
-	 */
-
-#if !defined(NO_RLIMIT)
-	set_resource_limits(memlimit_high ? MEM_LIMIT_HIGH : MEM_LIMIT_NORMAL);
-#else
-	if (memlimit_high == 0) {
-		fprintf(stderr, "Warning: option --restrict-memory ignored, no rlimit support\n");
-		fflush(stderr);
-	}
-#endif
 
 	/*
 	 *  Create heap
@@ -678,7 +625,6 @@ int main(int argc, char *argv[]) {
 			"   -c FILE            compile into bytecode (use with only one file argument)\n"
 			"   --run-stdin        treat stdin like a file, i.e. compile full input (not line by line)\n"
 			"   --verbose          verbose messages to stderr\n"
-	                "   --restrict-memory  use lower memory limit (used by test runner)\n"
 	                "\n"
 	                "If <filename> is omitted, interactive mode is started automatically.\n");
 	fflush(stderr);
