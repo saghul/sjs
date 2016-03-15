@@ -110,15 +110,6 @@ static int wrapped_compile_execute(duk_context *ctx) {
 		return 0;  /* duk_safe_call() cleans up */
 	}
 
-#if 0
-	/* Manual test for bytecode dump/load cycle: dump and load before
-	 * execution.  Enable manually, then run "make qecmatest" for a
-	 * reasonably good coverage of different functions and programs.
-	 */
-	duk_dump_function(ctx);
-	duk_load_function(ctx);
-#endif
-
 	duk_push_global_object(ctx);  /* 'this' binding */
 	duk_call_method(ctx, 0);
 
