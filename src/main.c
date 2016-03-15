@@ -46,15 +46,6 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #endif
-#if defined(DUK_CMDLINE_ALLOC_LOGGING)
-#include "duk_alloc_logging.h"
-#endif
-#if defined(DUK_CMDLINE_ALLOC_TORTURE)
-#include "duk_alloc_torture.h"
-#endif
-#if defined(DUK_CMDLINE_ALLOC_HYBRID)
-#include "duk_alloc_hybrid.h"
-#endif
 #include "duktape.h"
 
 #if defined(DUK_CMDLINE_DEBUGGER_SUPPORT)
@@ -773,16 +764,6 @@ int main(int argc, char *argv[]) {
 			"   --run-stdin        treat stdin like a file, i.e. compile full input (not line by line)\n"
 			"   --verbose          verbose messages to stderr\n"
 	                "   --restrict-memory  use lower memory limit (used by test runner)\n"
-	                "   --alloc-default    use Duktape default allocator\n"
-#if defined(DUK_CMDLINE_ALLOC_LOGGING)
-	                "   --alloc-logging    use logging allocator (writes to /tmp)\n"
-#endif
-#if defined(DUK_CMDLINE_ALLOC_TORTURE)
-	                "   --alloc-torture    use torture allocator\n"
-#endif
-#if defined(DUK_CMDLINE_ALLOC_HYBRID)
-	                "   --alloc-hybrid     use hybrid allocator\n"
-#endif
 #if defined(DUK_CMDLINE_DEBUGGER_SUPPORT)
 			"   --debugger         start example debugger\n"
 #endif
