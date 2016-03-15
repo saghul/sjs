@@ -1,31 +1,3 @@
-/*
- *  Command line execution tool.  Useful for test cases and manual testing.
- *
- *  To enable readline and other fancy stuff, compile with -DDUK_CMDLINE_FANCY.
- *  It is not the default to maximize portability.  You can also compile in
- *  support for example allocators, grep for DUK_CMDLINE_*.
- */
-
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || \
-    defined(WIN64) || defined(_WIN64) || defined(__WIN64__)
-/* Suppress warnings about plain fopen() etc. */
-#define _CRT_SECURE_NO_WARNINGS
-#if defined(_MSC_VER) && (_MSC_VER < 1900)
-/* Workaround for snprintf() missing in older MSVC versions.
- * Note that _snprintf() may not NUL terminate the string, but
- * this difference does not matter here as a NUL terminator is
- * always explicitly added.
- */
-#define snprintf _snprintf
-#endif
-#endif
-
-#define  GREET_CODE(variant)  \
-	"print('((o) Duktape" variant " ' + " \
-	"Math.floor(Duktape.version / 10000) + '.' + " \
-	"Math.floor(Duktape.version / 100) % 100 + '.' + " \
-	"Duktape.version % 100" \
-	", '(" DUK_GIT_DESCRIBE ")');"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,6 +6,15 @@
 
 #include "duktape.h"
 #include "linenoise.h"
+
+
+#define GREET_CODE                                                       \
+	"print('Welcome to Skookum JS');"                                \
+	"var dukVersion = '" DUK_GIT_DESCRIBE "';"                       \
+	"var dukCommit = '" DUK_GIT_COMMIT "'.substr(0, 7);"             \
+	"print('[Duktape ' + dukVersion + ' (' + dukCommit + ')]');"     \
+	"delete dukVersion;"                                             \
+	"delete dukCommit;"
 
 
 static int interactive_mode = 0;
@@ -309,7 +290,7 @@ static int handle_interactive(duk_context *ctx) {
 	int retval = 0;
 	int rc;
 
-	duk_eval_string(ctx, GREET_CODE(""));
+	duk_eval_string(ctx, GREET_CODE);
 	duk_pop(ctx);
 
 	while((line = linenoise(prompt)) != NULL) {
