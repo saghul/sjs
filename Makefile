@@ -21,3 +21,9 @@ LDFLAGS	+= -lm
 
 sjs: $(DUKTAPE_SOURCES) $(DUKTAPE_CMDLINE_SOURCES)
 	$(CC) -o $@ $(CFLAGS) $(DUKTAPE_SOURCES) $(DUKTAPE_CMDLINE_SOURCES) $(LDFLAGS)
+
+clean:
+	rm -f sjs
+	rm -rf sjs.dSYM
+
+.PHONY: clean
