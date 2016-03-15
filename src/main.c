@@ -60,21 +60,6 @@
 #endif
 #include "duktape.h"
 
-#if defined(DUK_CMDLINE_AJSHEAP)
-/* Defined in duk_cmdline_ajduk.c or alljoyn.js headers. */
-void ajsheap_init(void);
-void ajsheap_dump(void);
-void ajsheap_register(duk_context *ctx);
-void ajsheap_start_exec_timeout(void);
-void ajsheap_clear_exec_timeout(void);
-void *ajsheap_alloc_wrapped(void *udata, duk_size_t size);
-void *ajsheap_realloc_wrapped(void *udata, void *ptr, duk_size_t size);
-void ajsheap_free_wrapped(void *udata, void *ptr);
-void *AJS_Alloc(void *udata, duk_size_t size);
-void *AJS_Realloc(void *udata, void *ptr, duk_size_t size);
-void AJS_Free(void *udata, void *ptr);
-#endif
-
 #if defined(DUK_CMDLINE_DEBUGGER_SUPPORT)
 #include "duk_trans_socket.h"
 #endif
@@ -234,16 +219,8 @@ static int wrapped_compile_execute(duk_context *ctx) {
 	duk_load_function(ctx);
 #endif
 
-#if defined(DUK_CMDLINE_AJSHEAP)
-	ajsheap_start_exec_timeout();
-#endif
-
 	duk_push_global_object(ctx);  /* 'this' binding */
 	duk_call_method(ctx, 0);
-
-#if defined(DUK_CMDLINE_AJSHEAP)
-	ajsheap_clear_exec_timeout();
-#endif
 
 	if (interactive_mode) {
 		/*
@@ -374,10 +351,6 @@ static int handle_fh(duk_context *ctx, FILE *f, const char *filename, const char
 
 	rc = duk_safe_call(ctx, wrapped_compile_execute, 4 /*nargs*/, 1 /*nret*/);
 
-#if defined(DUK_CMDLINE_AJSHEAP)
-	ajsheap_clear_exec_timeout();
-#endif
-
 	free(buf);
 	buf = NULL;
 
@@ -446,10 +419,6 @@ static int handle_eval(duk_context *ctx, char *code) {
 
 	rc = duk_safe_call(ctx, wrapped_compile_execute, 3 /*nargs*/, 1 /*nret*/);
 
-#if defined(DUK_CMDLINE_AJSHEAP)
-	ajsheap_clear_exec_timeout();
-#endif
-
 	if (rc != DUK_EXEC_SUCCESS) {
 		print_pop_error(ctx, stderr);
 	} else {
@@ -510,10 +479,6 @@ static int handle_interactive(duk_context *ctx) {
 
 		rc = duk_safe_call(ctx, wrapped_compile_execute, 3 /*nargs*/, 1 /*nret*/);
 
-#if defined(DUK_CMDLINE_AJSHEAP)
-		ajsheap_clear_exec_timeout();
-#endif
-
 		if (rc != DUK_EXEC_SUCCESS) {
 			/* in interactive mode, write to stdout */
 			print_pop_error(ctx, stdout);
@@ -572,10 +537,6 @@ static int handle_interactive(duk_context *ctx) {
 
 		rc = duk_safe_call(ctx, wrapped_compile_execute, 3 /*nargs*/, 1 /*nret*/);
 
-#if defined(DUK_CMDLINE_AJSHEAP)
-		ajsheap_clear_exec_timeout();
-#endif
-
 		if (buffer) {
 			free(buffer);
 			buffer = NULL;
@@ -628,12 +589,9 @@ static void debugger_detached(void *udata) {
 #define  ALLOC_LOGGING  1
 #define  ALLOC_TORTURE  2
 #define  ALLOC_HYBRID   3
-#define  ALLOC_AJSHEAP  4
 
-static duk_context *create_duktape_heap(int alloc_provider, int debugger, int ajsheap_log) {
+static duk_context *create_duktape_heap(int alloc_provider, int debugger) {
 	duk_context *ctx;
-
-	(void) ajsheap_log;  /* suppress warning */
 
 	ctx = NULL;
 	if (!ctx && alloc_provider == ALLOC_LOGGING) {
@@ -678,44 +636,13 @@ static duk_context *create_duktape_heap(int alloc_provider, int debugger, int aj
 		fflush(stderr);
 #endif
 	}
-	if (!ctx && alloc_provider == ALLOC_AJSHEAP) {
-#if defined(DUK_CMDLINE_AJSHEAP)
-		ajsheap_init();
 
-		ctx = duk_create_heap(
-			ajsheap_log ? ajsheap_alloc_wrapped : AJS_Alloc,
-			ajsheap_log ? ajsheap_realloc_wrapped : AJS_Realloc,
-			ajsheap_log ? ajsheap_free_wrapped : AJS_Free,
-			(void *) 0xdeadbeef,  /* heap_udata: ignored by AjsHeap, use as marker */
-			NULL
-		);                /* fatal_handler */
-#else
-		fprintf(stderr, "Warning: option --alloc-ajsheap ignored, no ajsheap allocator support\n");
-		fflush(stderr);
-#endif
-	}
-	if (!ctx && alloc_provider == ALLOC_DEFAULT) {
-		ctx = duk_create_heap_default();
-	}
-
+	ctx = duk_create_heap_default();
 	if (!ctx) {
 		fprintf(stderr, "Failed to create Duktape heap\n");
 		fflush(stderr);
 		exit(-1);
 	}
-
-#if defined(DUK_CMDLINE_AJSHEAP)
-	if (alloc_provider == ALLOC_AJSHEAP) {
-		fprintf(stdout, "Pool dump after heap creation\n");
-		ajsheap_dump();
-	}
-#endif
-
-#if defined(DUK_CMDLINE_AJSHEAP)
-	if (alloc_provider == ALLOC_AJSHEAP) {
-		ajsheap_register(ctx);
-	}
-#endif
 
 	if (debugger) {
 #if defined(DUK_CMDLINE_DEBUGGER_SUPPORT)
@@ -756,28 +683,9 @@ static duk_context *create_duktape_heap(int alloc_provider, int debugger, int aj
 static void destroy_duktape_heap(duk_context *ctx, int alloc_provider) {
 	(void) alloc_provider;
 
-#if defined(DUK_CMDLINE_AJSHEAP)
-	if (alloc_provider == ALLOC_AJSHEAP) {
-		fprintf(stdout, "Pool dump before duk_destroy_heap(), before forced gc\n");
-		ajsheap_dump();
-
-		duk_gc(ctx, 0);
-
-		fprintf(stdout, "Pool dump before duk_destroy_heap(), after forced gc\n");
-		ajsheap_dump();
-	}
-#endif
-
 	if (ctx) {
 		duk_destroy_heap(ctx);
 	}
-
-#if defined(DUK_CMDLINE_AJSHEAP)
-	if (alloc_provider == ALLOC_AJSHEAP) {
-		fprintf(stdout, "Pool dump after duk_destroy_heap() (should have zero allocs)\n");
-		ajsheap_dump();
-	}
-#endif
 }
 
 int main(int argc, char *argv[]) {
@@ -788,7 +696,6 @@ int main(int argc, char *argv[]) {
 	int interactive = 0;
 	int memlimit_high = 1;
 	int alloc_provider = ALLOC_DEFAULT;
-	int ajsheap_log = 0;
 	int debugger = 0;
 	int recreate_heap = 0;
 	int no_heap_destroy = 0;
@@ -844,11 +751,6 @@ int main(int argc, char *argv[]) {
 	);
 #endif  /* EMSCRIPTEN */
 
-#if defined(DUK_CMDLINE_AJSHEAP)
-	alloc_provider = ALLOC_AJSHEAP;
-#endif
-	(void) ajsheap_log;
-
 	/*
 	 *  Signal handling setup
 	 */
@@ -893,10 +795,6 @@ int main(int argc, char *argv[]) {
 			alloc_provider = ALLOC_TORTURE;
 		} else if (strcmp(arg, "--alloc-hybrid") == 0) {
 			alloc_provider = ALLOC_HYBRID;
-		} else if (strcmp(arg, "--alloc-ajsheap") == 0) {
-			alloc_provider = ALLOC_AJSHEAP;
-		} else if (strcmp(arg, "--ajsheap-log") == 0) {
-			ajsheap_log = 1;
 		} else if (strcmp(arg, "--debugger") == 0) {
 			debugger = 1;
 		} else if (strcmp(arg, "--recreate-heap") == 0) {
@@ -934,7 +832,7 @@ int main(int argc, char *argv[]) {
 	 *  Create heap
 	 */
 
-	ctx = create_duktape_heap(alloc_provider, debugger, ajsheap_log);
+	ctx = create_duktape_heap(alloc_provider, debugger);
 
 	/*
 	 *  Execute any argument file(s)
@@ -980,7 +878,7 @@ int main(int argc, char *argv[]) {
 			}
 
 			destroy_duktape_heap(ctx, alloc_provider);
-			ctx = create_duktape_heap(alloc_provider, debugger, ajsheap_log);
+			ctx = create_duktape_heap(alloc_provider, debugger);
 		}
 	}
 
@@ -1001,7 +899,7 @@ int main(int argc, char *argv[]) {
 			}
 
 			destroy_duktape_heap(ctx, alloc_provider);
-			ctx = create_duktape_heap(alloc_provider, debugger, ajsheap_log);
+			ctx = create_duktape_heap(alloc_provider, debugger);
 		}
 	}
 
@@ -1058,10 +956,6 @@ int main(int argc, char *argv[]) {
 #endif
 #if defined(DUK_CMDLINE_ALLOC_HYBRID)
 	                "   --alloc-hybrid     use hybrid allocator\n"
-#endif
-#if defined(DUK_CMDLINE_AJSHEAP)
-	                "   --alloc-ajsheap    use ajsheap allocator (enabled by default with 'ajduk')\n"
-	                "   --ajsheap-log      write alloc log to /tmp/ajduk-alloc-log.txt\n"
 #endif
 #if defined(DUK_CMDLINE_DEBUGGER_SUPPORT)
 			"   --debugger         start example debugger\n"
