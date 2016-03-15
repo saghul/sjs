@@ -365,7 +365,6 @@ int main(int argc, char *argv[]) {
 	int have_files = 0;
 	int have_eval = 0;
 	int interactive = 0;
-	int verbose = 0;
 	int run_stdin = 0;
 	const char *compile_filename = NULL;
 	int i;
@@ -399,8 +398,6 @@ int main(int argc, char *argv[]) {
 				goto usage;
 			}
 			i++;  /* skip code */
-		} else if (strcmp(arg, "--verbose") == 0) {
-			verbose = 1;
 		} else if (strcmp(arg, "--run-stdin") == 0) {
 			run_stdin = 1;
 		} else if (strlen(arg) >= 1 && arg[0] == '-') {
@@ -444,11 +441,6 @@ int main(int argc, char *argv[]) {
 			continue;
 		} else if (strlen(arg) >= 1 && arg[0] == '-') {
 			continue;
-		}
-
-		if (verbose) {
-			fprintf(stderr, "*** Executing file: %s\n", arg);
-			fflush(stderr);
 		}
 
 		if (handle_file(ctx, arg, compile_filename) != 0) {
@@ -505,7 +497,6 @@ int main(int argc, char *argv[]) {
 	                "   -e CODE            evaluate code\n"
 			"   -c FILE            compile into bytecode (use with only one file argument)\n"
 			"   --run-stdin        treat stdin like a file, i.e. compile full input (not line by line)\n"
-			"   --verbose          verbose messages to stderr\n"
 	                "\n"
 	                "If <filename> is omitted, interactive mode is started automatically.\n");
 	fflush(stderr);
