@@ -517,7 +517,6 @@ int main(int argc, char *argv[]) {
 	int have_eval = 0;
 	int interactive = 0;
 	int memlimit_high = 1;
-	int no_heap_destroy = 0;
 	int verbose = 0;
 	int run_stdin = 0;
 	const char *compile_filename = NULL;
@@ -559,8 +558,6 @@ int main(int argc, char *argv[]) {
 				goto usage;
 			}
 			i++;  /* skip code */
-		} else if (strcmp(arg, "--no-heap-destroy") == 0) {
-			no_heap_destroy = 1;
 		} else if (strcmp(arg, "--verbose") == 0) {
 			verbose = 1;
 		} else if (strcmp(arg, "--run-stdin") == 0) {
@@ -664,12 +661,7 @@ int main(int argc, char *argv[]) {
 		fflush(stderr);
 	}
 
-	if (ctx && no_heap_destroy) {
-		duk_gc(ctx, 0);
-	}
-	if (ctx && !no_heap_destroy) {
-		destroy_duktape_heap(ctx);
-	}
+	destroy_duktape_heap(ctx);
 	ctx = NULL;
 
 	return retval;
@@ -687,7 +679,6 @@ int main(int argc, char *argv[]) {
 			"   --run-stdin        treat stdin like a file, i.e. compile full input (not line by line)\n"
 			"   --verbose          verbose messages to stderr\n"
 	                "   --restrict-memory  use lower memory limit (used by test runner)\n"
-			"   --no-heap-destroy  force GC, but don't destroy heap at end (leak testing)\n"
 	                "\n"
 	                "If <filename> is omitted, interactive mode is started automatically.\n");
 	fflush(stderr);
