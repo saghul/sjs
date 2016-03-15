@@ -517,7 +517,6 @@ int main(int argc, char *argv[]) {
 	int have_eval = 0;
 	int interactive = 0;
 	int memlimit_high = 1;
-	int recreate_heap = 0;
 	int no_heap_destroy = 0;
 	int verbose = 0;
 	int run_stdin = 0;
@@ -560,8 +559,6 @@ int main(int argc, char *argv[]) {
 				goto usage;
 			}
 			i++;  /* skip code */
-		} else if (strcmp(arg, "--recreate-heap") == 0) {
-			recreate_heap = 1;
 		} else if (strcmp(arg, "--no-heap-destroy") == 0) {
 			no_heap_destroy = 1;
 		} else if (strcmp(arg, "--verbose") == 0) {
@@ -633,16 +630,6 @@ int main(int argc, char *argv[]) {
 			retval = 1;
 			goto cleanup;
 		}
-
-		if (recreate_heap) {
-			if (verbose) {
-				fprintf(stderr, "*** Recreating heap...\n");
-				fflush(stderr);
-			}
-
-			destroy_duktape_heap(ctx);
-			ctx = create_duktape_heap();
-		}
 	}
 
 	if (run_stdin) {
@@ -653,16 +640,6 @@ int main(int argc, char *argv[]) {
 		if (handle_fh(ctx, stdin, "stdin", compile_filename) != 0) {
 			retval = 1;
 			goto cleanup;
-		}
-
-		if (recreate_heap) {
-			if (verbose) {
-				fprintf(stderr, "*** Recreating heap...\n");
-				fflush(stderr);
-			}
-
-			destroy_duktape_heap(ctx);
-			ctx = create_duktape_heap();
 		}
 	}
 
@@ -710,7 +687,6 @@ int main(int argc, char *argv[]) {
 			"   --run-stdin        treat stdin like a file, i.e. compile full input (not line by line)\n"
 			"   --verbose          verbose messages to stderr\n"
 	                "   --restrict-memory  use lower memory limit (used by test runner)\n"
-			"   --recreate-heap    recreate heap after every file\n"
 			"   --no-heap-destroy  force GC, but don't destroy heap at end (leak testing)\n"
 	                "\n"
 	                "If <filename> is omitted, interactive mode is started automatically.\n");
