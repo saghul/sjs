@@ -6,11 +6,6 @@
  *  support for example allocators, grep for DUK_CMDLINE_*.
  */
 
-#if !defined(DUK_CMDLINE_FANCY)
-#define NO_READLINE
-#define NO_SIGNAL
-#endif
-
 #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || \
     defined(WIN64) || defined(_WIN64) || defined(__WIN64__)
 /* Suppress warnings about plain fopen() etc. */
@@ -35,28 +30,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#if !defined(NO_SIGNAL)
 #include <signal.h>
-#endif
-#if !defined(NO_READLINE)
-#include <readline/readline.h>
-#include <readline/history.h>
-#endif
-#include "duktape.h"
 
-#define  LINEBUF_SIZE       65536
+#include "duktape.h"
+#include "linenoise.h"
+
 
 static int interactive_mode = 0;
-
-#if !defined(NO_SIGNAL)
-static void my_sighandler(int x) {
-	fprintf(stderr, "Got signal %d\n", x);
-	fflush(stderr);
-}
-static void set_sigint_handler(void) {
-	(void) signal(SIGINT, my_sighandler);
-}
-#endif  /* NO_SIGNAL */
 
 static int get_stack_raw(duk_context *ctx) {
 	if (!duk_is_object(ctx, -1)) {
@@ -322,118 +302,30 @@ static int handle_eval(duk_context *ctx, char *code) {
 	return retval;
 }
 
-#if defined(NO_READLINE)
+
 static int handle_interactive(duk_context *ctx) {
-	const char *prompt = "duk> ";
-	char *buffer = NULL;
-	int retval = 0;
-	int rc;
-	int got_eof = 0;
-
-	duk_eval_string(ctx, GREET_CODE(" [no readline]"));
-	duk_pop(ctx);
-
-	buffer = (char *) malloc(LINEBUF_SIZE);
-	if (!buffer) {
-		fprintf(stderr, "failed to allocated a line buffer\n");
-		fflush(stderr);
-		retval = -1;
-		goto done;
-	}
-
-	while (!got_eof) {
-		size_t idx = 0;
-
-		fwrite(prompt, 1, strlen(prompt), stdout);
-		fflush(stdout);
-
-		for (;;) {
-			int c = fgetc(stdin);
-			if (c == EOF) {
-				got_eof = 1;
-				break;
-			} else if (c == '\n') {
-				break;
-			} else if (idx >= LINEBUF_SIZE) {
-				fprintf(stderr, "line too long\n");
-				fflush(stderr);
-				retval = -1;
-				goto done;
-			} else {
-				buffer[idx++] = (char) c;
-			}
-		}
-
-		duk_push_pointer(ctx, (void *) buffer);
-		duk_push_uint(ctx, (duk_uint_t) idx);
-		duk_push_string(ctx, "input");
-
-		interactive_mode = 1;  /* global */
-
-		rc = duk_safe_call(ctx, wrapped_compile_execute, 3 /*nargs*/, 1 /*nret*/);
-
-		if (rc != DUK_EXEC_SUCCESS) {
-			/* in interactive mode, write to stdout */
-			print_pop_error(ctx, stdout);
-			retval = -1;  /* an error 'taints' the execution */
-		} else {
-			duk_pop(ctx);
-		}
-	}
-
- done:
-	if (buffer) {
-		free(buffer);
-		buffer = NULL;
-	}
-
-	return retval;
-}
-#else  /* NO_READLINE */
-static int handle_interactive(duk_context *ctx) {
-	const char *prompt = "duk> ";
-	char *buffer = NULL;
+	const char *prompt = "sjs> ";
+	char* line;
 	int retval = 0;
 	int rc;
 
 	duk_eval_string(ctx, GREET_CODE(""));
 	duk_pop(ctx);
 
-	/*
-	 *  Note: using readline leads to valgrind-reported leaks inside
-	 *  readline itself.  Execute code from an input file (and not
-	 *  through stdin) for clean valgrind runs.
-	 */
-
-	rl_initialize();
-
-	for (;;) {
-		if (buffer) {
-			free(buffer);
-			buffer = NULL;
+	while((line = linenoise(prompt)) != NULL) {
+		if (line[0] != '\0') {
+		    linenoiseHistoryAdd(line);
 		}
 
-		buffer = readline(prompt);
-		if (!buffer) {
-			break;
-		}
-
-		if (buffer && buffer[0] != (char) 0) {
-			add_history(buffer);
-		}
-
-		duk_push_pointer(ctx, (void *) buffer);
-		duk_push_uint(ctx, (duk_uint_t) strlen(buffer));
+		duk_push_pointer(ctx, (void *) line);
+		duk_push_uint(ctx, (duk_uint_t) strlen(line));
 		duk_push_string(ctx, "input");
 
 		interactive_mode = 1;  /* global */
 
 		rc = duk_safe_call(ctx, wrapped_compile_execute, 3 /*nargs*/, 1 /*nret*/);
 
-		if (buffer) {
-			free(buffer);
-			buffer = NULL;
-		}
+		free(line);
 
 		if (rc != DUK_EXEC_SUCCESS) {
 			/* in interactive mode, write to stdout */
@@ -444,14 +336,8 @@ static int handle_interactive(duk_context *ctx) {
 		}
 	}
 
-	if (buffer) {
-		free(buffer);
-		buffer = NULL;
-	}
-
 	return retval;
 }
-#endif  /* NO_READLINE */
 
 
 static duk_context *create_duktape_heap(void) {
@@ -488,12 +374,7 @@ int main(int argc, char *argv[]) {
 	 *  Signal handling setup
 	 */
 
-#if !defined(NO_SIGNAL)
-	set_sigint_handler();
-
-	/* This is useful at the global level; libraries should avoid SIGPIPE though */
-	/*signal(SIGPIPE, SIG_IGN);*/
-#endif
+	signal(SIGPIPE, SIG_IGN);
 
 	/*
 	 *  Parse options
