@@ -585,57 +585,9 @@ static void debugger_detached(void *udata) {
 }
 #endif
 
-#define  ALLOC_DEFAULT  0
-#define  ALLOC_LOGGING  1
-#define  ALLOC_TORTURE  2
-#define  ALLOC_HYBRID   3
 
-static duk_context *create_duktape_heap(int alloc_provider, int debugger) {
+static duk_context *create_duktape_heap(int debugger) {
 	duk_context *ctx;
-
-	ctx = NULL;
-	if (!ctx && alloc_provider == ALLOC_LOGGING) {
-#if defined(DUK_CMDLINE_ALLOC_LOGGING)
-		ctx = duk_create_heap(duk_alloc_logging,
-		                      duk_realloc_logging,
-		                      duk_free_logging,
-		                      (void *) 0xdeadbeef,
-		                      NULL);
-#else
-		fprintf(stderr, "Warning: option --alloc-logging ignored, no logging allocator support\n");
-		fflush(stderr);
-#endif
-	}
-	if (!ctx && alloc_provider == ALLOC_TORTURE) {
-#if defined(DUK_CMDLINE_ALLOC_TORTURE)
-		ctx = duk_create_heap(duk_alloc_torture,
-		                      duk_realloc_torture,
-		                      duk_free_torture,
-		                      (void *) 0xdeadbeef,
-		                      NULL);
-#else
-		fprintf(stderr, "Warning: option --alloc-torture ignored, no torture allocator support\n");
-		fflush(stderr);
-#endif
-	}
-	if (!ctx && alloc_provider == ALLOC_HYBRID) {
-#if defined(DUK_CMDLINE_ALLOC_HYBRID)
-		void *udata = duk_alloc_hybrid_init();
-		if (!udata) {
-			fprintf(stderr, "Failed to init hybrid allocator\n");
-			fflush(stderr);
-		} else {
-			ctx = duk_create_heap(duk_alloc_hybrid,
-			                      duk_realloc_hybrid,
-			                      duk_free_hybrid,
-			                      udata,
-			                      NULL);
-		}
-#else
-		fprintf(stderr, "Warning: option --alloc-hybrid ignored, no hybrid allocator support\n");
-		fflush(stderr);
-#endif
-	}
 
 	ctx = duk_create_heap_default();
 	if (!ctx) {
@@ -666,23 +618,10 @@ static duk_context *create_duktape_heap(int alloc_provider, int debugger) {
 #endif
 	}
 
-#if 0
-	/* Manual test for duk_debugger_cooperate() */
-	{
-		for (i = 0; i < 60; i++) {
-			printf("cooperate: %d\n", i);
-			usleep(1000000);
-			duk_debugger_cooperate(ctx);
-		}
-	}
-#endif
-
 	return ctx;
 }
 
-static void destroy_duktape_heap(duk_context *ctx, int alloc_provider) {
-	(void) alloc_provider;
-
+static void destroy_duktape_heap(duk_context *ctx) {
 	if (ctx) {
 		duk_destroy_heap(ctx);
 	}
@@ -695,7 +634,6 @@ int main(int argc, char *argv[]) {
 	int have_eval = 0;
 	int interactive = 0;
 	int memlimit_high = 1;
-	int alloc_provider = ALLOC_DEFAULT;
 	int debugger = 0;
 	int recreate_heap = 0;
 	int no_heap_destroy = 0;
@@ -787,14 +725,6 @@ int main(int argc, char *argv[]) {
 				goto usage;
 			}
 			i++;  /* skip code */
-		} else if (strcmp(arg, "--alloc-default") == 0) {
-			alloc_provider = ALLOC_DEFAULT;
-		} else if (strcmp(arg, "--alloc-logging") == 0) {
-			alloc_provider = ALLOC_LOGGING;
-		} else if (strcmp(arg, "--alloc-torture") == 0) {
-			alloc_provider = ALLOC_TORTURE;
-		} else if (strcmp(arg, "--alloc-hybrid") == 0) {
-			alloc_provider = ALLOC_HYBRID;
 		} else if (strcmp(arg, "--debugger") == 0) {
 			debugger = 1;
 		} else if (strcmp(arg, "--recreate-heap") == 0) {
@@ -832,7 +762,7 @@ int main(int argc, char *argv[]) {
 	 *  Create heap
 	 */
 
-	ctx = create_duktape_heap(alloc_provider, debugger);
+	ctx = create_duktape_heap(debugger);
 
 	/*
 	 *  Execute any argument file(s)
@@ -877,8 +807,8 @@ int main(int argc, char *argv[]) {
 				fflush(stderr);
 			}
 
-			destroy_duktape_heap(ctx, alloc_provider);
-			ctx = create_duktape_heap(alloc_provider, debugger);
+			destroy_duktape_heap(ctx);
+			ctx = create_duktape_heap(debugger);
 		}
 	}
 
@@ -898,8 +828,8 @@ int main(int argc, char *argv[]) {
 				fflush(stderr);
 			}
 
-			destroy_duktape_heap(ctx, alloc_provider);
-			ctx = create_duktape_heap(alloc_provider, debugger);
+			destroy_duktape_heap(ctx);
+			ctx = create_duktape_heap(debugger);
 		}
 	}
 
@@ -928,7 +858,7 @@ int main(int argc, char *argv[]) {
 		duk_gc(ctx, 0);
 	}
 	if (ctx && !no_heap_destroy) {
-		destroy_duktape_heap(ctx, alloc_provider);
+		destroy_duktape_heap(ctx);
 	}
 	ctx = NULL;
 
