@@ -48,10 +48,6 @@
 #endif
 #include "duktape.h"
 
-#if defined(DUK_CMDLINE_DEBUGGER_SUPPORT)
-#include "duk_trans_socket.h"
-#endif
-
 #define  MEM_LIMIT_NORMAL   (128*1024*1024)   /* 128 MB */
 #define  MEM_LIMIT_HIGH     (2047*1024*1024)  /* ~2 GB */
 #define  LINEBUF_SIZE       65536
@@ -494,33 +490,8 @@ static int handle_interactive(duk_context *ctx) {
 }
 #endif  /* NO_READLINE */
 
-#if defined(DUK_CMDLINE_DEBUGGER_SUPPORT)
-static void debugger_detached(void *udata) {
-	duk_context *ctx = (duk_context *) udata;
-	(void) ctx;
-	fprintf(stderr, "Debugger detached, udata: %p\n", (void *) udata);
-	fflush(stderr);
 
-#if 0  /* For manual auto-reattach test */
-	duk_trans_socket_finish();
-	duk_trans_socket_init();
-	duk_trans_socket_waitconn();
-	fprintf(stderr, "Debugger connected, call duk_debugger_attach() and then execute requested file(s)/eval\n");
-	fflush(stderr);
-	duk_debugger_attach(ctx,
-	                    duk_trans_socket_read_cb,
-	                    duk_trans_socket_write_cb,
-	                    duk_trans_socket_peek_cb,
-	                    duk_trans_socket_read_flush_cb,
-	                    duk_trans_socket_write_flush_cb,
-	                    debugger_detached,
-	                    (void *) ctx);
-#endif
-}
-#endif
-
-
-static duk_context *create_duktape_heap(int debugger) {
+static duk_context *create_duktape_heap(void) {
 	duk_context *ctx;
 
 	ctx = duk_create_heap_default();
@@ -528,28 +499,6 @@ static duk_context *create_duktape_heap(int debugger) {
 		fprintf(stderr, "Failed to create Duktape heap\n");
 		fflush(stderr);
 		exit(-1);
-	}
-
-	if (debugger) {
-#if defined(DUK_CMDLINE_DEBUGGER_SUPPORT)
-		fprintf(stderr, "Debugger enabled, create socket and wait for connection\n");
-		fflush(stderr);
-		duk_trans_socket_init();
-		duk_trans_socket_waitconn();
-		fprintf(stderr, "Debugger connected, call duk_debugger_attach() and then execute requested file(s)/eval\n");
-		fflush(stderr);
-		duk_debugger_attach(ctx,
-		                    duk_trans_socket_read_cb,
-		                    duk_trans_socket_write_cb,
-		                    duk_trans_socket_peek_cb,
-		                    duk_trans_socket_read_flush_cb,
-		                    duk_trans_socket_write_flush_cb,
-		                    debugger_detached,
-		                    (void *) ctx);
-#else
-		fprintf(stderr, "Warning: option --debugger ignored, no debugger support\n");
-		fflush(stderr);
-#endif
 	}
 
 	return ctx;
@@ -568,7 +517,6 @@ int main(int argc, char *argv[]) {
 	int have_eval = 0;
 	int interactive = 0;
 	int memlimit_high = 1;
-	int debugger = 0;
 	int recreate_heap = 0;
 	int no_heap_destroy = 0;
 	int verbose = 0;
@@ -612,8 +560,6 @@ int main(int argc, char *argv[]) {
 				goto usage;
 			}
 			i++;  /* skip code */
-		} else if (strcmp(arg, "--debugger") == 0) {
-			debugger = 1;
 		} else if (strcmp(arg, "--recreate-heap") == 0) {
 			recreate_heap = 1;
 		} else if (strcmp(arg, "--no-heap-destroy") == 0) {
@@ -649,7 +595,7 @@ int main(int argc, char *argv[]) {
 	 *  Create heap
 	 */
 
-	ctx = create_duktape_heap(debugger);
+	ctx = create_duktape_heap();
 
 	/*
 	 *  Execute any argument file(s)
@@ -695,7 +641,7 @@ int main(int argc, char *argv[]) {
 			}
 
 			destroy_duktape_heap(ctx);
-			ctx = create_duktape_heap(debugger);
+			ctx = create_duktape_heap();
 		}
 	}
 
@@ -716,7 +662,7 @@ int main(int argc, char *argv[]) {
 			}
 
 			destroy_duktape_heap(ctx);
-			ctx = create_duktape_heap(debugger);
+			ctx = create_duktape_heap();
 		}
 	}
 
@@ -764,9 +710,6 @@ int main(int argc, char *argv[]) {
 			"   --run-stdin        treat stdin like a file, i.e. compile full input (not line by line)\n"
 			"   --verbose          verbose messages to stderr\n"
 	                "   --restrict-memory  use lower memory limit (used by test runner)\n"
-#if defined(DUK_CMDLINE_DEBUGGER_SUPPORT)
-			"   --debugger         start example debugger\n"
-#endif
 			"   --recreate-heap    recreate heap after every file\n"
 			"   --no-heap-destroy  force GC, but don't destroy heap at end (leak testing)\n"
 	                "\n"
