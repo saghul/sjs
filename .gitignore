@@ -1,4 +1,5 @@
 sjs
-sjs.dSYM/
+libsjs*
+*.dSYM/
 original/
 *.swp

@@ -1,29 +1,24 @@
-#
-#  Example Makefile for building a program with embedded Duktape.
-#  The example program here is the Duktape command line tool.
-#
 
-DUKTAPE_SOURCES = src/duktape/duktape.c
-DUKTAPE_CMDLINE_SOURCES = src/main.c
+LIBSJS_SRC = src/duktape/duktape.c
+LIBSJS_LIB = libsjs.so
+
+SJS_CLI_SRC = src/main.c
 
 CC ?= gcc
 CFLAGS += -O2 -g -pedantic -std=c99 -Wall -fstrict-aliasing -fno-omit-frame-pointer
-CFLAGS += -I./src/duktape   # duktape.h and duk_config.h must be in include path
+CFLAGS += -I./src/duktape
 LDFLAGS	+= -lm
 
-# If you have readline, you may want to enable these.  On some platforms
-# -lreadline also requires -lncurses (e.g. RHEL), so it is added by default
-# (you may be able to remove it)
-#CCOPTS += -DDUK_CMDLINE_FANCY
-#CCLIBS += -lreadline
-#CCLIBS += -lncurses
+all: sjs
 
+$(LIBSJS_LIB): $(LIBSJS_SRC)
+	$(CC) -shared -fPIC $(CFLAGS) -o $@ $^
 
-sjs: $(DUKTAPE_SOURCES) $(DUKTAPE_CMDLINE_SOURCES)
-	$(CC) -o $@ $(CFLAGS) $(DUKTAPE_SOURCES) $(DUKTAPE_CMDLINE_SOURCES) $(LDFLAGS)
+sjs: $(SJS_CLI_SRC) $(LIBSJS_LIB)
+	$(CC) -o $@ $(CFLAGS) $< $(LDFLAGS) -L. -lsjs
 
 clean:
-	rm -f sjs
-	rm -rf sjs.dSYM
+	-rm -f sjs libsjs.so
+	-rm -rf *.dSYM
 
-.PHONY: clean
+.PHONY: all clean
