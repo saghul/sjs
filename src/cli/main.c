@@ -178,29 +178,6 @@ static int handle_fh(duk_context *ctx, FILE *f, const char *filename) {
 	goto cleanup;
 }
 
-static int handle_file(duk_context *ctx, const char *filename) {
-	FILE *f = NULL;
-	int retval;
-	char fnbuf[256];
-
-	snprintf(fnbuf, sizeof(fnbuf), "%s", filename);
-	fnbuf[sizeof(fnbuf) - 1] = (char) 0;
-
-	f = fopen(fnbuf, "rb");
-	if (!f) {
-		fprintf(stderr, "failed to open source file: %s\n", filename);
-		fflush(stderr);
-		goto error;
-	}
-
-	retval = handle_fh(ctx, f, filename);
-
-	fclose(f);
-	return retval;
-
- error:
-	return -1;
-}
 
 static int handle_eval(duk_context *ctx, char *code) {
 	int rc;
@@ -338,9 +315,12 @@ int main(int argc, char *argv[]) {
 			continue;
 		}
 
-		if (handle_file(ctx, arg) != 0) {
+		if (duk_peval_file(ctx, arg) != 0) {
+			print_pop_error(ctx, stderr);
 			retval = 1;
 			goto cleanup;
+		} else {
+			duk_pop(ctx);
 		}
 	}
 
