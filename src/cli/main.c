@@ -167,7 +167,6 @@ static int handle_eval(duk_context *ctx, char *code) {
 static int handle_interactive(duk_context *ctx) {
 	const char *prompt = "sjs> ";
 	char* line;
-	int retval = 0;
 	int rc;
 
 	duk_eval_string(ctx, GREET_CODE);
@@ -190,13 +189,12 @@ static int handle_interactive(duk_context *ctx) {
 		if (rc != DUK_EXEC_SUCCESS) {
 			/* in interactive mode, write to stdout */
 			print_pop_error(ctx, stdout);
-			retval = -1;  /* an error 'taints' the execution */
 		} else {
 			duk_pop(ctx);
 		}
 	}
 
-	return retval;
+	return 0;
 }
 
 
