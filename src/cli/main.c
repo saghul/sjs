@@ -371,11 +371,6 @@ int main(int argc, char *argv[]) {
 	 */
 
  cleanup:
-	if (interactive) {
-		fprintf(stderr, "Cleaning up...\n");
-		fflush(stderr);
-	}
-
 	sjs_vm_destroy(vm);
 	vm = NULL;
 	ctx = NULL;
