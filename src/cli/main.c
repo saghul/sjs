@@ -57,16 +57,7 @@ static int wrapped_compile_execute(duk_context *ctx) {
 
 	src_data = (const char *) duk_require_pointer(ctx, -3);
 	src_len = (duk_size_t) duk_require_uint(ctx, -2);
-
-	if (src_data != NULL && src_len >= 2 && src_data[0] == (char) 0xff) {
-	    /* Bytecode. */
-	    duk_push_lstring(ctx, src_data, src_len);
-	    duk_to_buffer(ctx, -1, NULL);
-	    duk_load_function(ctx);
-	} else {
-	    /* Source. */
-	    duk_compile_lstring_filename(ctx, 0, src_data, src_len);
-	}
+	duk_compile_lstring_filename(ctx, 0, src_data, src_len);
 
 	/* [ ... src_data src_len function ] */
 
