@@ -6,6 +6,7 @@
 
 #include "duktape.h"
 #include "linenoise.h"
+#include "vm.h"
 
 
 #define GREET_CODE                                                       \
@@ -270,26 +271,8 @@ static int handle_interactive(duk_context *ctx) {
 }
 
 
-static duk_context *create_duktape_heap(void) {
-	duk_context *ctx;
-
-	ctx = duk_create_heap_default();
-	if (!ctx) {
-		fprintf(stderr, "Failed to create Duktape heap\n");
-		fflush(stderr);
-		exit(-1);
-	}
-
-	return ctx;
-}
-
-static void destroy_duktape_heap(duk_context *ctx) {
-	if (ctx) {
-		duk_destroy_heap(ctx);
-	}
-}
-
 int main(int argc, char *argv[]) {
+	sjs_vm_t* vm = NULL;
 	duk_context *ctx = NULL;
 	int retval = 0;
 	int have_files = 0;
@@ -334,10 +317,11 @@ int main(int argc, char *argv[]) {
 	}
 
 	/*
-	 *  Create heap
+	 *  Create VM
 	 */
 
-	ctx = create_duktape_heap();
+	vm = sjs_vm_create();
+	ctx = vm->ctx;
 
 	/*
 	 *  Execute any argument file(s)
@@ -404,7 +388,8 @@ int main(int argc, char *argv[]) {
 		fflush(stderr);
 	}
 
-	destroy_duktape_heap(ctx);
+	sjs_vm_destroy(vm);
+	vm = NULL;
 	ctx = NULL;
 
 	return retval;

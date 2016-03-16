@@ -1,12 +1,12 @@
 
-LIBSJS_SRC = src/duktape/duktape.c
+LIBSJS_SRC = src/duktape/duktape.c src/vm/vm.c
 LIBSJS_LIB = libsjs.so
 
 SJS_CLI_SRCS = $(wildcard src/cli/*.c)
 
 CC ?= gcc
 CFLAGS += -O2 -g -pedantic -std=c99 -Wall -fstrict-aliasing -fno-omit-frame-pointer
-CFLAGS += -I./src/duktape
+CFLAGS += -I./src/duktape -I./src/vm
 LDFLAGS	+= -lm
 
 all: sjs
