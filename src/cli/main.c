@@ -119,9 +119,6 @@ static int handle_stdin(duk_context *ctx) {
 		avail = bufsz - bufoff;
 		if (avail < 1024) {
 			size_t newsz;
-#if 0
-			fprintf(stderr, "resizing read buffer: %ld -> %ld\n", (long) bufsz, (long) (bufsz * 2));
-#endif
 			newsz = bufsz + (bufsz >> 2) + 1024;  /* +25% and some extra */
 			buf = (char *) realloc(buf, newsz);
 			if (!buf) {
@@ -131,15 +128,7 @@ static int handle_stdin(duk_context *ctx) {
 		}
 
 		avail = bufsz - bufoff;
-#if 0
-		fprintf(stderr, "reading input: buf=%p bufsz=%ld bufoff=%ld avail=%ld\n",
-		        (void *) buf, (long) bufsz, (long) bufoff, (long) avail);
-#endif
-
 		got = fread((void *) (buf + bufoff), (size_t) 1, avail, stdin);
-#if 0
-		fprintf(stderr, "got=%ld\n", (long) got);
-#endif
 		if (got == 0) {
 			break;
 		}
