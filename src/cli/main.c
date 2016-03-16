@@ -221,25 +221,25 @@ int main(int argc, char *argv[]) {
 
     /* Parse options */
     for (i = 1; i < argc; i++) {
-            char *arg = argv[i];
-            if (!arg) {
-                    goto usage;
+        char *arg = argv[i];
+        if (!arg) {
+            goto usage;
+        }
+        if (strcmp(arg, "-i") == 0) {
+            interactive = 1;
+        } else if (strcmp(arg, "-e") == 0) {
+            have_eval = 1;
+            if (i == argc - 1) {
+                goto usage;
             }
-            if (strcmp(arg, "-i") == 0) {
-                    interactive = 1;
-            } else if (strcmp(arg, "-e") == 0) {
-                    have_eval = 1;
-                    if (i == argc - 1) {
-                            goto usage;
-                    }
-                    i++;  /* skip code */
-            } else if (strlen(arg) > 1 && arg[0] == '-') {
-                    goto usage;
-            } else if (strlen(arg) == 1 && arg[0] == '-') {
-                    run_stdin = 1;
-            } else {
-                    have_files = 1;
-            }
+            i++;  /* skip code */
+        } else if (strlen(arg) > 1 && arg[0] == '-') {
+            goto usage;
+        } else if (strlen(arg) == 1 && arg[0] == '-') {
+            run_stdin = 1;
+        } else {
+            have_files = 1;
+        }
     }
 
     if (!have_files && !have_eval && !run_stdin) {
