@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "duktape.h"
 #include "linenoise.h"
@@ -198,6 +200,17 @@ static int handle_interactive(duk_context *ctx) {
 }
 
 
+static int handle_file(duk_context *ctx, char* filename) {
+	if (duk_peval_file(ctx, filename) != 0) {
+		print_pop_error(ctx, stderr);
+		return -1;
+	} else {
+		duk_pop(ctx);
+		return 0;
+	}
+}
+
+
 int main(int argc, char *argv[]) {
 	sjs_vm_t* vm = NULL;
 	duk_context *ctx = NULL;
@@ -231,14 +244,15 @@ int main(int argc, char *argv[]) {
 				goto usage;
 			}
 			i++;  /* skip code */
-		} else if (strcmp(arg, "--run-stdin") == 0) {
-			run_stdin = 1;
-		} else if (strlen(arg) >= 1 && arg[0] == '-') {
+		} else if (strlen(arg) > 1 && arg[0] == '-') {
 			goto usage;
+		} else if (strlen(arg) == 1 && arg[0] == '-') {
+			run_stdin = 1;
 		} else {
 			have_files = 1;
 		}
 	}
+
 	if (!have_files && !have_eval && !run_stdin) {
 		interactive = 1;
 	}
@@ -270,24 +284,24 @@ int main(int argc, char *argv[]) {
 			}
 			i++;  /* skip code */
 			continue;
-		} else if (strlen(arg) >= 1 && arg[0] == '-') {
+		} else if (strlen(arg) > 1 && arg[0] == '-') {
 			continue;
+		} else if (strlen(arg) == 1 && arg[0] == '-') {
+			if (handle_stdin(ctx) != 0) {
+				retval = 1;
+				goto cleanup;
+			}
+		} else {
+			if (handle_file(ctx, arg) != 0) {
+				retval = 1;
+				goto cleanup;
+			}
 		}
 
-		if (duk_peval_file(ctx, arg) != 0) {
-			print_pop_error(ctx, stderr);
-			retval = 1;
-			goto cleanup;
-		} else {
-			duk_pop(ctx);
-		}
 	}
 
-	if (run_stdin) {
-		/* Running stdin like a full file (reading all lines before
-		 * compiling) is useful with emduk:
-		 * cat test.js | ./emduk --run-stdin
-		 */
+	if (!isatty(STDIN_FILENO)) {
+		interactive = 0;
 		if (handle_stdin(ctx) != 0) {
 			retval = 1;
 			goto cleanup;
@@ -321,11 +335,10 @@ int main(int argc, char *argv[]) {
 	 */
 
  usage:
-	fprintf(stderr, "Usage: duk [options] [<filenames>]\n"
+	fprintf(stderr, "Usage: duk [options] [<filenames> | -]\n"
 	                "\n"
 	                "   -i                 enter interactive mode after executing argument file(s) / eval code\n"
 	                "   -e CODE            evaluate code\n"
-			"   --run-stdin        treat stdin like a file, i.e. compile full input (not line by line)\n"
 	                "\n"
 	                "If <filename> is omitted, interactive mode is started automatically.\n");
 	fflush(stderr);
