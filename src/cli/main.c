@@ -97,7 +97,7 @@ static int wrapped_compile_execute(duk_context *ctx) {
 	return 0;  /* duk_safe_call() cleans up */
 }
 
-static int handle_fh(duk_context *ctx, FILE *f, const char *filename) {
+static int handle_stdin(duk_context *ctx) {
 	char *buf = NULL;
 	size_t bufsz;
 	size_t bufoff;
@@ -136,7 +136,7 @@ static int handle_fh(duk_context *ctx, FILE *f, const char *filename) {
 		        (void *) buf, (long) bufsz, (long) bufoff, (long) avail);
 #endif
 
-		got = fread((void *) (buf + bufoff), (size_t) 1, avail, f);
+		got = fread((void *) (buf + bufoff), (size_t) 1, avail, stdin);
 #if 0
 		fprintf(stderr, "got=%ld\n", (long) got);
 #endif
@@ -148,7 +148,7 @@ static int handle_fh(duk_context *ctx, FILE *f, const char *filename) {
 
 	duk_push_pointer(ctx, (void *) buf);
 	duk_push_uint(ctx, (duk_uint_t) bufoff);
-	duk_push_string(ctx, filename);
+	duk_push_string(ctx, "stdin");
 
 	interactive_mode = 0;  /* global */
 
@@ -173,7 +173,7 @@ static int handle_fh(duk_context *ctx, FILE *f, const char *filename) {
 	return retval;
 
  error:
-	fprintf(stderr, "error in executing file %s\n", filename);
+	fprintf(stderr, "error executing <stdin>\n");
 	fflush(stderr);
 	goto cleanup;
 }
@@ -329,7 +329,7 @@ int main(int argc, char *argv[]) {
 		 * compiling) is useful with emduk:
 		 * cat test.js | ./emduk --run-stdin
 		 */
-		if (handle_fh(ctx, stdin, "stdin") != 0) {
+		if (handle_stdin(ctx) != 0) {
 			retval = 1;
 			goto cleanup;
 		}
