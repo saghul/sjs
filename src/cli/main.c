@@ -343,9 +343,6 @@ int main(int argc, char *argv[]) {
 			}
 			i++;  /* skip code */
 			continue;
-		} else if (strlen(arg) == 2 && strcmp(arg, "-c") == 0) {
-			i++;  /* skip filename */
-			continue;
 		} else if (strlen(arg) >= 1 && arg[0] == '-') {
 			continue;
 		}
