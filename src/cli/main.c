@@ -19,6 +19,8 @@
     "delete dukVersion;"                                             \
     "delete dukCommit;"
 
+#define SJS_CLI_STDIN_BUF_SIZE    65536
+
 
 static int get_stack_raw(duk_context *ctx) {
     if (!duk_is_object(ctx, -1)) {
@@ -80,18 +82,18 @@ static int wrapped_compile_execute(duk_context *ctx) {
 
 
 static int handle_stdin(duk_context *ctx) {
-    char *buf = NULL;
+    char *buf;
     size_t bufsz;
     size_t bufoff;
     size_t got;
     int rc;
-    int retval = -1;
 
-    buf = (char *) malloc(1024);
+    buf = malloc(SJS_CLI_STDIN_BUF_SIZE);
     if (!buf) {
         goto error;
     }
-    bufsz = 1024;
+
+    bufsz = SJS_CLI_STDIN_BUF_SIZE;
     bufoff = 0;
 
     /* Read until EOF, avoid fseek/stat because it won't work with stdin. */
@@ -100,17 +102,15 @@ static int handle_stdin(duk_context *ctx) {
 
         avail = bufsz - bufoff;
         if (avail < 1024) {
-            size_t newsz;
-            newsz = bufsz + (bufsz >> 2) + 1024;  /* +25% and some extra */
-            buf = (char *) realloc(buf, newsz);
+            bufsz = bufsz + SJS_CLI_STDIN_BUF_SIZE;
+            buf = realloc(buf, bufsz);
             if (!buf) {
                 goto error;
             }
-            bufsz = newsz;
         }
 
         avail = bufsz - bufoff;
-        got = fread((void *) (buf + bufoff), (size_t) 1, avail, stdin);
+        got = fread((void *) (buf + bufoff), 1, avail, stdin);
         if (got == 0) {
             break;
         }
@@ -132,26 +132,18 @@ static int handle_stdin(duk_context *ctx) {
         goto error;
     } else {
         duk_pop(ctx);
-        retval = 0;
+        return 0;
     }
-    /* fall thru */
-
-cleanup:
-    if (buf) {
-        free(buf);
-    }
-    return retval;
 
 error:
     fprintf(stderr, "error executing <stdin>\n");
     fflush(stderr);
-    goto cleanup;
+    return -1;
 }
 
 
 static int handle_eval(duk_context *ctx, char *code) {
     int rc;
-    int retval = -1;
 
     duk_push_false(ctx);
     duk_push_pointer(ctx, (void *) code);
@@ -159,15 +151,13 @@ static int handle_eval(duk_context *ctx, char *code) {
     duk_push_string(ctx, "eval");
 
     rc = duk_safe_call(ctx, wrapped_compile_execute, 4 /*nargs*/, 1 /*nret*/);
-
     if (rc != DUK_EXEC_SUCCESS) {
         print_pop_error(ctx, stderr);
+        return -1;
     } else {
         duk_pop(ctx);
-        retval = 0;
+        return 0;
     }
-
-    return retval;
 }
 
 
