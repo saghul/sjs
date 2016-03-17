@@ -65,3 +65,25 @@ DUK_EXTERNAL void sjs_vm_destroy(sjs_vm_t* vm) {
     }
 }
 
+
+DUK_EXTERNAL void sjs_vm_setup_args(sjs_vm_t* vm, int argc, char* argv[]) {
+    duk_context* ctx = vm->ctx;
+
+    duk_push_global_object(ctx);
+    duk_get_prop_string(ctx, -1, "system");
+    /* -> [ ... global system ] */
+
+    duk_push_array(ctx);
+    /* -> [ ... global system array ] */
+
+    for (int i = 0; i < argc; i++) {
+        duk_push_string(ctx, argv[i]);
+        duk_put_prop_index(ctx, -2, i);
+    }
+
+    duk_put_prop_string(ctx, -2, "argv");
+    /* -> [ ... global system ] */
+
+    duk_pop(ctx);
+    duk_pop(ctx);
+}

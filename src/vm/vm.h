@@ -11,5 +11,6 @@ typedef struct {
 
 DUK_EXTERNAL_DECL sjs_vm_t* sjs_vm_create(void);
 DUK_EXTERNAL_DECL void sjs_vm_destroy(sjs_vm_t* vm);
+DUK_EXTERNAL_DECL void sjs_vm_setup_args(sjs_vm_t* vm, int argc, char* argv[]);
 
 #endif

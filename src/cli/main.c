@@ -248,6 +248,7 @@ int main(int argc, char *argv[]) {
 
     /* Create VM */
     vm = sjs_vm_create();
+    sjs_vm_setup_args(vm, argc, argv);
     ctx = vm->ctx;
 
     /* Execute any argument file(s) */
