@@ -14,6 +14,30 @@ static void sjs__duk_fatal_handler(duk_context *ctx, duk_errcode_t code, const c
 }
 
 
+static void sjs__setup_system_module(sjs_vm_t* vm) {
+    duk_context* ctx = vm->ctx;
+
+    duk_push_global_object(ctx);
+    duk_push_object(ctx);
+    duk_push_object(ctx);
+    /* -> [ ... global obj obj ] */
+
+    duk_push_string(ctx, DUK_GIT_DESCRIBE);
+    /* -> [ ... global obj obj val ] */
+
+    duk_put_prop_string(ctx, -2, "duktape");
+    /* -> [ ... global obj obj ] */
+
+    duk_put_prop_string(ctx, -2, "versions");
+    /* -> [ ... global obj ] */
+
+    duk_put_prop_string(ctx, -2, "system");
+    /* -> [ ... global ] */
+
+    duk_pop(ctx);
+}
+
+
 DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
     sjs_vm_t* vm;
     vm = calloc(1, sizeof(*vm));
@@ -26,6 +50,9 @@ DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
 			      sjs__duk_fatal_handler    /* fatal error handler */
 			     );
     assert(vm->ctx != NULL);
+
+    sjs__setup_system_module(vm);
+
     return vm;
 }
 
