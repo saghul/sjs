@@ -92,7 +92,7 @@ static void sjs__setup_system_module(sjs_vm_t* vm) {
 DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
     sjs_vm_t* vm;
     vm = calloc(1, sizeof(*vm));
-    assert(vm != NULL);
+    assert(vm);
 
     vm->ctx = duk_create_heap(NULL,                     /* alloc function */
 			      NULL,                     /* realloc function */
@@ -110,15 +110,17 @@ DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
 
 
 DUK_EXTERNAL void sjs_vm_destroy(sjs_vm_t* vm) {
-    if (vm != NULL) {
-	duk_destroy_heap(vm->ctx);
-	vm->ctx = NULL;
-	free(vm);
-    }
+    assert(vm);
+
+    duk_destroy_heap(vm->ctx);
+    vm->ctx = NULL;
+    free(vm);
 }
 
 
 DUK_EXTERNAL void sjs_vm_setup_args(sjs_vm_t* vm, int argc, char* argv[]) {
+    assert(vm);
+
     duk_context* ctx = vm->ctx;
 
     duk_push_global_object(ctx);
@@ -142,5 +144,6 @@ DUK_EXTERNAL void sjs_vm_setup_args(sjs_vm_t* vm, int argc, char* argv[]) {
 
 
 DUK_EXTERNAL duk_context* sjs_vm_get_duk_ctx(sjs_vm_t* vm) {
+    assert(vm);
     return vm->ctx;
 }
