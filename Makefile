@@ -15,7 +15,7 @@ $(LIBSJS_LIB): $(LIBSJS_SRC)
 	$(CC) -shared -fPIC $(CFLAGS) -o $@ $^
 
 sjs: $(SJS_CLI_SRCS) $(LIBSJS_LIB)
-	$(CC) -o $@ $(CFLAGS) -Wno-gnu-zero-variadic-macro-arguments -Iinclude $(SJS_CLI_SRCS) $(LDFLAGS) -L. -lsjs
+	$(CC) -o $@ $(CFLAGS) -Iinclude $(SJS_CLI_SRCS) $(LDFLAGS) -L. -lsjs
 
 clean:
 	-rm -f sjs libsjs.so
