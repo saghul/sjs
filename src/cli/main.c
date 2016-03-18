@@ -1,4 +1,5 @@
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -209,40 +210,43 @@ static int handle_file(duk_context *ctx, char* filename) {
 int main(int argc, char *argv[]) {
     sjs_vm_t* vm = NULL;
     duk_context *ctx = NULL;
-    int retval = 0;
-    int have_files = 0;
-    int have_eval = 0;
+    char* run_file = NULL;
+    char* eval_code = NULL;
     int interactive = 0;
     int run_stdin = 0;
-    int i;
+    int retval = 0;
 
     /* Signal handling setup */
     signal(SIGPIPE, SIG_IGN);
 
     /* Parse options */
-    for (i = 1; i < argc; i++) {
+    for (int i = 1; i < argc; i++) {
         char *arg = argv[i];
-        if (!arg) {
-            goto usage;
-        }
+        assert(arg);
         if (strcmp(arg, "-i") == 0) {
             interactive = 1;
+        } else if (strcmp(arg, "-h") == 0) {
+            goto usage;
         } else if (strcmp(arg, "-e") == 0) {
-            have_eval = 1;
             if (i == argc - 1) {
+                retval = 1;
                 goto usage;
             }
-            i++;  /* skip code */
+            eval_code = argv[i + 1];
+            break;
         } else if (strlen(arg) > 1 && arg[0] == '-') {
+            retval = 1;
             goto usage;
-        } else if (strlen(arg) == 1 && arg[0] == '-') {
+        } else if (strcmp(arg, "-") == 0) {
             run_stdin = 1;
+            break;
         } else {
-            have_files = 1;
+            run_file = arg;
+            break;
         }
     }
 
-    if (!have_files && !have_eval && !run_stdin) {
+    if (!run_file && !eval_code && !run_stdin) {
         interactive = 1;
     }
 
@@ -251,35 +255,21 @@ int main(int argc, char *argv[]) {
     sjs_vm_setup_args(vm, argc, argv);
     ctx = vm->ctx;
 
-    /* Execute any argument file(s) */
-    for (i = 1; i < argc; i++) {
-        char *arg = argv[i];
-        if (!arg) {
-            continue;
-        } else if (strlen(arg) == 2 && strcmp(arg, "-e") == 0) {
-            /* Here we know the eval arg exists but check anyway */
-            if (i == argc - 1) {
-                retval = 1;
-                goto cleanup;
-            }
-            if (handle_eval(ctx, argv[i + 1]) != 0) {
-                retval = 1;
-                goto cleanup;
-            }
-            i++;  /* skip code */
-            continue;
-        } else if (strlen(arg) > 1 && arg[0] == '-') {
-            continue;
-        } else if (strlen(arg) == 1 && arg[0] == '-') {
-            if (handle_stdin(ctx) != 0) {
-                retval = 1;
-                goto cleanup;
-            }
-        } else {
-            if (handle_file(ctx, arg) != 0) {
-                retval = 1;
-                goto cleanup;
-            }
+    /* run */
+    if (run_file) {
+        if (handle_file(ctx, run_file) != 0) {
+            retval = 1;
+            goto cleanup;
+        }
+    } else if (run_stdin) {
+        if (handle_stdin(ctx) != 0) {
+            retval = 1;
+            goto cleanup;
+        }
+    } else if (eval_code) {
+        if (handle_eval(ctx, eval_code) != 0) {
+            retval = 1;
+            goto cleanup;
         }
     }
 
@@ -306,12 +296,13 @@ cleanup:
     return retval;
 
 usage:
-    fprintf(stderr, "Usage: duk [options] [<filenames> | -]\n"
+    fprintf(stderr, "Usage: duk [options] [ <code> | <file> | - ]\n"
                     "\n"
+                    "   -h         show help text\n"
                     "   -i         enter interactive mode after executing argument file(s) / eval code\n"
                     "   -e CODE    evaluate code\n"
                     "\n"
-                    "If <filename> is omitted, interactive mode is started automatically.\n");
+                    "If <file> is omitted, interactive mode is started automatically.\n");
     fflush(stderr);
-    exit(1);
+    exit(retval);
 }
