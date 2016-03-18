@@ -1,6 +1,3 @@
-sjs
-!include/sjs/
-libsjs*
-*.dSYM/
+build/
 original/
 *.swp
