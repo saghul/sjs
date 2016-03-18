@@ -3,6 +3,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef __APPLE__
+# include <crt_externs.h>
+# define environ (*_NSGetEnviron())
+#else
+extern char** environ;
+#endif
+
 #include "duktape.h"
 #include "vm.h"
 
@@ -35,6 +42,8 @@ static void sjs__setup_system_module(sjs_vm_t* vm) {
     duk_get_prop_string(ctx, -1, "system");
     /* -> [ ... global system ] */
 
+    /* add the 'versions' object */
+
     duk_push_object(ctx);
     /* -> [ ... global system obj ] */
 
@@ -43,6 +52,31 @@ static void sjs__setup_system_module(sjs_vm_t* vm) {
     /* -> [ ... global system obj ] */
 
     duk_put_prop_string(ctx, -2, "versions");
+    /* -> [ ... global system ] */
+
+    /* add the env object */
+
+    duk_push_object(ctx);
+    /* -> [ ... global system obj ] */
+
+    for (int i = 0; environ[i]; i++) {
+        const char* e = environ[i];
+        const char* ptr = strrchr(e, '=');
+        const char* key;
+        const char* value;
+        if (!ptr) {
+            continue;
+        }
+        key = e;
+        value = ptr + 1;
+
+        duk_push_lstring(ctx, key, (duk_size_t)(ptr - key));
+        duk_push_string(ctx, value);
+        duk_put_prop(ctx, -3);
+    }
+    /* -> [ ... global system obj ] */
+
+    duk_put_prop_string(ctx, -2, "env");
     /* -> [ ... global system ] */
 
     duk_pop(ctx);
