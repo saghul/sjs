@@ -14,6 +14,11 @@ extern char** environ;
 #include "vm.h"
 
 
+struct sjs_vm_t {
+    duk_context* ctx;
+};
+
+
 static void sjs__duk_fatal_handler(duk_context *ctx, duk_errcode_t code, const char *msg) {
     fprintf(stderr, "FATAL %ld: %s\n", (long) code, (const char *) (msg ? msg : "null"));
     fflush(stderr);
@@ -133,4 +138,9 @@ DUK_EXTERNAL void sjs_vm_setup_args(sjs_vm_t* vm, int argc, char* argv[]) {
 
     duk_pop(ctx);
     duk_pop(ctx);
+}
+
+
+DUK_EXTERNAL duk_context* sjs_vm_get_duk_ctx(sjs_vm_t* vm) {
+    return vm->ctx;
 }

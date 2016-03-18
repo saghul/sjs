@@ -253,7 +253,7 @@ int main(int argc, char *argv[]) {
     /* Create VM */
     vm = sjs_vm_create();
     sjs_vm_setup_args(vm, argc, argv);
-    ctx = vm->ctx;
+    ctx = sjs_vm_get_duk_ctx(vm);
 
     /* run */
     if (run_file) {
