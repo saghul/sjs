@@ -9,13 +9,20 @@ CFLAGS += -O2 -g -pedantic -std=c99 -Wall -fstrict-aliasing -fno-omit-frame-poin
 CFLAGS += -Iinclude/sjs
 LDFLAGS	+= -lm
 
+UNAME := $(shell uname -s)
+ifeq ($(UNAME), Darwin)
+EXTRA_CFLAGS =
+else
+EXTRA_CFLAGS = -Wl,-rpath='$$ORIGIN'
+endif
+
 all: sjs
 
 $(LIBSJS_LIB): $(LIBSJS_SRC)
 	$(CC) -shared -fPIC $(CFLAGS) -o $@ $^
 
 sjs: $(SJS_CLI_SRCS) $(LIBSJS_LIB)
-	$(CC) -o $@ $(CFLAGS) -D_GNU_SOURCE -Iinclude -Wl,-rpath='$$ORIGIN' $(SJS_CLI_SRCS) $(LDFLAGS) -L. -lsjs
+	$(CC) -o $@ $(CFLAGS) $(EXTRA_CFLAGS) -D_GNU_SOURCE -Iinclude $(SJS_CLI_SRCS) $(LDFLAGS) -L. -lsjs
 
 clean:
 	-rm -f sjs libsjs.so
