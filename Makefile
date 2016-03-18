@@ -15,7 +15,7 @@ $(LIBSJS_LIB): $(LIBSJS_SRC)
 	$(CC) -shared -fPIC $(CFLAGS) -o $@ $^
 
 sjs: $(SJS_CLI_SRCS) $(LIBSJS_LIB)
-	$(CC) -o $@ $(CFLAGS) -D_GNU_SOURCE -Iinclude $(SJS_CLI_SRCS) $(LDFLAGS) -L. -lsjs
+	$(CC) -o $@ $(CFLAGS) -D_GNU_SOURCE -Iinclude -Wl,-rpath='$$ORIGIN' $(SJS_CLI_SRCS) $(LDFLAGS) -L. -lsjs
 
 clean:
 	-rm -f sjs libsjs.so
