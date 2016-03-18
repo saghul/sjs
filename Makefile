@@ -1,5 +1,5 @@
 
-LIBSJS_SRC = src/vm/duktape.c src/vm/vm.c src/version.c
+LIBSJS_SRC = src/duktape.c src/vm.c src/version.c
 LIBSJS_LIB = libsjs.so
 
 SJS_CLI_SRCS = $(wildcard src/cli/*.c)
