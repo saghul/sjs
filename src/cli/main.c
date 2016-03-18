@@ -7,9 +7,8 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "duktape.h"
 #include "linenoise.h"
-#include "vm.h"
+#include "sjs/sjs.h"
 
 
 #define GREET_CODE                                                   \
