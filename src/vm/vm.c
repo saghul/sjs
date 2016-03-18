@@ -12,6 +12,7 @@ extern char** environ;
 
 #include "duktape.h"
 #include "vm.h"
+#include "version.h"
 
 
 struct sjs_vm_t {
@@ -54,6 +55,8 @@ static void sjs__setup_system_module(sjs_vm_t* vm) {
 
     duk_push_string(ctx, DUK_GIT_DESCRIBE);
     duk_put_prop_string(ctx, -2, "duktape");
+    duk_push_string(ctx, sjs_version());
+    duk_put_prop_string(ctx, -2, "sjs");
     /* -> [ ... global system obj ] */
 
     duk_put_prop_string(ctx, -2, "versions");

@@ -4,5 +4,6 @@
 
 #include "duktape.h"
 #include "vm.h"
+#include "version.h"
 
 #endif

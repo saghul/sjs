@@ -12,12 +12,8 @@
 
 
 #define GREET_CODE                                                   \
-    "print('Welcome to Skookum JS');"                                \
-    "var dukVersion = '" DUK_GIT_DESCRIBE "';"                       \
-    "var dukCommit = '" DUK_GIT_COMMIT "'.substr(0, 7);"             \
-    "print('[Duktape ' + dukVersion + ' (' + dukCommit + ')]');"     \
-    "delete dukVersion;"                                             \
-    "delete dukCommit;"
+    "print('Skookum JS ' + system.versions.sjs);"                    \
+    "print('[Duktape ' + system.versions.duktape + ']');"
 
 #define SJS_CLI_STDIN_BUF_SIZE    65536
 
