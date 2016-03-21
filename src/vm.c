@@ -45,50 +45,50 @@ static void sjs__create_system_module(sjs_vm_t* vm) {
 static void sjs__setup_system_module(sjs_vm_t* vm) {
     duk_context* ctx = vm->ctx;
 
-    duk_push_global_object(ctx);
-    duk_get_prop_string(ctx, -1, "system");
-    /* -> [ ... global system ] */
+    duk_get_global_string(ctx, "system");
+    /* -> [ ... system ] */
 
-    /* add the 'versions' object */
+    /* system.versions */
+    {
+	duk_push_object(ctx);
+	/* -> [ ... system obj ] */
 
-    duk_push_object(ctx);
-    /* -> [ ... global system obj ] */
+	duk_push_string(ctx, DUK_GIT_DESCRIBE);
+	duk_put_prop_string(ctx, -2, "duktape");
+	duk_push_string(ctx, sjs_version());
+	duk_put_prop_string(ctx, -2, "sjs");
+	/* -> [ ... system obj ] */
 
-    duk_push_string(ctx, DUK_GIT_DESCRIBE);
-    duk_put_prop_string(ctx, -2, "duktape");
-    duk_push_string(ctx, sjs_version());
-    duk_put_prop_string(ctx, -2, "sjs");
-    /* -> [ ... global system obj ] */
-
-    duk_put_prop_string(ctx, -2, "versions");
-    /* -> [ ... global system ] */
-
-    /* add the env object */
-
-    duk_push_object(ctx);
-    /* -> [ ... global system obj ] */
-
-    for (int i = 0; environ[i]; i++) {
-        const char* e = environ[i];
-        const char* ptr = strrchr(e, '=');
-        const char* key;
-        const char* value;
-        if (!ptr) {
-            continue;
-        }
-        key = e;
-        value = ptr + 1;
-
-        duk_push_lstring(ctx, key, (duk_size_t)(ptr - key));
-        duk_push_string(ctx, value);
-        duk_put_prop(ctx, -3);
+	duk_put_prop_string(ctx, -2, "versions");
+	/* -> [ ... system ] */
     }
-    /* -> [ ... global system obj ] */
 
-    duk_put_prop_string(ctx, -2, "env");
-    /* -> [ ... global system ] */
+    /* system.env */
+    {
+	duk_push_object(ctx);
+	/* -> [ ... system obj ] */
 
-    duk_pop(ctx);
+	for (int i = 0; environ[i]; i++) {
+	    const char* e = environ[i];
+	    const char* ptr = strrchr(e, '=');
+	    const char* key;
+	    const char* value;
+	    if (!ptr) {
+		continue;
+	    }
+	    key = e;
+	    value = ptr + 1;
+
+	    duk_push_lstring(ctx, key, (duk_size_t)(ptr - key));
+	    duk_push_string(ctx, value);
+	    duk_put_prop(ctx, -3);
+	}
+	/* -> [ ... system obj ] */
+
+	duk_put_prop_string(ctx, -2, "env");
+	/* -> [ ... system ] */
+    }
+
     duk_pop(ctx);
 }
 
@@ -163,30 +163,33 @@ DUK_EXTERNAL void sjs_vm_setup_args(sjs_vm_t* vm, int argc, char* argv[]) {
 
     duk_context* ctx = vm->ctx;
 
-    duk_push_global_object(ctx);
-    duk_get_prop_string(ctx, -1, "system");
-    /* -> [ ... global system ] */
+    duk_get_global_string(ctx, "system");
 
-    duk_push_array(ctx);
-    /* -> [ ... global system array ] */
+    /* system.argv */
+    {
+	duk_push_array(ctx);
+	/* -> [ ... system array ] */
 
-    for (int i = 0; i < argc; i++) {
-        duk_push_string(ctx, argv[i]);
-        duk_put_prop_index(ctx, -2, i);
+	for (int i = 0; i < argc; i++) {
+	    duk_push_string(ctx, argv[i]);
+	    duk_put_prop_index(ctx, -2, i);
+	}
+
+	duk_put_prop_string(ctx, -2, "argv");
+	/* -> [ ... system ] */
     }
 
-    duk_put_prop_string(ctx, -2, "argv");
-    /* -> [ ... global system ] */
+    /* system.exe */
+    {
+	char* executable = realpath(argv[0], NULL);
+	assert(executable);
+	duk_push_string(ctx,executable);
+	/* -> [ ... global system string ] */
 
-    char* executable = realpath(argv[0], NULL);
-    assert(executable);
-    duk_push_string(ctx,executable);
-    /* -> [ ... global system string ] */
+	duk_put_prop_string(ctx, -2, "exe");
+	/* -> [ ... global system ] */
+    }
 
-    duk_put_prop_string(ctx, -2, "exe");
-    /* -> [ ... global system ] */
-
-    duk_pop(ctx);
     duk_pop(ctx);
 }
 
