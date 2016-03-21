@@ -8,6 +8,7 @@ set(CMAKE_C_FLAGS "-O2 -g -pedantic -std=c99 -Wall -fstrict-aliasing -fno-omit-f
 #
 add_library(sjs SHARED
     src/duktape.c
+    src/modules.c
     src/vm.c
     src/version.c
 )

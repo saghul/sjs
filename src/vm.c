@@ -13,6 +13,7 @@ extern char** environ;
 #include "duktape.h"
 #include "vm.h"
 #include "version.h"
+#include "internal.h"
 
 
 struct sjs_vm_t {
@@ -100,7 +101,19 @@ static duk_ret_t sjs__modsearch(duk_context* ctx) {
      * 3: module
      */
 
-    duk_error(ctx, DUK_ERR_ERROR, "Module %s not found", duk_get_string(ctx, 0));
+    ssize_t len;
+    char* data;
+    const char* filename;
+
+    filename = duk_get_string(ctx, 0);
+    len = sjs__read_file(filename, &data);
+    if (len < 0) {
+	duk_error(ctx, DUK_ERR_ERROR, "Module %s not found", filename);
+	return 0;
+    }
+
+    duk_push_lstring(ctx, data, len);
+    return 1;
 }
 
 
