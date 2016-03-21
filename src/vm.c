@@ -92,6 +92,28 @@ static void sjs__setup_system_module(sjs_vm_t* vm) {
 }
 
 
+static duk_ret_t sjs__modsearch(duk_context* ctx) {
+    /* nargs is 4:
+     * 0: id
+     * 1: require
+     * 2: exports
+     * 3: module
+     */
+
+    duk_error(ctx, DUK_ERR_ERROR, "Module %s not found", duk_get_string(ctx, 0));
+}
+
+
+static void sjs__setup_modsearch(sjs_vm_t* vm) {
+    duk_context* ctx = vm->ctx;
+
+    duk_get_global_string(ctx, "Duktape");
+    duk_push_c_function(ctx, sjs__modsearch, 4 /* nargs */);
+    duk_put_prop_string(ctx, -2, "modSearch");
+    duk_pop(ctx);
+}
+
+
 DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
     sjs_vm_t* vm;
     vm = calloc(1, sizeof(*vm));
@@ -107,6 +129,8 @@ DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
 
     sjs__create_system_module(vm);
     sjs__setup_system_module(vm);
+
+    sjs__setup_modsearch(vm);
 
     return vm;
 }
