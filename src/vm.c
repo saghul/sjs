@@ -178,6 +178,14 @@ DUK_EXTERNAL void sjs_vm_setup_args(sjs_vm_t* vm, int argc, char* argv[]) {
     duk_put_prop_string(ctx, -2, "argv");
     /* -> [ ... global system ] */
 
+    char* executable = realpath(argv[0], NULL);
+    assert(executable);
+    duk_push_string(ctx,executable);
+    /* -> [ ... global system string ] */
+
+    duk_put_prop_string(ctx, -2, "exe");
+    /* -> [ ... global system ] */
+
     duk_pop(ctx);
     duk_pop(ctx);
 }

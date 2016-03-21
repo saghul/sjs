@@ -17,6 +17,10 @@ target_include_directories(sjs
     PUBLIC ${CMAKE_SOURCE_DIR}/include/sjs
 )
 
+set_target_properties(sjs
+    PROPERTIES COMPILE_DEFINITIONS "_XOPEN_SOURCE=500"
+)
+
 
 # sjs
 #
