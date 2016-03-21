@@ -93,31 +93,6 @@ static void sjs__setup_system_module(sjs_vm_t* vm) {
 }
 
 
-static duk_ret_t sjs__modsearch(duk_context* ctx) {
-    /* nargs is 4:
-     * 0: id
-     * 1: require
-     * 2: exports
-     * 3: module
-     */
-
-
-    ssize_t len;
-    char* data;
-    const char* filename;
-
-    filename = duk_get_string(ctx, 0);
-    len = sjs__read_file(filename, &data);
-    if (len < 0) {
-        duk_error(ctx, DUK_ERR_ERROR, "Module %s not found", filename);
-        return 0;
-    }
-
-    duk_push_lstring(ctx, data, len);
-    return 1;
-}
-
-
 static void sjs__setup_modsearch(sjs_vm_t* vm) {
     duk_context* ctx = vm->ctx;
 
