@@ -194,7 +194,14 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
         } else {
             struct stat st;
             if (stat(tmp, &st) != 0) {
-                continue;
+                /* try to add .js and load it */
+                strcat(tmp, ".js");
+                len = read_file(tmp, &data);
+                if (len < 0) {
+                    continue;
+                }
+                found = 1;
+                break;
             }
             if (S_ISDIR(st.st_mode)) {
                 /* it's a directory, try to add /index.js */
