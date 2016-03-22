@@ -151,6 +151,20 @@ static void sjs__setup_modsearch(sjs_vm_t* vm) {
 }
 
 
+static void sjs__setup_global_module(sjs_vm_t* vm) {
+    duk_context* ctx = vm->ctx;
+
+    duk_push_global_object(ctx);
+    duk_dup_top(ctx);
+    /* -> [ ... global global ] */
+
+    duk_put_prop_string(ctx, -2, "global");
+    /* -> [ ... global ] */
+
+    duk_pop(ctx);
+}
+
+
 DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
     sjs_vm_t* vm;
     vm = calloc(1, sizeof(*vm));
@@ -166,6 +180,8 @@ DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
 
     sjs__create_system_module(vm);
     sjs__setup_system_module(vm);
+
+    sjs__setup_global_module(vm);
 
     sjs__setup_modsearch(vm);
 
