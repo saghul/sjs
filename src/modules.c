@@ -17,7 +17,7 @@ static const char* default_search_paths[] = {
     "./modules",
     "/usr/lib/sjs/modules",
     "/usr/local/lib/sjs/modules",
-    "~saghul/.local/sjs/modules",
+    "~/.local/sjs/modules",
     NULL
 };
 
