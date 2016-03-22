@@ -38,22 +38,12 @@ static void sjs__duk_fatal_handler(duk_context *ctx, duk_errcode_t code, const c
 }
 
 
-static void sjs__create_system_module(sjs_vm_t* vm) {
-    duk_context* ctx = vm->ctx;
-
-    duk_push_global_object(ctx);
-    duk_push_object(ctx);
-    /* -> [ ... global obj ] */
-
-    duk_put_prop_string(ctx, -2, "system");
-    /* -> [ ... global ] */
-
-    duk_pop(ctx);
-}
-
-
 static void sjs__setup_system_module(sjs_vm_t* vm) {
     duk_context* ctx = vm->ctx;
+
+    /* create system module */
+    duk_push_object(ctx);
+    duk_put_global_string(ctx, "system");
 
     duk_get_global_string(ctx, "system");
     /* -> [ ... system ] */
@@ -155,13 +145,7 @@ static void sjs__setup_global_module(sjs_vm_t* vm) {
     duk_context* ctx = vm->ctx;
 
     duk_push_global_object(ctx);
-    duk_dup_top(ctx);
-    /* -> [ ... global global ] */
-
-    duk_put_prop_string(ctx, -2, "global");
-    /* -> [ ... global ] */
-
-    duk_pop(ctx);
+    duk_put_global_string(ctx, "global");
 }
 
 
@@ -178,11 +162,8 @@ DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
                              );
     assert(vm->ctx != NULL);
 
-    sjs__create_system_module(vm);
     sjs__setup_system_module(vm);
-
     sjs__setup_global_module(vm);
-
     sjs__setup_modsearch(vm);
 
     return vm;
