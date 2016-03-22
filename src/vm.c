@@ -21,6 +21,16 @@ struct sjs_vm_t {
 };
 
 
+static const char* default_search_paths[] = {
+    ".",
+    "./modules",
+    "/usr/lib/sjs/modules",
+    "/usr/local/lib/sjs/modules",
+    "~/.local/sjs/modules",
+    NULL
+};
+
+
 static void sjs__duk_fatal_handler(duk_context *ctx, duk_errcode_t code, const char *msg) {
     fprintf(stderr, "FATAL %ld: %s\n", (long) code, (const char *) (msg ? msg : "null"));
     fflush(stderr);
@@ -86,6 +96,44 @@ static void sjs__setup_system_module(sjs_vm_t* vm) {
         /* -> [ ... system obj ] */
 
         duk_put_prop_string(ctx, -2, "env");
+        /* -> [ ... system ] */
+    }
+
+    /* system.path */
+    {
+        int i = 0;
+        duk_push_array(ctx);
+        /* -> [ ... system array ] */
+
+        /* path specified by env variable */
+        {
+            char* sjs_path = getenv("SJS_PATH");
+            if (sjs_path) {
+                char* token;
+                char* saveptr;
+                token = strtok_r(sjs_path, ":", &saveptr);
+                for (;;) {
+                    if (!token) {
+                        break;
+                    }
+                    duk_push_string(ctx, token);
+                    duk_put_prop_index(ctx, -2, i);
+                    i++;
+                    token = strtok_r(NULL, ":", &saveptr);
+                }
+            }
+        }
+
+        /* default search paths */
+        {
+            for (int j = 0; default_search_paths[j]; j++) {
+                duk_push_string(ctx, default_search_paths[j]);
+                duk_put_prop_index(ctx, -2, i);
+                i++;
+            }
+        }
+
+        duk_put_prop_string(ctx, -2, "path");
         /* -> [ ... system ] */
     }
 

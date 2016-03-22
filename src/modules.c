@@ -12,16 +12,6 @@
 #include "duktape.h"
 
 
-static const char* default_search_paths[] = {
-    ".",
-    "./modules",
-    "/usr/lib/sjs/modules",
-    "/usr/local/lib/sjs/modules",
-    "~/.local/sjs/modules",
-    NULL
-};
-
-
 static ssize_t read_file(const char* path, char** data) {
     FILE* f;
     long fsize;
@@ -179,8 +169,16 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
     len = -1;
     filename = duk_get_string(ctx, 0);
 
-    for (int i = 0; default_search_paths[i]; i++) {
-        const char* path = default_search_paths[i];
+    /* iterate over system.path */
+    duk_get_global_string(ctx, "system");
+    duk_get_prop_string(ctx, -1, "path");
+    duk_remove(ctx, -2);
+    duk_enum(ctx, -1, DUK_ENUM_ARRAY_INDICES_ONLY | DUK_ENUM_SORT_ARRAY_INDICES);
+    /* [ ... path enum ] */
+
+    while (duk_next(ctx, -1, 1)) {
+        const char* path = duk_get_string(ctx, -1);
+        duk_pop_2(ctx);    /* pop key and value off the stack */
 
         if (normalize_path(path, filename, tmp) < 0) {
             continue;
@@ -212,6 +210,8 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
             }
         }
     }
+
+    duk_pop_2(ctx);    /* pop the enum and path off the stack */
 
     if (found) {
         duk_push_lstring(ctx, data, len);
