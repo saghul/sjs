@@ -11,9 +11,11 @@
 #include "sjs/sjs.h"
 
 
-#define GREET_CODE                                                   \
-    "print('Skookum JS ' + system.versions.sjs);"                    \
-    "print('[Duktape ' + system.versions.duktape + ']');"
+#define SJS__CLI_GREET_CODE                                          \
+    "(function() {                                                   \
+        print('Skookum JS ' + system.versions.sjs);                  \
+        print('[Duktape ' + system.versions.duktape + ']');          \
+    })();"
 
 #define SJS_CLI_STDIN_BUF_SIZE    65536
 
@@ -162,8 +164,7 @@ static int handle_interactive(duk_context *ctx) {
     char* line;
     int rc;
 
-    duk_eval_string(ctx, GREET_CODE);
-    duk_pop(ctx);
+    duk_eval_string_noresult(ctx, SJS__CLI_GREET_CODE);
 
     while((line = linenoise(prompt)) != NULL) {
         if (line[0] != '\0') {
