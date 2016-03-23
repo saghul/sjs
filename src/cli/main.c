@@ -11,11 +11,11 @@
 #include "sjs/sjs.h"
 
 
-#define SJS__CLI_GREET_CODE                                          \
-    "(function() {                                                   \
-        print('Skookum JS ' + system.versions.sjs);                  \
-        print('[Duktape ' + system.versions.duktape + ']');          \
-    })();"
+static const char* SJS__CLI_GREET_CODE =
+    "(function() {"
+    "    print('Skookum JS ' + system.versions.sjs);\n"
+    "    print('[Duktape ' + system.versions.duktape + ']');\n"
+    "})();";
 
 #define SJS_CLI_STDIN_BUF_SIZE    65536
 

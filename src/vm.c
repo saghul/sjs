@@ -21,6 +21,13 @@ struct sjs_vm_t {
 };
 
 
+static const char* SJS__BOOTSTRAP_CODE =
+    "(function() { \n"
+    "    // the _es6 module operates on globals \n"
+    "    require('_es6');\n"
+    "})();";
+
+
 static const char* default_search_paths[] = {
     ".",
     "./modules",
@@ -162,9 +169,13 @@ DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
                              );
     assert(vm->ctx != NULL);
 
+    /* setup builtin modules */
     sjs__setup_system_module(vm);
     sjs__setup_global_module(vm);
     sjs__setup_modsearch(vm);
+
+    /* run bootstrap code*/
+    duk_eval_string_noresult(vm->ctx, SJS__BOOTSTRAP_CODE);
 
     return vm;
 }
