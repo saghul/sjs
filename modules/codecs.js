@@ -1,15 +1,15 @@
 'use strict';
 
 var encoders = {
-    'base64': Duktape.enc.bind(global, 'base64'),
-    'hex': Duktape.enc.bind(global, 'hex'),
+    'base64': Duktape.enc.bind(Duktape, 'base64'),
+    'hex': Duktape.enc.bind(Duktape, 'hex'),
     'json': JSON.stringify
 };
 
 
-var decoders {
-    'base64': Duktape.dec.bind(global, 'base64'),
-    'hex': Duktape.dec.bind(global, 'hex'),
+var decoders = {
+    'base64': Duktape.dec.bind(Duktape, 'base64'),
+    'hex': Duktape.dec.bind(Duktape, 'hex'),
     'json': JSON.parse
 };
 
