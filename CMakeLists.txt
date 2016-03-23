@@ -41,12 +41,9 @@ target_include_directories(sjs_cli
     PRIVATE ${CMAKE_SOURCE_DIR}/include
 )
 
-set_target_properties(sjs_cli
-    PROPERTIES COMPILE_DEFINITIONS "_GNU_SOURCE"
-)
-
-set_target_properties(sjs_cli
-    PROPERTIES OUTPUT_NAME "sjs"
+set_target_properties(sjs_cli PROPERTIES
+    OUTPUT_NAME "sjs"
+    COMPILE_DEFINITIONS "_GNU_SOURCE"
 )
 
 target_link_libraries(sjs_cli
