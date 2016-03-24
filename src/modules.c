@@ -1,5 +1,6 @@
 
 #include <assert.h>
+#include <dlfcn.h>
 #include <errno.h>
 #include <pwd.h>
 #include <stdio.h>
@@ -10,6 +11,9 @@
 
 #include "internal.h"
 #include "duktape.h"
+
+
+typedef duk_ret_t (*sjs_mod_init_f)(duk_context*);
 
 
 static ssize_t read_file(const char* path, char** data) {
@@ -47,6 +51,31 @@ static ssize_t read_file(const char* path, char** data) {
 
     fclose(f);
     return fsize;
+}
+
+
+/*
+ * Load a jsdll addon located at 'path'. If successful it puts the exported object
+ * on top of the value stack.
+ *
+ * TODO: keep track of the loaded modules to dlclose() them on shutdown.
+ */
+static int load_jsdll(duk_context* ctx, const char* path) {
+    void* lib = dlopen(path, RTLD_NOW|RTLD_LOCAL);
+    if (lib) {
+        sjs_mod_init_f mod_init;
+        *(void**)(&mod_init) = dlsym(lib, "sjs_mod_init");
+        if (mod_init) {
+            duk_push_c_function(ctx, mod_init, 1 /*nargs*/);
+            duk_call(ctx, 0);
+            return 0;
+        } else {
+            dlclose(lib);
+            return -1;
+        }
+    } else {
+        return -1;
+    }
 }
 
 
@@ -162,9 +191,11 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
     char* data;
     const char* filename;
     char tmp[8192];
-    int found;
+    int found_js;
+    int found_jsdll;
 
-    found = 0;
+    found_js = 0;
+    found_jsdll = 0;
     data = NULL;
     len = -1;
     filename = duk_get_string(ctx, 0);
@@ -177,6 +208,7 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
     /* [ ... path enum ] */
 
     while (duk_next(ctx, -1, 1)) {
+        struct stat st;
         const char* path = duk_get_string(ctx, -1);
         duk_pop_2(ctx);    /* pop key and value off the stack */
 
@@ -184,47 +216,71 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
             continue;
         }
 
-        if (str_endswith(tmp, ".js")) {
-            len = read_file(tmp, &data);
-            if (len < 0) {
-                continue;
-            }
-            found = 1;
-            break;
-        } else {
-            struct stat st;
-            if (stat(tmp, &st) != 0) {
-                /* try to add .js and load it */
-                strcat(tmp, ".js");
-                len = read_file(tmp, &data);
-                if (len < 0) {
+        if (stat(tmp, &st) == 0) {
+            /* path exists, check if file or directory */
+            if (S_ISREG(st.st_mode)) {
+                /* file, check if .js or .jsdll */
+                if (str_endswith(tmp, ".js")) {
+                    len = read_file(tmp, &data);
+                    if (len < 0) {
+                        continue;
+                    }
+                    found_js = 1;
+                    break;
+                } else if (str_endswith(tmp, ".jsdll")) {
+                    if (load_jsdll(ctx, tmp) == 0) {
+                        found_jsdll = 1;
+                        break;
+                    }
+                } else {
                     continue;
                 }
-                found = 1;
-                break;
-            }
-            if (S_ISDIR(st.st_mode)) {
-                /* it's a directory, try to add /index.js */
+            } else if (S_ISDIR(st.st_mode)) {
+                /* directory, check for index.js or index.jsdll */
                 path_join(tmp, "index.js");
                 len = read_file(tmp, &data);
                 if (len < 0) {
+                    /* no index.js, try index.jsdll */
+                    strcat(tmp, "dll");
+                    if (load_jsdll(ctx, tmp) == 0) {
+                        found_jsdll = 1;
+                        break;
+                    }
                     continue;
                 }
-                found = 1;
+                found_js = 1;
                 break;
-            } else {
+            }
+        } else {
+            /* path doesn't exist, try to add .js or .jsdll */
+            strcat(tmp, ".js");
+            len = read_file(tmp, &data);
+            if (len < 0) {
+                /* no index.js, try index.jsdll */
+                strcat(tmp, "dll");
+                if (load_jsdll(ctx, tmp) == 0) {
+                    found_jsdll = 1;
+                    break;
+                }
                 continue;
             }
+            found_js = 1;
+            break;
         }
     }
 
-    duk_pop_2(ctx);    /* pop the enum and path off the stack */
-
-    if (found) {
+    if (found_js) {
+        duk_pop_2(ctx);    /* pop the enum and path off the stack */
         duk_push_lstring(ctx, data, len);
         free(data);
         return 1;
+    } else if (found_jsdll) {
+        /* the top of the stack has the exports object */
+        duk_put_prop_string(ctx, 3 /*idx of 'module'*/, "exports");
+        duk_pop_2(ctx);    /* pop the enum and path off the stack */
+        return 0;
     } else {
+        duk_pop_2(ctx);    /* pop the enum and path off the stack */
         duk_error(ctx, DUK_ERR_ERROR, "Module '%s' not found", filename);
         /* duk_error doesn't return */
         return -42;

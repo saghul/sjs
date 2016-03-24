@@ -4,6 +4,8 @@ project(sjs)
 
 set(CMAKE_C_FLAGS "-O2 -g -pedantic -std=c99 -Wall -fstrict-aliasing -fno-omit-frame-pointer")
 
+include_directories(${CMAKE_SOURCE_DIR}/include)
+
 # libsjs
 #
 add_library(sjs SHARED
@@ -14,7 +16,7 @@ add_library(sjs SHARED
 )
 
 target_include_directories(sjs
-    PUBLIC ${CMAKE_SOURCE_DIR}/include/sjs
+    PRIVATE ${CMAKE_SOURCE_DIR}/include/sjs
 )
 
 set_target_properties(sjs
@@ -37,10 +39,6 @@ add_executable(sjs_cli
     src/cli/main.c
 )
 
-target_include_directories(sjs_cli
-    PRIVATE ${CMAKE_SOURCE_DIR}/include
-)
-
 set_target_properties(sjs_cli PROPERTIES
     OUTPUT_NAME "sjs"
     COMPILE_DEFINITIONS "_GNU_SOURCE"
@@ -50,3 +48,20 @@ target_link_libraries(sjs_cli
     sjs
     m
 )
+
+
+# modules
+#
+
+# path
+add_library(_path MODULE
+    modules/_path.c
+)
+target_link_libraries(_path
+    sjs
+)
+set_target_properties(_path PROPERTIES
+    PREFIX ""
+    SUFFIX ".jsdll"
+)
+
