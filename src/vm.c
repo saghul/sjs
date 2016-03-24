@@ -21,11 +21,15 @@ struct sjs_vm_t {
 };
 
 
-static const char* SJS__BOOTSTRAP_CODE =
-    "(function() { \n"
-    "    // the _es6 module operates on globals \n"
-    "    require('_es6');\n"
-    "})();";
+/* generated from src/bootstrap.js */
+static const char SJS__BOOTSTRAP_CODE[] = {
+    40, 102, 117, 110, 99, 116, 105, 111, 110, 40, 41, 32, 123, 10, 32,
+    32, 32, 32, 47, 47, 32, 116, 104, 101, 32, 95, 101, 115, 54, 32,
+    109, 111, 100, 117, 108, 101, 32, 111, 112, 101, 114, 97, 116, 101,
+    115, 32, 111, 110, 32, 103, 108, 111, 98, 97, 108, 115, 10, 32, 32,
+    32, 32, 114, 101, 113, 117, 105, 114, 101, 40, 39, 95, 101, 115, 54,
+    39, 41, 59, 10, 125, 41, 40, 41, 59, 10, 0
+};
 
 
 static const char* default_search_paths[] = {
