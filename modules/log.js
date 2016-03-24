@@ -20,11 +20,13 @@ function getLogger(name) {
 }
 
 
-module.exports.defaultLogger = defaultLogger;
-module.exports.getLogger = getLogger;
-module.exports.trace = Logger.prototype.trace.bind(defaultLogger);
-module.exports.debug = Logger.prototype.debug.bind(defaultLogger);
-module.exports.info = Logger.prototype.info.bind(defaultLogger);
-module.exports.warn = Logger.prototype.warn.bind(defaultLogger);
-module.exports.error = Logger.prototype.error.bind(defaultLogger);
-module.exports.fatal = Logger.prototype.fatal.bind(defaultLogger);
+module.exports = {
+    defaultLogger: defaultLogger,
+    getLogger: getLogger,
+    trace: Logger.prototype.trace.bind(defaultLogger),
+    debug: Logger.prototype.debug.bind(defaultLogger),
+    info: Logger.prototype.info.bind(defaultLogger),
+    warn: Logger.prototype.warn.bind(defaultLogger),
+    error: Logger.prototype.error.bind(defaultLogger),
+    fatal: Logger.prototype.fatal.bind(defaultLogger)
+};
