@@ -1,7 +1,5 @@
 'use strict';
 
-require('es6');
-
 var Logger = Duktape.Logger;
 var loggers = new Map();
 var defaultLogger = getLogger('sjs');
