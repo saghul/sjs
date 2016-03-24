@@ -134,6 +134,18 @@ static void sjs__setup_system_module(sjs_vm_t* vm) {
         /* -> [ ... system ] */
     }
 
+    /* system.arch */
+    {
+        duk_push_string(ctx, DUK_USE_ARCH_STRING);
+        duk_put_prop_string(ctx, -2, "arch");
+    }
+
+    /* system.platform */
+    {
+        duk_push_string(ctx, DUK_USE_OS_STRING);
+        duk_put_prop_string(ctx, -2, "platform");
+    }
+
     duk_pop(ctx);
 }
 
