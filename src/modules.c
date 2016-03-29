@@ -189,7 +189,7 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
 
     ssize_t len;
     char* data;
-    const char* filename;
+    const char* id;
     char tmp[8192];
     int found_js;
     int found_jsdll;
@@ -198,7 +198,7 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
     found_jsdll = 0;
     data = NULL;
     len = -1;
-    filename = duk_get_string(ctx, 0);
+    id = duk_get_string(ctx, 0);
 
     /* iterate over system.path */
     duk_get_global_string(ctx, "system");
@@ -212,7 +212,7 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
         const char* path = duk_get_string(ctx, -1);
         duk_pop_2(ctx);    /* pop key and value off the stack */
 
-        if (normalize_path(path, filename, tmp) < 0) {
+        if (normalize_path(path, id, tmp) < 0) {
             continue;
         }
 
@@ -281,7 +281,7 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
         return 0;
     } else {
         duk_pop_2(ctx);    /* pop the enum and path off the stack */
-        duk_error(ctx, DUK_ERR_ERROR, "Module '%s' not found", filename);
+        duk_error(ctx, DUK_ERR_ERROR, "Module '%s' not found", id);
         /* duk_error doesn't return */
         return -42;
     }
