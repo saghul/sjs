@@ -248,6 +248,14 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
                     }
                     continue;
                 }
+                /* fix require.id */
+                {
+                    char tmpid[1024];
+                    snprintf(tmpid, sizeof(tmpid), "%s/index", id);
+                    duk_push_string(ctx, "id");
+                    duk_push_string(ctx, tmpid);
+                    duk_def_prop(ctx, 1 /* index of 'require' */, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_FORCE);
+                }
                 found_js = 1;
                 break;
             }
