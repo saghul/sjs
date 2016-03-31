@@ -77,3 +77,5 @@ install(DIRECTORY modules
 # path
 include(modules/path.cmake)
 
+# errno
+include(modules/errno.cmake)
