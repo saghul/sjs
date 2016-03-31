@@ -75,14 +75,5 @@ install(DIRECTORY modules
 #
 
 # path
-add_library(_path MODULE
-    modules/_path.c
-)
-target_link_libraries(_path
-    sjs
-)
-set_target_properties(_path PROPERTIES
-    PREFIX ""
-    SUFFIX ".jsdll"
-)
+include(modules/path.cmake)
 
