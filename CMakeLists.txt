@@ -28,7 +28,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
         MACOSX_RPATH                ON
         BUILD_WITH_INSTALL_RPATH    1
         INSTALL_NAME_DIR            "@rpath"
-)
+    )
 endif()
 
 
@@ -53,6 +53,23 @@ if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
         dl
     )
 endif()
+
+
+# install target
+#
+
+install(TARGETS sjs sjs_cli
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib)
+
+install(DIRECTORY include/sjs
+        DESTINATION include)
+
+install(DIRECTORY modules
+        DESTINATION lib/sjs
+        PATTERN "*.c" EXCLUDE
+        PATTERN "*.h" EXCLUDE
+        PATTERN "*.swp" EXCLUDE)
 
 # modules
 #
