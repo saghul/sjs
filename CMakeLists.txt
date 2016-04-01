@@ -79,3 +79,6 @@ include(modules/path.cmake)
 
 # errno
 include(modules/errno.cmake)
+
+# net
+include(modules/net.cmake)
