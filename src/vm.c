@@ -194,7 +194,7 @@ DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
     vm->ctx = duk_create_heap(NULL,                     /* alloc function */
                               NULL,                     /* realloc function */
                               NULL,                     /* free function */
-                              (void*) vm,               /* user data */
+                              NULL,                     /* user data */
                               sjs__duk_fatal_handler    /* fatal error handler */
                              );
     assert(vm->ctx != NULL);
