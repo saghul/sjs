@@ -82,3 +82,7 @@ include(modules/errno.cmake)
 
 # net
 include(modules/net.cmake)
+
+# time
+include(modules/time.cmake)
+
