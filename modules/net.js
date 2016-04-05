@@ -107,6 +107,35 @@ Socket.prototype.shutdown = function(how) {
 }
 
 
+function getaddrinfo(hostname, servname, hints) {
+    var hints = hints || {};
+    return _gai.getaddrinfo(hostname, servname, hints);
+}
+
+
+function isIPv4(address) {
+    return _socket.inet_pton(_socket.c.AF_INET, address) !== undefined;
+}
+
+
+function isIPv6(address) {
+    return _socket.inet_pton(_socket.c.AF_INET6, address) !== undefined;
+}
+
+
+function isIP(address) {
+    if (isIPv4(address)) {
+        return 4;
+    } else if (isIPv6(address)) {
+        return 6;
+    } else {
+        return 0;
+    }
+}
+
+
+// - helpers
+
 // finalizer: will get called when a Socket is garbage collected
 function socketDealloc(sock) {
     if (sock._fd !== -1) {
@@ -147,17 +176,16 @@ function normalizeAddress(domain, address) {
 }
 
 
-function getaddrinfo(hostname, servname, hints) {
-    var hints = hints || {};
-    return _gai.getaddrinfo(hostname, servname, hints);
-}
-
+// - exports
 
 module.exports = {
     Socket        : Socket,
     getaddrinfo   : getaddrinfo,
     gai_strerror  : _gai.gai_strerror,
-    gai_error_map : new Map()
+    gai_error_map : new Map(),
+    isIP          : isIP,
+    isIPv4        : isIPv4,
+    isIPv6        : isIPv6
 };
 
 // extract constants

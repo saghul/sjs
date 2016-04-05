@@ -551,6 +551,33 @@ static duk_ret_t sock_sendto(duk_context* ctx) {
 }
 
 
+/*
+ * Convert an IP address into it's packed network format. Args:
+ * - 0: domain
+ * - 1: address
+ */
+static duk_ret_t sock_inet_pton(duk_context* ctx) {
+    int domain;
+    const char* addr;
+    char buf[sizeof(struct in6_addr)];
+
+    domain = duk_require_int(ctx, 0);
+    addr = duk_require_string(ctx, 1);
+
+    if (inet_pton(domain, addr, buf) != 1) {
+        duk_push_undefined(ctx);
+    } else if (domain == AF_INET) {
+        duk_push_lstring(ctx, buf, sizeof(struct in_addr));
+    } else if (domain == AF_INET6) {
+        duk_push_lstring(ctx, buf, sizeof(struct in6_addr));
+    } else {
+        abort();
+    }
+
+    return 1;
+}
+
+
 static const duk_number_list_entry module_consts[] = {
     /* socket domain */
     { "AF_INET", AF_INET },
@@ -582,6 +609,7 @@ static const duk_function_list_entry module_funcs[] = {
     { "write", sock_write, 2 },
     { "recvfrom", sock_recvfrom, 2 },
     { "sendto", sock_sendto, 4 },
+    { "inet_pton", sock_inet_pton, 2 },
     { NULL, NULL, 0 }
 };
 
