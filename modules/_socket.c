@@ -51,7 +51,7 @@ static duk_ret_t sock_socket(duk_context* ctx) {
  * Prse a socket address object at the given index. Returns 0 on success or -1 in case of error, and puts an error
  * object on top of the stack.
  */
-static int sock__parse_addr(duk_context* ctx, duk_idx_t addr_idx, int domain, struct sockaddr_storage* ss, socklen_t* addrlen) {
+static int sock__obj2addr(duk_context* ctx, duk_idx_t addr_idx, int domain, struct sockaddr_storage* ss, socklen_t* addrlen) {
     memset(ss, 0, sizeof(*ss));
     *addrlen = 0;
 
@@ -146,6 +146,67 @@ static int sock__parse_addr(duk_context* ctx, duk_idx_t addr_idx, int domain, st
 
 
 /*
+ * Create a socket address object out of a struct sockaddr*. The resulting object is at the top of the stack.
+ */
+static void sock__addr2obj(duk_context* ctx, const struct sockaddr* addr) {
+    switch (addr->sa_family) {
+        case AF_INET:
+        {
+            struct sockaddr_in* addr4;
+            char host[INET_ADDRSTRLEN];
+            int port;
+            addr4 = (struct sockaddr_in*) addr;
+            if (inet_ntop(AF_INET, &(addr4->sin_addr), host, sizeof(host)) == NULL) {
+            	duk_push_undefined(ctx);
+            	return;
+            }
+            port = ntohs(addr4->sin_port);
+            duk_push_object(ctx);
+            duk_push_string(ctx, host);
+            duk_put_prop_string(ctx, -2, "host");
+            duk_push_int(ctx, port);
+            duk_put_prop_string(ctx, -2, "port");
+            break;
+        }
+        case AF_INET6:
+        {
+            struct sockaddr_in6* addr6;
+            char host[INET6_ADDRSTRLEN];
+            int port;
+            addr6 = (struct sockaddr_in6*) addr;
+            if (inet_ntop(AF_INET6, &(addr6->sin6_addr), host, sizeof(host)) == NULL) {
+            	duk_push_undefined(ctx);
+            	return;
+            }
+            port = ntohs(addr6->sin6_port);
+            duk_push_object(ctx);
+            duk_push_string(ctx, host);
+            duk_put_prop_string(ctx, -2, "host");
+            duk_push_int(ctx, port);
+            duk_put_prop_string(ctx, -2, "port");
+            duk_push_int(ctx, addr6->sin6_flowinfo);
+            duk_put_prop_string(ctx, -2, "flowinfo");
+            duk_push_int(ctx, addr6->sin6_scope_id);
+            duk_put_prop_string(ctx, -2, "scopeid");
+            break;
+        }
+        case AF_UNIX:
+        {
+            /* TODO: handle Linux abstract sockets */
+            struct sockaddr_un* addru;
+            size_t len;
+            addru = (struct sockaddr_un*) addr;
+            len = strlen(addru->sun_path);
+            duk_push_lstring(ctx, addru->sun_path, len);
+            break;
+        }
+        default:
+            abort();
+    }
+}
+
+
+/*
  * Bind the socket. Args:
  * - 0: fd
  * - 1: domain
@@ -163,7 +224,7 @@ static duk_ret_t sock_bind(duk_context* ctx) {
 
     assert(fd >= 0);
 
-    if (sock__parse_addr(ctx, 2, domain, &ss, &addrlen) != 0) {
+    if (sock__obj2addr(ctx, 2, domain, &ss, &addrlen) != 0) {
         /* the stack top contains the error object */
         duk_throw(ctx);
         return -42;    /* control never returns here */
@@ -200,7 +261,7 @@ static duk_ret_t sock_connect(duk_context* ctx) {
 
     assert(fd >= 0);
 
-    if (sock__parse_addr(ctx, 2, domain, &ss, &addrlen) != 0) {
+    if (sock__obj2addr(ctx, 2, domain, &ss, &addrlen) != 0) {
         /* the stack top contains the error object */
         duk_throw(ctx);
         return -42;    /* control never returns here */
@@ -235,60 +296,7 @@ static duk_ret_t sock__getsockpeername(duk_context* ctx, sjs__socknamefunc func)
         return -42;    /* control never returns here */
     }
 
-    switch (ss.ss_family) {
-        case AF_INET:
-        {
-            struct sockaddr_in* addr4;
-            char host[INET_ADDRSTRLEN];
-            int port;
-            addr4 = (struct sockaddr_in*) &ss;
-            if (inet_ntop(AF_INET, &(addr4->sin_addr), host, sizeof(host)) == NULL) {
-                SJS__THROW_SOCKET_ERROR(errno);
-                return -42;    /* control never returns here */
-            }
-            port = ntohs(addr4->sin_port);
-            duk_push_object(ctx);
-            duk_push_string(ctx, host);
-            duk_put_prop_string(ctx, -2, "host");
-            duk_push_int(ctx, port);
-            duk_put_prop_string(ctx, -2, "port");
-            break;
-        }
-        case AF_INET6:
-        {
-            struct sockaddr_in6* addr6;
-            char host[INET6_ADDRSTRLEN];
-            int port;
-            addr6 = (struct sockaddr_in6*) &ss;
-            if (inet_ntop(AF_INET6, &(addr6->sin6_addr), host, sizeof(host)) == NULL) {
-                SJS__THROW_SOCKET_ERROR(errno);
-                return -42;    /* control never returns here */
-            }
-            port = ntohs(addr6->sin6_port);
-            duk_push_object(ctx);
-            duk_push_string(ctx, host);
-            duk_put_prop_string(ctx, -2, "host");
-            duk_push_int(ctx, port);
-            duk_put_prop_string(ctx, -2, "port");
-            duk_push_int(ctx, addr6->sin6_flowinfo);
-            duk_put_prop_string(ctx, -2, "flowinfo");
-            duk_push_int(ctx, addr6->sin6_scope_id);
-            duk_put_prop_string(ctx, -2, "scopeid");
-            break;
-        }
-        case AF_UNIX:
-        {
-            /* TODO: handle Linux abstract sockets */
-            struct sockaddr_un* addru;
-            size_t len;
-            addru = (struct sockaddr_un*) &ss;
-            len = strlen(addru->sun_path);
-            duk_push_lstring(ctx, addru->sun_path, len);
-            break;
-        }
-        default:
-            abort();
-    }
+    sock__addr2obj(ctx, (const struct sockaddr*) &ss);
 
     return 1;
 }
@@ -454,12 +462,102 @@ static duk_ret_t sock_write(duk_context* ctx) {
 }
 
 
+/*
+ * Receive data from a socket. Returns an object with
+ * 'data' and 'address'. Args:
+ * - 0: fd
+ * - 1: nread
+ * TODO:
+ *  - use buffers
+ */
+static duk_ret_t sock_recvfrom(duk_context* ctx) {
+    int fd;
+    ssize_t r;
+    size_t nread;
+    char* buf;
+    struct sockaddr_storage ss;
+    socklen_t addrlen;
+
+    addrlen = sizeof(ss);
+    fd = duk_require_int(ctx, 0);
+    nread = duk_require_int(ctx, 1);
+    buf = malloc(nread);
+    if (!buf) {
+        SJS__THROW_SOCKET_ERROR(ENOMEM);
+        return -42;    /* control never returns here */
+    }
+
+    r = recvfrom(fd, buf, nread, 0, (struct sockaddr*) &ss, &addrlen);
+    if (r < 0) {
+        SJS__THROW_SOCKET_ERROR(errno);
+        return -42;    /* control never returns here */
+    } else {
+        duk_push_object(ctx);
+        if (r == 0) {
+            duk_push_string(ctx, "");
+        } else {
+            duk_push_lstring(ctx, buf, r);
+        }
+        duk_put_prop_string(ctx, -2, "data");
+        if (addrlen > 0) {
+            sock__addr2obj(ctx, (const struct sockaddr*) &ss);
+        } else {
+            duk_push_undefined(ctx);
+        }
+        duk_put_prop_string(ctx, -2, "address");
+    }
+
+    return 1;
+}
+
+
+/*
+ * Send data to a unconnected socket. Args:
+ * - 0: fd
+ * - 1: domain
+ * - 2: data
+ * - 3: address
+ * TODO:
+ *  - use buffers
+ */
+static duk_ret_t sock_sendto(duk_context* ctx) {
+    int fd;
+    int domain;
+    ssize_t r;
+    size_t len;
+    const char* buf;
+    struct sockaddr_storage ss;
+    socklen_t addrlen;
+
+    fd = duk_require_int(ctx, 0);
+    domain = duk_require_int(ctx, 1);
+    buf = duk_require_lstring(ctx, 2, &len);
+
+    if (sock__obj2addr(ctx, 3, domain, &ss, &addrlen) != 0) {
+        /* the stack top contains the error object */
+        duk_throw(ctx);
+        return -42;    /* control never returns here */
+    }
+
+    r = sendto(fd, buf, len, 0, (const struct sockaddr*) &ss, addrlen);
+    if (r < 0) {
+        SJS__THROW_SOCKET_ERROR(errno);
+        return -42;    /* control never returns here */
+    } else {
+        duk_push_int(ctx, r);
+    }
+
+    return 1;
+}
+
+
 static const duk_number_list_entry module_consts[] = {
     /* socket domain */
     { "AF_INET", AF_INET },
     { "AF_INET6", AF_INET6 },
     { "AF_UNIX", AF_UNIX },
     /* socket type */
+    { "SOCK_DGRAM", SOCK_DGRAM },
     { "SOCK_STREAM", SOCK_STREAM },
     /* shutdown how */
     { "SHUT_RD", SHUT_RD },
@@ -482,6 +580,8 @@ static const duk_function_list_entry module_funcs[] = {
     { "accept", sock_accept, 1 },
     { "read", sock_read, 2 },
     { "write", sock_write, 2 },
+    { "recvfrom", sock_recvfrom, 2 },
+    { "sendto", sock_sendto, 4 },
     { NULL, NULL, 0 }
 };
 

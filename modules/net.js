@@ -87,6 +87,19 @@ Socket.prototype.write = function(data) {
 }
 
 
+Socket.prototype.recvfrom = function(nread) {
+    checkSocket.call(this);
+    var nread = (nread >>> 0) || 4096;
+    return _socket.recvfrom(this._fd, nread);
+}
+
+
+Socket.prototype.sendto = function(data, address) {
+    checkSocket.call(this);
+    return _socket.sendto(this._fd, this._domain, data, normalizeAddress(this._domain, address));
+}
+
+
 Socket.prototype.shutdown = function(how) {
     checkSocket.call(this);
     var how = how >>> 0;
