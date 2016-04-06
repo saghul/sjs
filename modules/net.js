@@ -37,7 +37,7 @@ Socket.prototype.accept = function() {
 
 Socket.prototype.bind = function(address) {
     checkSocket.call(this);
-    _socket.bind(this._fd, this._domain, normalizeAddress(this._domain, address));
+    _socket.bind(this._fd, normalizeAddress(this._domain, address));
 }
 
 
@@ -51,7 +51,7 @@ Socket.prototype.close = function() {
 
 Socket.prototype.connect = function(address) {
     checkSocket.call(this);
-    _socket.connect(this._fd, this._domain, normalizeAddress(this._domain, address));
+    _socket.connect(this._fd, normalizeAddress(this._domain, address));
 }
 
 
@@ -96,7 +96,7 @@ Socket.prototype.recvfrom = function(nread) {
 
 Socket.prototype.sendto = function(data, address) {
     checkSocket.call(this);
-    return _socket.sendto(this._fd, this._domain, data, normalizeAddress(this._domain, address));
+    return _socket.sendto(this._fd, data, normalizeAddress(this._domain, address));
 }
 
 
@@ -155,24 +155,37 @@ function checkSocket() {
 
 function normalizeAddress(domain, address) {
     var addr = address || {};
-    switch (domain) {
-        case _socket.c.AF_INET:
-            addr.host = addr.host || '0.0.0.0';
+
+    if (domain === _socket.c.AF_UNIX) {
+        if (typeof addr === 'string') {
+            return {domain: _socket.c.AF_UNIX, path: addr};
+        } else {
+            throw new TypeError('invalid address');
+        }
+    } else {
+        if (typeof addr !== 'object') {
+            throw new TypeError('invalid address');
+        }
+
+        if (!addr.host) {
+            addr.host = domain === _socket.c.AF_INET6 ? '::' : '0.0.0.0';
+        }
+
+        var iptype = isIP(addr.host);
+        if (iptype === 0) {
+            throw new Error('invalid IP address: ' + addr.host);
+        } else if (iptype === 4) {
+            addr.domain = _socket.c.AF_INET;
             addr.port = addr.port >>> 0;
-            break;
-        case _socket.c.AF_INET6:
-            addr.host = addr.host || '::';
+        } else {
+            addr.domain = _socket.c.AF_INET6;
             addr.port = addr.port >>> 0;
             addr.flowinfo = addr.flowinfo >>> 0;
             addr.scopeid = addr.scopeid >>> 0;
-            break;
-        case _socket.c.AF_UNIX:
-            // nothing
-            break;
-        default:
-            throw new Error('invalid socket domain');
+        }
+
+        return addr;
     }
-    return addr;
 }
 
 

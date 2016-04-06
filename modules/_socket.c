@@ -51,9 +51,15 @@ static duk_ret_t sock_socket(duk_context* ctx) {
  * Prse a socket address object at the given index. Returns 0 on success or -1 in case of error, and puts an error
  * object on top of the stack.
  */
-static int sock__obj2addr(duk_context* ctx, duk_idx_t addr_idx, int domain, struct sockaddr_storage* ss, socklen_t* addrlen) {
+static int sock__obj2addr(duk_context* ctx, duk_idx_t addr_idx, struct sockaddr_storage* ss, socklen_t* addrlen) {
+    int domain;
+
     memset(ss, 0, sizeof(*ss));
     *addrlen = 0;
+
+    duk_get_prop_string(ctx, addr_idx, "domain");
+    domain = duk_require_int(ctx, -1);
+    duk_pop(ctx);
 
     switch(domain) {
         case AF_INET:
@@ -131,11 +137,13 @@ static int sock__obj2addr(duk_context* ctx, duk_idx_t addr_idx, int domain, stru
             const char* path;
             size_t path_len;
             addru = (struct sockaddr_un*) ss;
-            path = duk_require_lstring(ctx, addr_idx, &path_len);
+            duk_get_prop_string(ctx, addr_idx, "path");
+            path = duk_require_lstring(ctx, -1, &path_len);
             strncpy(addru->sun_path, path, sizeof(addru->sun_path) - 1);
             addru->sun_path[sizeof(addru->sun_path) - 1] = '\0';
             addru->sun_family = AF_UNIX;
             *addrlen = sizeof(*addru);
+            duk_pop(ctx);
             break;
         }
         default:
@@ -209,22 +217,19 @@ static void sock__addr2obj(duk_context* ctx, const struct sockaddr* addr) {
 /*
  * Bind the socket. Args:
  * - 0: fd
- * - 1: domain
- * - 2: address object
+ * - 1: address object
  */
 static duk_ret_t sock_bind(duk_context* ctx) {
     int r;
     int fd;
-    int domain;
     struct sockaddr_storage ss;
     socklen_t addrlen;
 
     fd = duk_require_int(ctx, 0);
-    domain = duk_require_int(ctx, 1);
 
     assert(fd >= 0);
 
-    if (sock__obj2addr(ctx, 2, domain, &ss, &addrlen) != 0) {
+    if (sock__obj2addr(ctx, 1, &ss, &addrlen) != 0) {
         /* the stack top contains the error object */
         duk_throw(ctx);
         return -42;    /* control never returns here */
@@ -246,22 +251,19 @@ static duk_ret_t sock_bind(duk_context* ctx) {
 /*
  * Connect the socket. Args:
  * - 0: fd
- * - 1: domain
- * - 2: address object
+ * - 1: address object
  */
 static duk_ret_t sock_connect(duk_context* ctx) {
     int r;
     int fd;
-    int domain;
     struct sockaddr_storage ss;
     socklen_t addrlen;
 
     fd = duk_require_int(ctx, 0);
-    domain = duk_require_int(ctx, 1);
 
     assert(fd >= 0);
 
-    if (sock__obj2addr(ctx, 2, domain, &ss, &addrlen) != 0) {
+    if (sock__obj2addr(ctx, 1, &ss, &addrlen) != 0) {
         /* the stack top contains the error object */
         duk_throw(ctx);
         return -42;    /* control never returns here */
@@ -514,15 +516,13 @@ static duk_ret_t sock_recvfrom(duk_context* ctx) {
 /*
  * Send data to a unconnected socket. Args:
  * - 0: fd
- * - 1: domain
- * - 2: data
- * - 3: address
+ * - 1: data
+ * - 2: address
  * TODO:
  *  - use buffers
  */
 static duk_ret_t sock_sendto(duk_context* ctx) {
     int fd;
-    int domain;
     ssize_t r;
     size_t len;
     const char* buf;
@@ -530,10 +530,9 @@ static duk_ret_t sock_sendto(duk_context* ctx) {
     socklen_t addrlen;
 
     fd = duk_require_int(ctx, 0);
-    domain = duk_require_int(ctx, 1);
-    buf = duk_require_lstring(ctx, 2, &len);
+    buf = duk_require_lstring(ctx, 1, &len);
 
-    if (sock__obj2addr(ctx, 3, domain, &ss, &addrlen) != 0) {
+    if (sock__obj2addr(ctx, 2, &ss, &addrlen) != 0) {
         /* the stack top contains the error object */
         duk_throw(ctx);
         return -42;    /* control never returns here */
