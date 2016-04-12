@@ -74,6 +74,8 @@ static void sjs__setup_system_module(sjs_vm_t* vm) {
 
         duk_push_string(ctx, DUK_GIT_DESCRIBE);
         duk_put_prop_string(ctx, -2, "duktape");
+        duk_push_lstring(ctx, DUK_GIT_COMMIT, 7);
+        duk_put_prop_string(ctx, -2, "duktapeCommit");
         duk_push_string(ctx, sjs_version());
         duk_put_prop_string(ctx, -2, "sjs");
         /* -> [ ... system obj ] */
