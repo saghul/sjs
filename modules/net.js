@@ -74,16 +74,16 @@ Socket.prototype.listen = function(backlog) {
 }
 
 
-Socket.prototype.read = function(nread) {
+Socket.prototype.recv = function(nread) {
     checkSocket.call(this);
     var nread = (nread >>> 0) || 4096;
-    return _socket.read(this._fd, nread);
+    return _socket.recv(this._fd, nread);
 }
 
 
-Socket.prototype.write = function(data) {
+Socket.prototype.send = function(data) {
     checkSocket.call(this);
-    return _socket.write(this._fd, data);
+    return _socket.send(this._fd, data);
 }
 
 

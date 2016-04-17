@@ -406,7 +406,7 @@ static duk_ret_t sock_accept(duk_context* ctx) {
  *  - use buffers
  *  - accept a list of buffers and use readv
  */
-static duk_ret_t sock_read(duk_context* ctx) {
+static duk_ret_t sock_recv(duk_context* ctx) {
     int fd;
     ssize_t r;
     size_t nread;
@@ -420,7 +420,7 @@ static duk_ret_t sock_read(duk_context* ctx) {
         return -42;    /* control never returns here */
     }
 
-    r = read(fd, buf, nread);
+    r = recv(fd, buf, nread, 0);
     if (r < 0) {
         SJS__THROW_SOCKET_ERROR(errno);
         return -42;    /* control never returns here */
@@ -443,7 +443,7 @@ static duk_ret_t sock_read(duk_context* ctx) {
  *  - use buffers
  *  - accept a list of buffers and use readv
  */
-static duk_ret_t sock_write(duk_context* ctx) {
+static duk_ret_t sock_send(duk_context* ctx) {
     int fd;
     ssize_t r;
     size_t len;
@@ -452,7 +452,7 @@ static duk_ret_t sock_write(duk_context* ctx) {
     fd = duk_require_int(ctx, 0);
     buf = duk_require_lstring(ctx, 1, &len);
 
-    r = write(fd, buf, len);
+    r = send(fd, buf, len, 0);
     if (r < 0) {
         SJS__THROW_SOCKET_ERROR(errno);
         return -42;    /* control never returns here */
@@ -604,8 +604,8 @@ static const duk_function_list_entry module_funcs[] = {
     { "shutdown", sock_shutdown, 2 },
     { "listen", sock_listen, 2 },
     { "accept", sock_accept, 1 },
-    { "read", sock_read, 2 },
-    { "write", sock_write, 2 },
+    { "recv", sock_recv, 2 },
+    { "send", sock_send, 2 },
     { "recvfrom", sock_recvfrom, 2 },
     { "sendto", sock_sendto, 4 },
     { "inet_pton", sock_inet_pton, 2 },
