@@ -5,6 +5,7 @@
 
 #ifdef __APPLE__
 # include <crt_externs.h>
+# include <mach-o/dyld.h> /* _NSGetExecutablePath */
 # define environ (*_NSGetEnviron())
 #else
 extern char** environ;
@@ -54,6 +55,51 @@ static duk_ret_t sjs__exit(duk_context* ctx) {
     /* TODO: properly tear down the vm */
     exit(code);
     return -42;    /* control never returns here */
+}
+
+
+static void sjs__executable(char* buf, size_t size) {
+#if defined(__linux__)
+    ssize_t n;
+
+    n = size - 1;
+    if (n > 0) {
+	n = readlink("/proc/self/exe", buf, n);
+    }
+
+    if (n == -1) {
+        return;
+    }
+
+    buffer[n] = '\0';
+#elif defined(__APPLE__)
+    /* realpath(exepath) may be > PATH_MAX so double it to be on the safe side. */
+    char abspath[PATH_MAX * 2 + 1];
+    char exepath[PATH_MAX + 1];
+    uint32_t exepath_size;
+    size_t abspath_size;
+
+    exepath_size = sizeof(exepath);
+    if (_NSGetExecutablePath(exepath, &exepath_size)) {
+        return;
+    }
+
+    if (realpath(exepath, abspath) != abspath) {
+        return;
+    }
+
+    abspath_size = strlen(abspath);
+    if (abspath_size == 0) {
+        return;
+    }
+
+    size -= 1;
+    if (size > abspath_size)
+        size = abspath_size;
+
+    memcpy(buf, abspath, size);
+    buf[size] = '\0';
+#endif
 }
 
 
@@ -160,10 +206,18 @@ static void sjs__setup_system_module(sjs_vm_t* vm) {
         duk_put_prop_string(ctx, -2, "platform");
     }
 
+    /* system.executable */
+    {
+        char buf[8192] = {0};
+        sjs__executable(buf, sizeof(buf));
+        duk_push_string(ctx, buf);
+        duk_put_prop_string(ctx, -2, "executable");
+    }
+
     /* system.exit(x) */
     {
-	duk_push_c_function(ctx, sjs__exit, 1 /* nargs */);
-	duk_put_prop_string(ctx, -2, "exit");
+        duk_push_c_function(ctx, sjs__exit, 1 /* nargs */);
+        duk_put_prop_string(ctx, -2, "exit");
     }
 
     duk_pop(ctx);
@@ -241,17 +295,6 @@ DUK_EXTERNAL void sjs_vm_setup_args(sjs_vm_t* vm, int argc, char* argv[]) {
 
         duk_put_prop_string(ctx, -2, "argv");
         /* -> [ ... system ] */
-    }
-
-    /* system.exe */
-    {
-        char* executable = realpath(argv[0], NULL);
-        assert(executable);
-        duk_push_string(ctx,executable);
-        /* -> [ ... global system string ] */
-
-        duk_put_prop_string(ctx, -2, "exe");
-        /* -> [ ... global system ] */
     }
 
     duk_pop(ctx);
