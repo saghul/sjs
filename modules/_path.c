@@ -36,9 +36,25 @@ static duk_ret_t path_dirname(duk_context* ctx) {
 }
 
 
+static duk_ret_t path_normalize(duk_context* ctx) {
+    const char* path;
+    char rpath[8192];
+
+    path = duk_require_string(ctx, 0);
+    if (sjs_path_normalize(path, rpath, sizeof(rpath)) < 0) {
+        /* TODO: throw instead? */
+        duk_push_undefined(ctx);
+    } else {
+        duk_push_string(ctx, rpath);
+    }
+    return 1;
+}
+
+
 static const duk_function_list_entry module_funcs[] = {
     { "basename", path_basename, 1 /*nargs*/ },
     { "dirname", path_dirname, 1 /*nargs*/ },
+    { "normalize", path_normalize, 1 /*nargs*/ },
     { NULL, NULL, 0 }
 };
 

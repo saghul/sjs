@@ -79,12 +79,15 @@ static int load_jsdll(duk_context* ctx, const char* path) {
 }
 
 
-static void path_join(char* path, const char* p) {
+static void path_join(char* path, size_t size, const char* p) {
+    char sep;
+
     assert(path && p);
 
+    sep = '\0';
     if (path[strlen(path)-1] != '/') {
         if (p[0] != '/') {
-            strcat(path, "/");
+            sep = '/';
         }
     } else {
         if (p[0] == '/') {
@@ -92,21 +95,28 @@ static void path_join(char* path, const char* p) {
         }
     }
 
-    strcat(path, p);
+    snprintf(path, size, "%s%c%s", path, sep, p);
 }
 
 
-static int normalize_path(const char* path, const char*filename, char* normalized_path) {
-    assert(path && filename && normalized_path);
+int sjs__path_normalize(const char* path, char* normalized_path, size_t normalized_path_len) {
+    assert(path && normalized_path && normalized_path_len);
 
-    if (path[0] == '/') {
-        /* absolute path: /usr/lib/foo */
-        strcpy(normalized_path, path);
-    } else if (path[0] == '~') {
+    const char* ptr;
+
+    /* expand ~ and ~user */
+    if (path[0] == '~') {
         /* relative to home path: ~/foo/bar or ~user/foo/bar */
+        char tmp[8192];
         char* home;
-        char* pathptr;
-        if (strlen(path) == 1 || path[1] == '/') {
+        char* sep = strchr(path, '/');
+        int pos;
+        if (sep) {
+            pos = sep - path;
+        } else {
+            pos = strlen(path);
+        }
+        if (pos == 1) {
             home = getenv("HOME");
             if (!home) {
                 char buf[4096];
@@ -122,20 +132,12 @@ static int normalize_path(const char* path, const char*filename, char* normalize
                 }
                 home = pw.pw_dir;
             }
-            pathptr = (char*) path + 1;
         } else {
             char name[256];
             char buf[4096];
             struct passwd pw;
             struct passwd *pwresult;
-            size_t namelen;
-            char* p = strchr(path, '/');
-            if (!p) {
-                namelen = strlen(path) - 1;    /* remove leading ~ */
-            } else {
-                namelen = p - path;
-            }
-            snprintf(name, namelen, "%s", path+1);
+            snprintf(name, pos, "%s", path+1);
             int r = getpwnam_r(name, &pw, buf, sizeof(buf), &pwresult);
             if (r != 0) {
                 return -r;
@@ -144,17 +146,17 @@ static int normalize_path(const char* path, const char*filename, char* normalize
                 return -ENOENT;
             }
             home = pw.pw_dir;
-            pathptr = (char*) path + namelen;
         }
-        strcpy(normalized_path, home);
-        path_join(normalized_path, pathptr);
+        snprintf(tmp, sizeof(tmp), "%s/%s", home, path+pos);
+        ptr = tmp;
     } else {
-        if (realpath(path, normalized_path) == NULL) {
-            return -errno;
-        }
+        ptr = path;
     }
 
-    path_join(normalized_path, filename);
+    if (realpath(ptr, normalized_path) == NULL) {
+        return -errno;
+    }
+
     return 0;
 }
 
@@ -212,9 +214,11 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
         const char* path = duk_get_string(ctx, -1);
         duk_pop_2(ctx);    /* pop key and value off the stack */
 
-        if (normalize_path(path, id, tmp) < 0) {
+        if (sjs__path_normalize(path, tmp, sizeof(tmp)) < 0) {
             continue;
         }
+
+        path_join(tmp, sizeof(tmp), id);
 
         if (stat(tmp, &st) == 0) {
             /* path exists, check if file or directory */
@@ -237,11 +241,11 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
                 }
             } else if (S_ISDIR(st.st_mode)) {
                 /* directory, check for index.js or index.jsdll */
-                path_join(tmp, "index.js");
+                path_join(tmp, sizeof(tmp), "index.js");
                 len = read_file(tmp, &data);
                 if (len < 0) {
                     /* no index.js, try index.jsdll */
-                    strcat(tmp, "dll");
+                    snprintf(tmp, sizeof(tmp), "%s%s", tmp, "dll");
                     if (load_jsdll(ctx, tmp) == 0) {
                         found_jsdll = 1;
                         break;
@@ -261,11 +265,11 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
             }
         } else {
             /* path doesn't exist, try to add .js or .jsdll */
-            strcat(tmp, ".js");
+            snprintf(tmp, sizeof(tmp), "%s%s", tmp, ".js");
             len = read_file(tmp, &data);
             if (len < 0) {
                 /* no index.js, try index.jsdll */
-                strcat(tmp, "dll");
+                snprintf(tmp, sizeof(tmp), "%s%s", tmp, "dll");
                 if (load_jsdll(ctx, tmp) == 0) {
                     found_jsdll = 1;
                     break;
