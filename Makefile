@@ -2,9 +2,10 @@
 MAKE?=make
 CMAKE_MK=build/Makefile
 
-all: $(CMAKE_MK)
+all: build
+
+build: $(CMAKE_MK)
 	@$(MAKE) -C build
-	ln -sf build/sjs sjs
 
 $(CMAKE_MK):
 	cmake -H. -Bbuild
@@ -17,6 +18,8 @@ clean:
 
 distclean: clean
 	@rm -rf build
-	@rm -f sjs
 
-.PHONY: all install clean distclean
+run: build
+	SJS_PATH=build ./build/sjs
+
+.PHONY: all build install clean distclean run
