@@ -86,3 +86,6 @@ include(modules/net.cmake)
 # time
 include(modules/time.cmake)
 
+# io
+include(modules/io.cmake)
+
