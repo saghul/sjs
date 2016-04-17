@@ -15,6 +15,7 @@ extern char** environ;
 #include "vm.h"
 #include "version.h"
 #include "internal.h"
+#include "es6shim.h"
 
 
 struct sjs_vm_t {
@@ -24,12 +25,7 @@ struct sjs_vm_t {
 
 /* generated from src/bootstrap.js */
 static const char SJS__BOOTSTRAP_CODE[] = {
-    40, 102, 117, 110, 99, 116, 105, 111, 110, 40, 41, 32, 123, 10, 32,
-    32, 32, 32, 47, 47, 32, 116, 104, 101, 32, 95, 101, 115, 54, 32,
-    109, 111, 100, 117, 108, 101, 32, 111, 112, 101, 114, 97, 116, 101,
-    115, 32, 111, 110, 32, 103, 108, 111, 98, 97, 108, 115, 10, 32, 32,
-    32, 32, 114, 101, 113, 117, 105, 114, 101, 40, 39, 95, 101, 115, 54,
-    39, 41, 59, 10, 125, 41, 40, 41, 59, 10, 0
+    0,
 };
 
 
@@ -260,7 +256,10 @@ DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
     sjs__setup_global_module(vm);
     sjs__setup_modsearch(vm);
 
-    /* run bootstrap code*/
+    /* setup es6 shim */
+    duk_eval_string_noresult(vm->ctx, sjs__es6shim_src);
+
+    /* run bootstrap code */
     duk_eval_string_noresult(vm->ctx, SJS__BOOTSTRAP_CODE);
 
     return vm;

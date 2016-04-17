@@ -7,4 +7,7 @@ with open(sys.argv[1], 'rb') as f:
 # append null byte
 data.append('0')
 
-print('static const char TMP[] = {%s};' % ', '.join(data))
+print('static const char TMP[] = {')
+for x in range(0, len(data), 16):
+    print('    %s,' % ', '.join(data[x:x+16]))
+print('};')

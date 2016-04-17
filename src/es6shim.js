@@ -8,7 +8,7 @@
   * https://github.com/paulmillr/es6-shim/
   */
 
-function _setup() {
+(function() {
   'use strict';
 
   var _apply = Function.call.bind(Function.apply);
@@ -3707,6 +3707,4 @@ function _setup() {
   }
 
   return globals;
-}
-
-module.exports = _setup();
+})();
