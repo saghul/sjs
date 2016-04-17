@@ -174,9 +174,23 @@ static int handle_eval(duk_context *ctx, char *code) {
 static int handle_interactive(duk_context *ctx) {
     const char *prompt = "sjs> ";
     char* line;
+    char history_file[4096];
+    int use_history;
     int rc;
 
     duk_eval_string_noresult(ctx, SJS__CLI_GREET_CODE);
+
+    /* setup history file
+     * TODO: make configurable?
+     */
+    if (sjs_path_normalize("~", history_file, sizeof(history_file)) == 0) {
+        strcat(history_file, "/.sjs_history");
+        linenoiseHistorySetMaxLen(1000);
+        linenoiseHistoryLoad(history_file);
+        use_history = 1;
+    } else {
+        use_history = 0;
+    }
 
     while((line = linenoise(prompt)) != NULL) {
         if (line[0] != '\0') {
@@ -198,6 +212,10 @@ static int handle_interactive(duk_context *ctx) {
         } else {
             duk_pop(ctx);
         }
+    }
+
+    if (use_history) {
+        linenoiseHistorySave(history_file);
     }
 
     return 0;
