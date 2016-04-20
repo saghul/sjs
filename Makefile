@@ -1,5 +1,6 @@
 
 MAKE?=make
+PYTHON?=python
 CMAKE_MK=build/Makefile
 
 all: build
@@ -21,5 +22,8 @@ distclean: clean
 
 run: build
 	SJS_PATH=build ./build/sjs
+
+test: build
+	$(PYTHON) tools/test.py test/
 
 .PHONY: all build install clean distclean run
