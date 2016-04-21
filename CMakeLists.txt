@@ -15,12 +15,26 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 # libsjs
 #
-add_library(sjs SHARED
+set(SOURCES
     src/duktape.c
     src/modules.c
     src/vm.c
     src/version.c
 )
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+    set(SOURCES ${SOURCES}
+        src/platform/darwin.c
+    )
+endif()
+
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    set(SOURCES ${SOURCES}
+        src/platform/linux.c
+    )
+endif()
+
+add_library(sjs SHARED ${SOURCES})
 
 target_include_directories(sjs
     PRIVATE ${CMAKE_SOURCE_DIR}/include/sjs

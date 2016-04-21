@@ -5,7 +5,6 @@
 
 #ifdef __APPLE__
 # include <crt_externs.h>
-# include <mach-o/dyld.h> /* _NSGetExecutablePath */
 # define environ (*_NSGetEnviron())
 #else
 extern char** environ;
@@ -51,51 +50,6 @@ static duk_ret_t sjs__exit(duk_context* ctx) {
     /* TODO: properly tear down the vm */
     exit(code);
     return -42;    /* control never returns here */
-}
-
-
-static void sjs__executable(char* buf, size_t size) {
-#if defined(__linux__)
-    ssize_t n;
-
-    n = size - 1;
-    if (n > 0) {
-	n = readlink("/proc/self/exe", buf, n);
-    }
-
-    if (n == -1) {
-        return;
-    }
-
-    buffer[n] = '\0';
-#elif defined(__APPLE__)
-    /* realpath(exepath) may be > PATH_MAX so double it to be on the safe side. */
-    char abspath[PATH_MAX * 2 + 1];
-    char exepath[PATH_MAX + 1];
-    uint32_t exepath_size;
-    size_t abspath_size;
-
-    exepath_size = sizeof(exepath);
-    if (_NSGetExecutablePath(exepath, &exepath_size)) {
-        return;
-    }
-
-    if (realpath(exepath, abspath) != abspath) {
-        return;
-    }
-
-    abspath_size = strlen(abspath);
-    if (abspath_size == 0) {
-        return;
-    }
-
-    size -= 1;
-    if (size > abspath_size)
-        size = abspath_size;
-
-    memcpy(buf, abspath, size);
-    buf[size] = '\0';
-#endif
 }
 
 
