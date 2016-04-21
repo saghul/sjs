@@ -21,7 +21,7 @@ install: $(CMAKE_MK)
 clean:
 	@$(MAKE) -C build clean
 
-distclean: clean
+distclean:
 	@rm -rf build
 
 run: build
