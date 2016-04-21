@@ -1,6 +1,4 @@
 
-#include <errno.h>
-#include <sys/select.h>
 #include <sys/time.h>
 
 #include <sjs/sjs.h>
@@ -12,10 +10,7 @@ static duk_ret_t time_time(duk_context* ctx) {
 
     r = gettimeofday(&tv, NULL);
     if (r < 0) {
-        duk_push_error_object(ctx, DUK_ERR_ERROR, "[errno %d] %s", (errno), strerror(errno));
-        duk_push_int(ctx, errno);
-        duk_put_prop_string(ctx, -2, "errno");
-        duk_throw(ctx);
+        SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
     } else {
         double t;
@@ -58,27 +53,10 @@ static duk_ret_t time_hrtime(duk_context* ctx) {
 }
 
 
-static duk_ret_t time_sleep(duk_context* ctx) {
-    struct timeval tv;
-    double time;
-
-    time = duk_require_number(ctx, 0);
-    tv.tv_sec = (unsigned long) time;
-    tv.tv_usec = (unsigned long)(time * 1000000) % 1000000;
-
-    select(0, NULL, NULL, NULL, &tv);
-
-    /* TODO: return remaining time in case of EINTR */
-    duk_push_undefined(ctx);
-    return 1;
-}
-
-
 static const duk_function_list_entry module_funcs[] = {
     /* name, function, nargs */
     { "time", time_time, 0 },
     { "hrtime", time_hrtime, 1 },
-    { "sleep", time_sleep, 1 },
     { NULL, NULL, 0 }
 };
 
