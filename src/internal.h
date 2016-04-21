@@ -10,4 +10,8 @@ int sjs__path_normalize(const char* path, char* normalized_path, size_t normaliz
 void sjs__executable(char* buf, size_t size);
 uint64_t sjs__hrtime(void);
 
+/* string functions borrowed from OpenBSD */
+size_t sjs__strlcat(char *dst, const char *src, size_t dsize);
+size_t sjs__strlcpy(char *dst, const char *src, size_t dsize);
+
 #endif

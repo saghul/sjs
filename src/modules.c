@@ -81,11 +81,13 @@ static int load_jsdll(duk_context* ctx, const char* path) {
 
 static void path_join(char* path, size_t size, const char* p) {
     char sep;
+    size_t pathlen;
 
     assert(path && p);
 
+    pathlen = strlen(path);
     sep = '\0';
-    if (path[strlen(path)-1] != '/') {
+    if (path[pathlen-1] != '/') {
         if (p[0] != '/') {
             sep = '/';
         }
@@ -95,7 +97,7 @@ static void path_join(char* path, size_t size, const char* p) {
         }
     }
 
-    snprintf(path, size, "%s%c%s", path, sep, p);
+    snprintf(path+pathlen, size-pathlen, "%c%s", sep, p);
 }
 
 
@@ -245,7 +247,7 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
                 len = read_file(tmp, &data);
                 if (len < 0) {
                     /* no index.js, try index.jsdll */
-                    snprintf(tmp, sizeof(tmp), "%s%s", tmp, "dll");
+                    sjs__strlcat(tmp, "dll", sizeof(tmp));
                     if (load_jsdll(ctx, tmp) == 0) {
                         found_jsdll = 1;
                         break;
@@ -265,11 +267,11 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
             }
         } else {
             /* path doesn't exist, try to add .js or .jsdll */
-            snprintf(tmp, sizeof(tmp), "%s%s", tmp, ".js");
+            sjs__strlcat(tmp, ".js", sizeof(tmp));
             len = read_file(tmp, &data);
             if (len < 0) {
                 /* no index.js, try index.jsdll */
-                snprintf(tmp, sizeof(tmp), "%s%s", tmp, "dll");
+                sjs__strlcat(tmp, "dll", sizeof(tmp));
                 if (load_jsdll(ctx, tmp) == 0) {
                     found_jsdll = 1;
                     break;

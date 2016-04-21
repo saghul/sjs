@@ -18,6 +18,7 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 set(SOURCES
     src/duktape.c
     src/modules.c
+    src/util.c
     src/vm.c
     src/version.c
 )
