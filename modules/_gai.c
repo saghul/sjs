@@ -151,13 +151,17 @@ static const duk_number_list_entry module_consts[] = {
     /* gai errors */
     {"EAI_AGAIN", EAI_AGAIN},
     {"EAI_BADFLAGS", EAI_BADFLAGS},
+#ifdef EAI_BADHINTS
     {"EAI_BADHINTS", EAI_BADHINTS},
+#endif
     {"EAI_FAIL", EAI_FAIL},
     {"EAI_FAMILY", EAI_FAMILY},
     {"EAI_MEMORY", EAI_MEMORY},
     {"EAI_NONAME", EAI_NONAME},
     {"EAI_OVERFLOW", EAI_OVERFLOW},
+#ifdef EAI_PROTOCOL
     {"EAI_PROTOCOL", EAI_PROTOCOL},
+#endif
     {"EAI_SERVICE", EAI_SERVICE},
     {"EAI_SOCKTYPE", EAI_SOCKTYPE},
     {"EAI_SYSTEM", EAI_SYSTEM},

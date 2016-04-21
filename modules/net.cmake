@@ -24,6 +24,11 @@ set_target_properties(_gai PROPERTIES
     PREFIX ""
     SUFFIX ".jsdll"
 )
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    set_target_properties(_gai PROPERTIES
+        COMPILE_DEFINITIONS "_POSIX_C_SOURCE=200112"
+    )
+endif()
 install(TARGETS _gai
         DESTINATION lib/sjs/modules)
 
