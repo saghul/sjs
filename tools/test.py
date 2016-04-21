@@ -36,7 +36,7 @@ if __name__ == "__main__":
         raise RuntimeError('run as follows: tools/test.py test_directory')
 
     test_dir = sys.argv[1]
-    for f in os.listdir(test_dir):
+    for f in sorted(os.listdir(test_dir)):
         if f.startswith('test-'):
             run_test(os.path.join(test_dir, f))
 
