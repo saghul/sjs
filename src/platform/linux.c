@@ -17,3 +17,9 @@ void sjs__executable(char* buf, size_t size) {
     buffer[n] = '\0';
 }
 
+
+uint64_t sjs__hrtime(void) {
+    /* TODO */
+    return 0;
+}
+

@@ -3,11 +3,6 @@
 #include <sys/select.h>
 #include <sys/time.h>
 
-#if defined(__APPLE__)
-#include <mach/mach.h>
-#include <mach/mach_time.h>
-#endif
-
 #include <sjs/sjs.h>
 
 
@@ -31,22 +26,6 @@ static duk_ret_t time_time(duk_context* ctx) {
 }
 
 
-/* high precission time, in nanoseconds */
-static uint64_t time__hrtime(void) {
-#if defined(__APPLE__)
-    static mach_timebase_info_data_t info;
-    if (info.denom == 0) {
-        mach_timebase_info(&info);
-    }
-    return mach_absolute_time() * info.numer / info.denom;
-#elif defined(__linux__)
-# error "TODO"
-#else
-# error "Implement me!"
-#endif
-}
-
-
 #define NANOS_PER_SEC 1000000000
 
 /*
@@ -54,7 +33,7 @@ static uint64_t time__hrtime(void) {
  * it returns the difference.
  */
 static duk_ret_t time_hrtime(duk_context* ctx) {
-    uint64_t t = time__hrtime();
+    uint64_t t = sjs_time_hrtime();
     uint64_t sec = t / NANOS_PER_SEC;
     uint64_t nsec = t % NANOS_PER_SEC;
     if (duk_is_array(ctx, 0)) {

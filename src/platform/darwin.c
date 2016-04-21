@@ -1,8 +1,11 @@
 
+#include <mach/mach.h>
+#include <mach/mach_time.h>
 #include <mach-o/dyld.h> /* _NSGetExecutablePath */
 #include <stdlib.h>
 
 #include "../internal.h"
+
 
 void sjs__executable(char* buf, size_t size) {
     /* realpath(exepath) may be > PATH_MAX so double it to be on the safe side. */
@@ -31,5 +34,14 @@ void sjs__executable(char* buf, size_t size) {
 
     memcpy(buf, abspath, size);
     buf[size] = '\0';
+}
+
+
+uint64_t sjs__hrtime(void) {
+    static mach_timebase_info_data_t info;
+    if (info.denom == 0) {
+        mach_timebase_info(&info);
+    }
+    return mach_absolute_time() * info.numer / info.denom;
 }
 
