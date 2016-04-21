@@ -11,15 +11,6 @@
 #include <sjs/sjs.h>
 
 
-#define SJS__THROW_SOCKET_ERROR(error)                                                          \
-    do {                                                                                        \
-        duk_push_error_object(ctx, DUK_ERR_ERROR, "[errno %d] %s", (error), strerror((error))); \
-        duk_push_int(ctx, (error));                                                             \
-        duk_put_prop_string(ctx, -2, "errno");                                                  \
-        duk_throw(ctx);                                                                         \
-    } while (0)                                                                                 \
-
-
 /*
  * Create a socket. Args:
  * - 0: domain
@@ -38,7 +29,7 @@ static duk_ret_t sock_socket(duk_context* ctx) {
 
     fd = socket(domain, type, protocol);
     if (fd == -1) {
-        SJS__THROW_SOCKET_ERROR(errno);
+        SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
     } else {
         duk_push_int(ctx, fd);
@@ -239,7 +230,7 @@ static duk_ret_t sock_bind(duk_context* ctx) {
 
     r = bind(fd, (const struct sockaddr*) &ss, addrlen);
     if (r != 0) {
-        SJS__THROW_SOCKET_ERROR(errno);
+        SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
     } else {
         duk_push_undefined(ctx);
@@ -273,7 +264,7 @@ static duk_ret_t sock_connect(duk_context* ctx) {
 
     r = connect(fd, (const struct sockaddr*) &ss, addrlen);
     if (r != 0) {
-        SJS__THROW_SOCKET_ERROR(errno);
+        SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
     } else {
         duk_push_undefined(ctx);
@@ -294,7 +285,7 @@ static duk_ret_t sock__getsockpeername(duk_context* ctx, sjs__socknamefunc func)
     len = sizeof(ss);
     r = func(fd, (struct sockaddr*) &ss, &len);
     if (r != 0) {
-        SJS__THROW_SOCKET_ERROR(errno);
+        SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
     }
 
@@ -344,7 +335,7 @@ static duk_ret_t sock_shutdown(duk_context* ctx) {
 
     r = shutdown(fd, how);
     if (r != 0) {
-        SJS__THROW_SOCKET_ERROR(errno);
+        SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
     }
 
@@ -368,7 +359,7 @@ static duk_ret_t sock_listen(duk_context* ctx) {
 
     r = listen(fd, backlog);
     if (r != 0) {
-        SJS__THROW_SOCKET_ERROR(errno);
+        SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
     }
 
@@ -389,7 +380,7 @@ static duk_ret_t sock_accept(duk_context* ctx) {
 
     r = accept(fd, NULL, NULL);
     if (r < 0) {
-        SJS__THROW_SOCKET_ERROR(errno);
+        SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
     }
 
@@ -416,13 +407,13 @@ static duk_ret_t sock_recv(duk_context* ctx) {
     nread = duk_require_int(ctx, 1);
     buf = malloc(nread);
     if (!buf) {
-        SJS__THROW_SOCKET_ERROR(ENOMEM);
+        SJS_THROW_ERRNO_ERROR2(ENOMEM);
         return -42;    /* control never returns here */
     }
 
     r = recv(fd, buf, nread, 0);
     if (r < 0) {
-        SJS__THROW_SOCKET_ERROR(errno);
+        SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
     } else if (r == 0) {
         /* EOF */
@@ -454,7 +445,7 @@ static duk_ret_t sock_send(duk_context* ctx) {
 
     r = send(fd, buf, len, 0);
     if (r < 0) {
-        SJS__THROW_SOCKET_ERROR(errno);
+        SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
     } else {
         duk_push_int(ctx, r);
@@ -485,13 +476,13 @@ static duk_ret_t sock_recvfrom(duk_context* ctx) {
     nread = duk_require_int(ctx, 1);
     buf = malloc(nread);
     if (!buf) {
-        SJS__THROW_SOCKET_ERROR(ENOMEM);
+        SJS_THROW_ERRNO_ERROR2(ENOMEM);
         return -42;    /* control never returns here */
     }
 
     r = recvfrom(fd, buf, nread, 0, (struct sockaddr*) &ss, &addrlen);
     if (r < 0) {
-        SJS__THROW_SOCKET_ERROR(errno);
+        SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
     } else {
         duk_push_object(ctx);
@@ -540,7 +531,7 @@ static duk_ret_t sock_sendto(duk_context* ctx) {
 
     r = sendto(fd, buf, len, 0, (const struct sockaddr*) &ss, addrlen);
     if (r < 0) {
-        SJS__THROW_SOCKET_ERROR(errno);
+        SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
     } else {
         duk_push_int(ctx, r);

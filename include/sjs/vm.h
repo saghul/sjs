@@ -15,14 +15,19 @@ DUK_EXTERNAL_DECL duk_context* sjs_vm_get_duk_ctx(sjs_vm_t* vm);
 DUK_EXTERNAL_DECL int sjs_path_normalize(const char* path, char* normalized_path, size_t normalized_path_len);
 DUK_EXTERNAL_DECL uint64_t sjs_time_hrtime(void);
 
-#define SJS_THROW_ERRNO_ERROR()                                                             \
+
+#define SJS_THROW_ERRNO_ERROR2(x)                                                           \
     do {                                                                                    \
-        int err = errno;                                                                    \
+        int err = x;                                                                        \
         duk_push_error_object(ctx, DUK_ERR_ERROR, "[errno %d] %s", (err), strerror((err))); \
         duk_push_int(ctx, (err));                                                           \
         duk_put_prop_string(ctx, -2, "errno");                                              \
         duk_throw(ctx);                                                                     \
     } while (0)                                                                             \
+
+
+#define SJS_THROW_ERRNO_ERROR()     \
+    SJS_THROW_ERRNO_ERROR2(errno)
 
 
 #endif

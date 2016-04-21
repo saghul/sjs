@@ -7,16 +7,6 @@
 #include <sjs/sjs.h>
 
 
-/* TODO: DRY this? */
-#define SJS__THROW_IO_ERROR(error)                                                              \
-    do {                                                                                        \
-        duk_push_error_object(ctx, DUK_ERR_ERROR, "[errno %d] %s", (error), strerror((error))); \
-        duk_push_int(ctx, (error));                                                             \
-        duk_put_prop_string(ctx, -2, "errno");                                                  \
-        duk_throw(ctx);                                                                         \
-    } while (0)                                                                                 \
-
-
 /*
  * Read data from a fd. Args:
  * - 0: fd
@@ -34,13 +24,13 @@ static duk_ret_t io_read(duk_context* ctx) {
     nread = duk_require_int(ctx, 1);
     buf = malloc(nread);
     if (!buf) {
-        SJS__THROW_IO_ERROR(ENOMEM);
+        SJS_THROW_ERRNO_ERROR2(ENOMEM);
         return -42;    /* control never returns here */
     }
 
     r = read(fd, buf, nread);
     if (r < 0) {
-        SJS__THROW_IO_ERROR(errno);
+        SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
     } else if (r == 0) {
         /* EOF */
@@ -71,7 +61,7 @@ static duk_ret_t io_write(duk_context* ctx) {
 
     r = write(fd, buf, len);
     if (r < 0) {
-        SJS__THROW_IO_ERROR(errno);
+        SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
     } else {
         duk_push_int(ctx, r);
