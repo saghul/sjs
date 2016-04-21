@@ -14,7 +14,7 @@ void sjs__executable(char* buf, size_t size) {
         return;
     }
 
-    buffer[n] = '\0';
+    buf[n] = '\0';
 }
 
 
