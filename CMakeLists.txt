@@ -2,7 +2,14 @@ cmake_minimum_required(VERSION 2.8)
 
 project(sjs)
 
-set(CMAKE_C_FLAGS "-O2 -g -pedantic -std=c99 -Wall -fstrict-aliasing -fno-omit-frame-pointer")
+if (NOT CMAKE_BUILD_TYPE)
+	message(STATUS "No build type selected, default to Debug")
+	set(CMAKE_BUILD_TYPE "Debug")
+endif()
+
+set(CMAKE_C_FLAGS "-pedantic -std=c99 -Wall -fstrict-aliasing -fno-omit-frame-pointer")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0 -g3")
+set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -O2 -g")
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 

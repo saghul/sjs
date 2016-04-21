@@ -1,15 +1,19 @@
 
 MAKE?=make
 PYTHON?=python
+
 CMAKE_MK=build/Makefile
+
+BUILDTYPE?=Debug
+VERBOSE?=
 
 all: build
 
 build: $(CMAKE_MK)
-	@$(MAKE) -C build
+	@$(MAKE) -C build VERBOSE=$(VERBOSE)
 
 $(CMAKE_MK):
-	cmake -H. -Bbuild
+	cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=$(BUILDTYPE)
 
 install: $(CMAKE_MK)
 	@$(MAKE) -C build install
