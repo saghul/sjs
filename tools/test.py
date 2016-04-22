@@ -19,6 +19,7 @@ def red(text):
 def run_test(f):
     test_file = os.path.basename(f)
     sys.stdout.write('Running {:50}'.format(test_file))
+    sys.stdout.flush()
     try:
         subprocess.check_output('%s %s' % (cmd, f), stderr=subprocess.STDOUT, shell=True)
     except subprocess.CalledProcessError as e:
