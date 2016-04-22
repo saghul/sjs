@@ -24,3 +24,16 @@ set_target_properties(_select PROPERTIES
 )
 install(TARGETS _select
         DESTINATION lib/sjs/modules)
+add_library(_poll MODULE
+    modules/_poll.c
+)
+target_link_libraries(_poll
+    sjs
+)
+set_target_properties(_poll PROPERTIES
+    PREFIX ""
+    SUFFIX ".jsdll"
+    COMPILE_DEFINITIONS "_GNU_SOURCE"
+)
+install(TARGETS _poll
+        DESTINATION lib/sjs/modules)
