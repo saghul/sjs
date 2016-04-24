@@ -28,3 +28,14 @@ as there is a single VM running for a given thread. There is no global state. Th
 inter-VM communication.
 
 See the :ref:`vmapi` section for details on the C API.
+
+
+Inspiration
+-----------
+
+Skookum JS was not inspired by browser JavaScript runtimes but by more "traditional" runtimes such as Ruby's MRI or
+Python's CPython.
+
+This means that the model is not inherently asynchronous and event-driven, as in a browser or
+`Node JS <ihttps://nodejs.org/en/>`_. `sjs` does provide the necessary tools to build asynchronous / event-driven
+frameworks on top of the provided modules.
