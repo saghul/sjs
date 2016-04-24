@@ -20,6 +20,10 @@ The runtime can be logically divided into 3 parts:
 * The modules: in `sjs` modules can be either written in pure JavaScript or in C. See the :ref:`modules` section.
 
 
+.. image:: .static/sjs-libsjs-diagram.png
+    :align: center
+
+
 The VM
 ------
 
