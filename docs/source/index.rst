@@ -13,8 +13,9 @@ Documentation
 .. toctree::
     :maxdepth: 1
 
-    design
     features
+    design
+    vmapi
     modules
     faq
 
