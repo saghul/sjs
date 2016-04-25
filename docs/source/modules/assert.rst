@@ -1,0 +1,7 @@
+
+.. _modassert:
+
+assert
+======
+
+TODO
