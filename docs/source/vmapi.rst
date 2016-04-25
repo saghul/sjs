@@ -40,7 +40,7 @@ Main VM API
 
 .. c:function:: void sjs_vm_setup_args(sjs_vm_t* vm, int argc, char* argv[])
 
-    Setup the VM's arguments. This is required for initializing some internals in the :ref:`mod_system` module.
+    Setup the VM's arguments. This is required for initializing some internals in the :ref:`modsystem` module.
 
     :param vm: The VM reference.
     :param argc: Number of arguments in the array.
