@@ -120,6 +120,7 @@ html_theme_options = {
     'github_repo': 'sjs',
     'github_banner': True,
     'show_powered_by': False,
+    'sidebar_width': '230px',
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
