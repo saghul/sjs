@@ -20,327 +20,330 @@ static duk_ret_t errno_strerror(duk_context* ctx) {
 }
 
 
+#define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
 #ifdef EPERM
-    { "EPERM", EPERM },
+    X(EPERM),
 #endif
 #ifdef ENOENT
-    { "ENOENT", ENOENT },
+    X(ENOENT),
 #endif
 #ifdef ESRCH
-    { "ESRCH", ESRCH },
+    X(ESRCH),
 #endif
 #ifdef EINTR
-    { "EINTR", EINTR },
+    X(EINTR),
 #endif
 #ifdef EIO
-    { "EIO", EIO },
+    X(EIO),
 #endif
 #ifdef ENXIO
-    { "ENXIO", ENXIO },
+    X(ENXIO),
 #endif
 #ifdef E2BIG
-    { "E2BIG", E2BIG },
+    X(E2BIG),
 #endif
 #ifdef ENOEXEC
-    { "ENOEXEC", ENOEXEC },
+    X(ENOEXEC),
 #endif
 #ifdef EBADF
-    { "EBADF", EBADF },
+    X(EBADF),
 #endif
 #ifdef ECHILD
-    { "ECHILD", ECHILD },
+    X(ECHILD),
 #endif
 #ifdef EDEADLK
-    { "EDEADLK", EDEADLK },
+    X(EDEADLK),
 #endif
 #ifdef ENOMEM
-    { "ENOMEM", ENOMEM },
+    X(ENOMEM),
 #endif
 #ifdef EACCES
-    { "EACCES", EACCES },
+    X(EACCES),
 #endif
 #ifdef EFAULT
-    { "EFAULT", EFAULT },
+    X(EFAULT),
 #endif
 #ifdef ENOTBLK
-    { "ENOTBLK", ENOTBLK },
+    X(ENOTBLK),
 #endif
 #ifdef EBUSY
-    { "EBUSY", EBUSY },
+    X(EBUSY),
 #endif
 #ifdef EEXIST
-    { "EEXIST", EEXIST },
+    X(EEXIST),
 #endif
 #ifdef EXDEV
-    { "EXDEV", EXDEV },
+    X(EXDEV),
 #endif
 #ifdef ENODEV
-    { "ENODEV", ENODEV },
+    X(ENODEV),
 #endif
 #ifdef ENOTDIR
-    { "ENOTDIR", ENOTDIR },
+    X(ENOTDIR),
 #endif
 #ifdef EISDIR
-    { "EISDIR", EISDIR },
+    X(EISDIR),
 #endif
 #ifdef EINVAL
-    { "EINVAL", EINVAL },
+    X(EINVAL),
 #endif
 #ifdef ENFILE
-    { "ENFILE", ENFILE },
+    X(ENFILE),
 #endif
 #ifdef EMFILE
-    { "EMFILE", EMFILE },
+    X(EMFILE),
 #endif
 #ifdef ENOTTY
-    { "ENOTTY", ENOTTY },
+    X(ENOTTY),
 #endif
 #ifdef ETXTBSY
-    { "ETXTBSY", ETXTBSY },
+    X(ETXTBSY),
 #endif
 #ifdef EFBIG
-    { "EFBIG", EFBIG },
+    X(EFBIG),
 #endif
 #ifdef ENOSPC
-    { "ENOSPC", ENOSPC },
+    X(ENOSPC),
 #endif
 #ifdef ESPIPE
-    { "ESPIPE", ESPIPE },
+    X(ESPIPE),
 #endif
 #ifdef EROFS
-    { "EROFS", EROFS },
+    X(EROFS),
 #endif
 #ifdef EMLINK
-    { "EMLINK", EMLINK },
+    X(EMLINK),
 #endif
 #ifdef EPIPE
-    { "EPIPE", EPIPE },
+    X(EPIPE),
 #endif
 #ifdef EDOM
-    { "EDOM", EDOM },
+    X(EDOM),
 #endif
 #ifdef ERANGE
-    { "ERANGE", ERANGE },
+    X(ERANGE),
 #endif
 #ifdef EAGAIN
-    { "EAGAIN", EAGAIN },
+    X(EAGAIN),
 #endif
 #ifdef EWOULDBLOCK
-    { "EWOULDBLOCK", EWOULDBLOCK },
+    X(EWOULDBLOCK),
 #endif
 #ifdef EINPROGRESS
-    { "EINPROGRESS", EINPROGRESS },
+    X(EINPROGRESS),
 #endif
 #ifdef EALREADY
-    { "EALREADY", EALREADY },
+    X(EALREADY),
 #endif
 #ifdef ENOTSOCK
-    { "ENOTSOCK", ENOTSOCK },
+    X(ENOTSOCK),
 #endif
 #ifdef EDESTADDRREQ
-    { "EDESTADDRREQ", EDESTADDRREQ },
+    X(EDESTADDRREQ),
 #endif
 #ifdef EMSGSIZE
-    { "EMSGSIZE", EMSGSIZE },
+    X(EMSGSIZE),
 #endif
 #ifdef EPROTOTYPE
-    { "EPROTOTYPE", EPROTOTYPE },
+    X(EPROTOTYPE),
 #endif
 #ifdef ENOPROTOOPT
-    { "ENOPROTOOPT", ENOPROTOOPT },
+    X(ENOPROTOOPT),
 #endif
 #ifdef EPROTONOSUPPORT
-    { "EPROTONOSUPPORT", EPROTONOSUPPORT },
+    X(EPROTONOSUPPORT),
 #endif
 #ifdef ESOCKTNOSUPPORT
-    { "ESOCKTNOSUPPORT", ESOCKTNOSUPPORT },
+    X(ESOCKTNOSUPPORT),
 #endif
 #ifdef ENOTSUP
-    { "ENOTSUP", ENOTSUP },
+    X(ENOTSUP),
 #endif
 #ifdef EPFNOSUPPORT
-    { "EPFNOSUPPORT", EPFNOSUPPORT },
+    X(EPFNOSUPPORT),
 #endif
 #ifdef EAFNOSUPPORT
-    { "EAFNOSUPPORT", EAFNOSUPPORT },
+    X(EAFNOSUPPORT),
 #endif
 #ifdef EADDRINUSE
-    { "EADDRINUSE", EADDRINUSE },
+    X(EADDRINUSE),
 #endif
 #ifdef EADDRNOTAVAIL
-    { "EADDRNOTAVAIL", EADDRNOTAVAIL },
+    X(EADDRNOTAVAIL),
 #endif
 #ifdef ENETDOWN
-    { "ENETDOWN", ENETDOWN },
+    X(ENETDOWN),
 #endif
 #ifdef ENETUNREACH
-    { "ENETUNREACH", ENETUNREACH },
+    X(ENETUNREACH),
 #endif
 #ifdef ENETRESET
-    { "ENETRESET", ENETRESET },
+    X(ENETRESET),
 #endif
 #ifdef ECONNABORTED
-    { "ECONNABORTED", ECONNABORTED },
+    X(ECONNABORTED),
 #endif
 #ifdef ECONNRESET
-    { "ECONNRESET", ECONNRESET },
+    X(ECONNRESET),
 #endif
 #ifdef ENOBUFS
-    { "ENOBUFS", ENOBUFS },
+    X(ENOBUFS),
 #endif
 #ifdef EISCONN
-    { "EISCONN", EISCONN },
+    X(EISCONN),
 #endif
 #ifdef ENOTCONN
-    { "ENOTCONN", ENOTCONN },
+    X(ENOTCONN),
 #endif
 #ifdef ESHUTDOWN
-    { "ESHUTDOWN", ESHUTDOWN },
+    X(ESHUTDOWN),
 #endif
 #ifdef ETOOMANYREFS
-    { "ETOOMANYREFS", ETOOMANYREFS },
+    X(ETOOMANYREFS),
 #endif
 #ifdef ETIMEDOUT
-    { "ETIMEDOUT", ETIMEDOUT },
+    X(ETIMEDOUT),
 #endif
 #ifdef ECONNREFUSED
-    { "ECONNREFUSED", ECONNREFUSED },
+    X(ECONNREFUSED),
 #endif
 #ifdef ELOOP
-    { "ELOOP", ELOOP },
+    X(ELOOP),
 #endif
 #ifdef ENAMETOOLONG
-    { "ENAMETOOLONG", ENAMETOOLONG },
+    X(ENAMETOOLONG),
 #endif
 #ifdef EHOSTDOWN
-    { "EHOSTDOWN", EHOSTDOWN },
+    X(EHOSTDOWN),
 #endif
 #ifdef EHOSTUNREACH
-    { "EHOSTUNREACH", EHOSTUNREACH },
+    X(EHOSTUNREACH),
 #endif
 #ifdef ENOTEMPTY
-    { "ENOTEMPTY", ENOTEMPTY },
+    X(ENOTEMPTY),
 #endif
 #ifdef EPROCLIM
-    { "EPROCLIM", EPROCLIM },
+    X(EPROCLIM),
 #endif
 #ifdef EUSERS
-    { "EUSERS", EUSERS },
+    X(EUSERS),
 #endif
 #ifdef EDQUOT
-    { "EDQUOT", EDQUOT },
+    X(EDQUOT),
 #endif
 #ifdef ESTALE
+    X(ESTALE),
     { "ESTALE", ESTALE },
 #endif
 #ifdef EREMOTE
-    { "EREMOTE", EREMOTE },
+    X(EREMOTE),
 #endif
 #ifdef EBADRPC
-    { "EBADRPC", EBADRPC },
+    X(EBADRPC),
 #endif
 #ifdef ERPCMISMATCH
-    { "ERPCMISMATCH", ERPCMISMATCH },
+    X(ERPCMISMATCH),
 #endif
 #ifdef EPROGUNAVAIL
-    { "EPROGUNAVAIL", EPROGUNAVAIL },
+    X(EPROGUNAVAIL),
 #endif
 #ifdef EPROGMISMATCH
-    { "EPROGMISMATCH", EPROGMISMATCH },
+    X(EPROGMISMATCH),
 #endif
 #ifdef EPROCUNAVAIL
-    { "EPROCUNAVAIL", EPROCUNAVAIL },
+    X(EPROCUNAVAIL),
 #endif
 #ifdef ENOLCK
-    { "ENOLCK", ENOLCK },
+    X(ENOLCK),
 #endif
 #ifdef ENOSYS
-    { "ENOSYS", ENOSYS },
+    X(ENOSYS),
 #endif
 #ifdef EFTYPE
-    { "EFTYPE", EFTYPE },
+    X(EFTYPE),
 #endif
 #ifdef EAUTH
-    { "EAUTH", EAUTH },
+    X(EAUTH),
 #endif
 #ifdef ENEEDAUTH
-    { "ENEEDAUTH", ENEEDAUTH },
+    X(ENEEDAUTH),
 #endif
 #ifdef EPWROFF
-    { "EPWROFF", EPWROFF },
+    X(EPWROFF),
 #endif
 #ifdef EDEVERR
-    { "EDEVERR", EDEVERR },
+    X(EDEVERR),
 #endif
 #ifdef EOVERFLOW
-    { "EOVERFLOW", EOVERFLOW },
+    X(EOVERFLOW),
 #endif
 #ifdef EBADEXEC
-    { "EBADEXEC", EBADEXEC },
+    X(EBADEXEC),
 #endif
 #ifdef EBADARCH
-    { "EBADARCH", EBADARCH },
+    X(EBADARCH),
 #endif
 #ifdef ESHLIBVERS
-    { "ESHLIBVERS", ESHLIBVERS },
+    X(ESHLIBVERS),
 #endif
 #ifdef EBADMACHO
-    { "EBADMACHO", EBADMACHO },
+    X(EBADMACHO),
 #endif
 #ifdef ECANCELED
-    { "ECANCELED", ECANCELED },
+    X(ECANCELED),
 #endif
 #ifdef EIDRM
-    { "EIDRM", EIDRM },
+    X(EIDRM),
 #endif
 #ifdef ENOMSG
-    { "ENOMSG", ENOMSG },
+    X(ENOMSG),
 #endif
 #ifdef EILSEQ
-    { "EILSEQ", EILSEQ },
+    X(EILSEQ),
 #endif
 #ifdef ENOATTR
-    { "ENOATTR", ENOATTR },
+    X(ENOATTR),
 #endif
 #ifdef EBADMSG
-    { "EBADMSG", EBADMSG },
+    X(EBADMSG),
 #endif
 #ifdef EMULTIHOP
-    { "EMULTIHOP", EMULTIHOP },
+    X(EMULTIHOP),
 #endif
 #ifdef ENODATA
-    { "ENODATA", ENODATA },
+    X(ENODATA),
 #endif
 #ifdef ENOLINK
-    { "ENOLINK", ENOLINK },
+    X(ENOLINK),
 #endif
 #ifdef ENOSR
-    { "ENOSR", ENOSR },
+    X(ENOSR),
 #endif
 #ifdef ENOSTR
-    { "ENOSTR", ENOSTR },
+    X(ENOSTR),
 #endif
 #ifdef EPROTO
-    { "EPROTO", EPROTO },
+    X(EPROTO),
 #endif
 #ifdef ETIME
-    { "ETIME", ETIME },
+    X(ETIME),
 #endif
 #ifdef EOPNOTSUPP
-    { "EOPNOTSUPP", EOPNOTSUPP },
+    X(EOPNOTSUPP),
 #endif
 #ifdef ENOPOLICY
-    { "ENOPOLICY", ENOPOLICY },
+    X(ENOPOLICY),
 #endif
 #ifdef ENOTRECOVERABLE
-    { "ENOTRECOVERABLE", ENOTRECOVERABLE },
+    X(ENOTRECOVERABLE),
 #endif
 #ifdef EOWNERDEAD
-    { "EOWNERDEAD", EOWNERDEAD },
+    X(EOWNERDEAD),
 #endif
     { NULL, 0.0 }
 };
+#undef X
 
 
 static const duk_function_list_entry module_funcs[] = {

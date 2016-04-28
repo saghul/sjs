@@ -71,12 +71,14 @@ static duk_ret_t io_write(duk_context* ctx) {
 }
 
 
+#define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
-    { "STDIN_FILENO", STDIN_FILENO },
-    { "STDOUT_FILENO", STDOUT_FILENO },
-    { "STDERR_FILENO", STDERR_FILENO },
+    X(STDIN_FILENO),
+    X(STDOUT_FILENO),
+    X(STDERR_FILENO),
     { NULL, 0.0 }
 };
+#undef X
 
 
 static const duk_function_list_entry module_funcs[] = {

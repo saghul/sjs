@@ -140,33 +140,35 @@ static duk_ret_t gai_gstrerror(duk_context* ctx) {
 }
 
 
+#define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
     /* ai_flags */
-    {"AI_ADDRCONFIG", AI_ADDRCONFIG},
-    {"AI_ALL", AI_ALL},
-    {"AI_CANONNAME", AI_CANONNAME},
-    {"AI_NUMERICHOST", AI_NUMERICHOST},
-    {"AI_NUMERICSERV", AI_NUMERICSERV},
-    {"AI_PASSIVE", AI_V4MAPPED},
+    X(AI_ADDRCONFIG),
+    X(AI_ALL),
+    X(AI_CANONNAME),
+    X(AI_NUMERICHOST),
+    X(AI_NUMERICSERV),
+    X(AI_V4MAPPED),
     /* gai errors */
-    {"EAI_AGAIN", EAI_AGAIN},
-    {"EAI_BADFLAGS", EAI_BADFLAGS},
+    X(EAI_AGAIN),
+    X(EAI_BADFLAGS),
 #ifdef EAI_BADHINTS
-    {"EAI_BADHINTS", EAI_BADHINTS},
+    X(EAI_BADHINTS),
 #endif
-    {"EAI_FAIL", EAI_FAIL},
-    {"EAI_FAMILY", EAI_FAMILY},
-    {"EAI_MEMORY", EAI_MEMORY},
-    {"EAI_NONAME", EAI_NONAME},
-    {"EAI_OVERFLOW", EAI_OVERFLOW},
+    X(EAI_FAIL),
+    X(EAI_FAMILY),
+    X(EAI_MEMORY),
+    X(EAI_NONAME),
+    X(EAI_OVERFLOW),
 #ifdef EAI_PROTOCOL
-    {"EAI_PROTOCOL", EAI_PROTOCOL},
+    X(EAI_PROTOCOL),
 #endif
-    {"EAI_SERVICE", EAI_SERVICE},
-    {"EAI_SOCKTYPE", EAI_SOCKTYPE},
-    {"EAI_SYSTEM", EAI_SYSTEM},
+    X(EAI_SERVICE),
+    X(EAI_SOCKTYPE),
+    X(EAI_SYSTEM),
     { NULL, 0.0 }
 };
+#undef X
 
 
 static const duk_function_list_entry module_funcs[] = {

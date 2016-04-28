@@ -104,10 +104,12 @@ static duk_ret_t select_select(duk_context* ctx) {
 }
 
 
+#define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
-    { "FD_SETSIZE", FD_SETSIZE },
+    X(FD_SETSIZE),
     { NULL, 0.0 }
 };
+#undef X
 
 
 static const duk_function_list_entry module_funcs[] = {

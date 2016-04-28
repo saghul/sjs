@@ -568,20 +568,22 @@ static duk_ret_t sock_inet_pton(duk_context* ctx) {
 }
 
 
+#define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
     /* socket domain */
-    { "AF_INET", AF_INET },
-    { "AF_INET6", AF_INET6 },
-    { "AF_UNIX", AF_UNIX },
+    X(AF_INET),
+    X(AF_INET6),
+    X(AF_UNIX),
     /* socket type */
-    { "SOCK_DGRAM", SOCK_DGRAM },
-    { "SOCK_STREAM", SOCK_STREAM },
+    X(SOCK_DGRAM),
+    X(SOCK_STREAM),
     /* shutdown how */
-    { "SHUT_RD", SHUT_RD },
-    { "SHUT_WR", SHUT_WR },
-    { "SHUT_RDWR", SHUT_RDWR },
+    X(SHUT_RD),
+    X(SHUT_WR),
+    X(SHUT_RDWR),
     { NULL, 0.0 }
 };
+#undef X
 
 
 static const duk_function_list_entry module_funcs[] = {
