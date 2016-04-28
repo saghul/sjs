@@ -5,17 +5,29 @@ const _gai = require('_gai');
 const _socket = require('_socket');
 
 
-function Socket(domain, type, protocol, fd) {
+function Socket(domain, type, protocol, options) {
     var protocol = protocol >>> 0;
+    var options = options || {};
 
-    if (fd && fd > -1) {
-        this._fd = fd;
+    if (options.fd !== undefined && options.fd > -1) {
+        this._fd = options.fd;
     } else {
         this._fd = _socket.socket(domain, type, protocol);
     }
+
     this._domain = domain;
     this._type = type;
     this._proto = protocol;
+
+    this._nonblock = !!options.nonBlocking;
+    if (this._nonblock) {
+        try {
+            _socket.set_nonblocking(this._fd, this._nonblock);
+        } catch (e) {
+            this.close();
+            throw e;
+        }
+    }
 
     // set finalizer
     Duktape.fin(this, socketDealloc);
@@ -31,7 +43,8 @@ function Socket(domain, type, protocol, fd) {
 Socket.prototype.accept = function() {
     checkSocket.call(this);
     var fd = _socket.accept(this._fd);
-    return new Socket(this._domain, this._type, this._proto, fd);
+    var options = {fd: fd, nonBlocking: this._nonblock};
+    return new Socket(this._domain, this._type, this._proto, options);
 }
 
 
@@ -104,6 +117,12 @@ Socket.prototype.shutdown = function(how) {
     checkSocket.call(this);
     var how = how >>> 0;
     _socket.shutdown(this._fd, how);
+}
+
+
+Socket.prototype.setNonBlocking = function(set) {
+    checkSocket.call(this);
+    _socket.set_nonblocking(this._fd, !!set);
 }
 
 

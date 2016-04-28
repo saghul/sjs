@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <errno.h>
 #include <stdio.h>
+#include <sys/ioctl.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/un.h>
@@ -568,6 +569,32 @@ static duk_ret_t sock_inet_pton(duk_context* ctx) {
 }
 
 
+/*
+ * Set the socket to non-blocking mode
+ * - 0: fd
+ * - 1: set
+ */
+static duk_ret_t sock_set_nonblocking(duk_context* ctx) {
+    int r, fd;
+    duk_bool_t set;
+
+    fd = duk_require_int(ctx, 0);
+    set = duk_require_boolean(ctx, 1);
+
+    do
+	r = ioctl(fd, FIONBIO, &set);
+    while (r == -1 && errno == EINTR);
+
+    if (r) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    }
+
+    duk_push_undefined(ctx);
+    return 1;
+}
+
+
 #define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
     /* socket domain */
@@ -602,6 +629,7 @@ static const duk_function_list_entry module_funcs[] = {
     { "recvfrom", sock_recvfrom, 2 },
     { "sendto", sock_sendto, 4 },
     { "inet_pton", sock_inet_pton, 2 },
+    { "set_nonblocking", sock_set_nonblocking, 2 },
     { NULL, NULL, 0 }
 };
 
