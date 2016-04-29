@@ -198,8 +198,8 @@ static int sjs__compile_execute(duk_context *ctx) {
 
     /* [ ... code len filename ] */
 
-    code = (const char *) duk_require_pointer(ctx, -3);
-    len = (duk_size_t) duk_require_uint(ctx, -2);
+    code = duk_require_pointer(ctx, -3);
+    len = duk_require_uint(ctx, -2);
     duk_compile_lstring_filename(ctx, DUK_COMPILE_STRICT, code, len);
 
     /* [ ... code len function ] */
