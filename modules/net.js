@@ -3,6 +3,7 @@
 const errno = require('errno');
 const _gai = require('_gai');
 const _socket = require('_socket');
+const outil = require('objectutil');
 
 
 function Socket(domain, type, protocol, options) {
@@ -30,7 +31,7 @@ function Socket(domain, type, protocol, options) {
     }
 
     // set finalizer
-    Duktape.fin(this, socketDealloc);
+    outil.finalizer(this, socketDealloc);
 
     Object.defineProperty(this, 'fd', {
         get: function() {

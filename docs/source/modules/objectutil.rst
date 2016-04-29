@@ -119,3 +119,14 @@ This module contains several utilities for working with objects. It oritinates f
     new object created from `superConstructor`.
 
     As an additional convenience, `superConstructor` will be accessible through the ``constructor.super_`` property.
+
+.. js:function:: objectutil.finalizer(object, funalizerFunc)
+
+    Set or get the finalizer for the given `object`.
+
+    :param object: Entity whose finalizer we are setting / getting.
+    :param finalizerFunc: Function which will be called when the object is about to be freed.
+    :returns: Undefined.
+
+    .. seealso::
+        `Duktape documentation on finalizers <http://duktape.org/guide.html#finalization>`_.
