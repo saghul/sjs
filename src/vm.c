@@ -363,29 +363,22 @@ DUK_EXTERNAL int sjs_vm_eval_code(const sjs_vm_t* vm, const char* filename, cons
 }
 
 
-/* TODO: refactor? read the file and use the eval code function */
 DUK_EXTERNAL int sjs_vm_eval_file(const sjs_vm_t* vm, const char* filename, FILE* foutput, FILE* ferror) {
     int r;
+    char* data;
 
-    assert(vm);
-    duk_context* ctx = vm->ctx;
-
-    r = duk_peval_file(ctx, filename);
-    if (r != DUK_EXEC_SUCCESS) {
-        if (ferror) {
-            duk_safe_call(ctx, sjs__get_error_stack, 1 /*nargs*/, 1 /*nrets*/);
-            fprintf(ferror, "%s\n", duk_safe_to_string(ctx, -1));
-            fflush(ferror);
-        }
+    r = sjs__file_read(filename, &data);
+    if (r < 0) {
+        return r;
+    } else if (r == 0) {
+        /* also return in case of a 0 sized file */
+        free(data);
+        return r;
     } else {
-        if (foutput) {
-            fprintf(foutput, "= %s\n", duk_safe_to_string(ctx, -1));
-            fflush(foutput);
-        }
+        r = sjs_vm_eval_code(vm, filename, data, r, foutput, ferror);
+        free(data);
+        return r;
     }
-
-    duk_pop(ctx);
-    return r;
 }
 
 
