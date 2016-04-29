@@ -207,7 +207,7 @@ static int sjs__compile_execute(duk_context *ctx) {
     duk_push_global_object(ctx);  /* 'this' binding */
     duk_call_method(ctx, 0);
 
-    return 0;  /* duk_safe_call() cleans up */
+    return 1;    /* either the result or error are on the stack top */
 }
 
 
