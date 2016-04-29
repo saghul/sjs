@@ -192,6 +192,45 @@ static void sjs__setup_global_module(sjs_vm_t* vm) {
 }
 
 
+static int sjs__compile_execute(duk_context *ctx) {
+    const char *code;
+    duk_size_t len;
+
+    /* [ ... code len filename ] */
+
+    code = (const char *) duk_require_pointer(ctx, -3);
+    len = (duk_size_t) duk_require_uint(ctx, -2);
+    duk_compile_lstring_filename(ctx, 0, code, len);
+
+    /* [ ... code len function ] */
+
+    duk_push_global_object(ctx);  /* 'this' binding */
+    duk_call_method(ctx, 0);
+
+    return 0;  /* duk_safe_call() cleans up */
+}
+
+
+static int sjs__get_error_stack(duk_context *ctx) {
+    if (!duk_is_object(ctx, -1)) {
+        return 1;
+    }
+
+    if (!duk_has_prop_string(ctx, -1, "stack")) {
+        return 1;
+    }
+
+    if (!duk_is_error(ctx, -1)) {
+        /* Not an Error instance, don't read "stack" */
+        return 1;
+    }
+
+    duk_get_prop_string(ctx, -1, "stack");  /* caller coerces */
+    duk_remove(ctx, -2);
+    return 1;
+}
+
+
 DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
     sjs_vm_t* vm;
     vm = calloc(1, sizeof(*vm));
@@ -251,6 +290,61 @@ DUK_EXTERNAL void sjs_vm_setup_args(sjs_vm_t* vm, int argc, char* argv[]) {
     }
 
     duk_pop(ctx);
+}
+
+
+DUK_EXTERNAL int sjs_vm_eval_code(const sjs_vm_t* vm, const char* filename, const char* code, size_t len, FILE* foutput, FILE* ferror) {
+    int r;
+
+    assert(vm);
+    duk_context* ctx = vm->ctx;
+
+    duk_push_pointer(ctx, (void *) code);
+    duk_push_uint(ctx, len);
+    duk_push_string(ctx, filename);
+
+    r = duk_safe_call(ctx, sjs__compile_execute, 3 /*nargs*/, 1 /*nret*/);
+    if (r != DUK_EXEC_SUCCESS) {
+        if (ferror) {
+            duk_safe_call(ctx, sjs__get_error_stack, 1 /*nargs*/, 1 /*nrets*/);
+            fprintf(ferror, "%s\n", duk_safe_to_string(ctx, -1));
+            fflush(ferror);
+        }
+    } else {
+        if (foutput) {
+            fprintf(foutput, "= %s\n", duk_safe_to_string(ctx, -1));
+            fflush(foutput);
+        }
+    }
+
+    duk_pop(ctx);
+    return r;
+}
+
+
+/* TODO: refactor? read the file and use the eval code function */
+DUK_EXTERNAL int sjs_vm_eval_file(const sjs_vm_t* vm, const char* filename, FILE* foutput, FILE* ferror) {
+    int r;
+
+    assert(vm);
+    duk_context* ctx = vm->ctx;
+
+    r = duk_peval_file(ctx, filename);
+    if (r != DUK_EXEC_SUCCESS) {
+        if (ferror) {
+            duk_safe_call(ctx, sjs__get_error_stack, 1 /*nargs*/, 1 /*nrets*/);
+            fprintf(ferror, "%s\n", duk_safe_to_string(ctx, -1));
+            fflush(ferror);
+        }
+    } else {
+        if (foutput) {
+            fprintf(foutput, "= %s\n", duk_safe_to_string(ctx, -1));
+            fflush(foutput);
+        }
+    }
+
+    duk_pop(ctx);
+    return r;
 }
 
 

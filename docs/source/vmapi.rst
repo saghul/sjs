@@ -53,6 +53,28 @@ Main VM API
     :param vm: The VM reference.
     :returns: The Duktape context.
 
+.. c:function:: int sjs_vm_eval_code(const sjs_vm_t* vm, const char* filename, const char* code, size_t len, FILE* foutput, FILE* ferror)
+
+    Evaluate the given JavaScript `code`.
+
+    :param vm: The VM reference.
+    :param filename: Indicates the filename that is being executed. It will be printed in tracebacks and such.
+    :param code: What is going to be executed.
+    :param len: Length of the code.
+    :param foutput: Stream where to print the result of the evaulated code (can be NULL).
+    :param ferror: Stream where to print errors, if any (can be NULL).
+    :returns: 0 if the code was evaluated without errors, != 0 otherwise.
+
+.. c:function:: int sjs_vm_eval_file(const sjs_vm_t* vm, const char* filename, FILE* foutput, FILE* ferror)
+
+    Evaluate the given file as JavaScript code.
+
+    :param vm: The VM reference.
+    :param filename: The file to be evaluated.
+    :param foutput: Stream where to print the result of the evaulated code (can be NULL).
+    :param ferror: Stream where to print errors, if any (can be NULL).
+    :returns: 0 if the code was evaluated without errors, != 0 otherwise.
+
 Utility functions
 ^^^^^^^^^^^^^^^^^
 

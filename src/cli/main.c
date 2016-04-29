@@ -1,10 +1,7 @@
 
 #include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <signal.h>
-#include <sys/stat.h>
+#include <stdio.h>
 #include <unistd.h>
 
 #include "linenoise.h"
@@ -32,71 +29,12 @@ static const char SJS__CLI_GREET_CODE[] = {
 #define SJS_CLI_STDIN_BUF_SIZE    65536
 
 
-static int get_stack_raw(duk_context *ctx) {
-    if (!duk_is_object(ctx, -1)) {
-        return 1;
-    }
-
-    if (!duk_has_prop_string(ctx, -1, "stack")) {
-        return 1;
-    }
-
-    if (!duk_is_error(ctx, -1)) {
-        /* Not an Error instance, don't read "stack". */
-        return 1;
-    }
-
-    duk_get_prop_string(ctx, -1, "stack");  /* caller coerces */
-    duk_remove(ctx, -2);
-    return 1;
-}
-
-
-/* Print error to stderr and pop error. */
-static void print_pop_error(duk_context *ctx, FILE *f) {
-    /* Print error objects with a stack trace specially.
-     * Note that getting the stack trace may throw an error
-     * so this also needs to be safe call wrapped.
-     */
-    (void) duk_safe_call(ctx, get_stack_raw, 1 /*nargs*/, 1 /*nrets*/);
-    fprintf(f, "%s\n", duk_safe_to_string(ctx, -1));
-    fflush(f);
-    duk_pop(ctx);
-}
-
-
-static int wrapped_compile_execute(duk_context *ctx) {
-    const char *src_data;
-    duk_size_t src_len;
-    duk_bool_t write_output;
-
-    /* [ ... write_output src_data src_len filename ] */
-
-    write_output = duk_require_boolean(ctx, -4);
-    src_data = (const char *) duk_require_pointer(ctx, -3);
-    src_len = (duk_size_t) duk_require_uint(ctx, -2);
-    duk_compile_lstring_filename(ctx, 0, src_data, src_len);
-
-    /* [ ... write_output src_data src_len function ] */
-
-    duk_push_global_object(ctx);  /* 'this' binding */
-    duk_call_method(ctx, 0);
-
-    if (write_output) {
-        fprintf(stdout, "= %s\n", duk_to_string(ctx, -1));
-        fflush(stdout);
-    }
-
-    return 0;  /* duk_safe_call() cleans up */
-}
-
-
-static int handle_stdin(duk_context *ctx) {
+static int handle_stdin(sjs_vm_t* vm) {
     char *buf;
     size_t bufsz;
     size_t bufoff;
     size_t got;
-    int rc;
+    int r;
 
     buf = malloc(SJS_CLI_STDIN_BUF_SIZE);
     if (!buf) {
@@ -127,21 +65,12 @@ static int handle_stdin(duk_context *ctx) {
         bufoff += got;
     }
 
-    duk_push_false(ctx);
-    duk_push_pointer(ctx, (void *) buf);
-    duk_push_uint(ctx, (duk_uint_t) bufoff);
-    duk_push_string(ctx, "stdin");
-
-    rc = duk_safe_call(ctx, wrapped_compile_execute, 4 /*nargs*/, 1 /*nret*/);
+    r = sjs_vm_eval_code(vm, "stdin", buf, bufoff, NULL, stderr);
 
     free(buf);
     buf = NULL;
 
-    if (rc != DUK_EXEC_SUCCESS) {
-        print_pop_error(ctx, stderr);
-        goto error;
-    } else {
-        duk_pop(ctx);
+    if (r == DUK_EXEC_SUCCESS) {
         return 0;
     }
 
@@ -152,32 +81,14 @@ error:
 }
 
 
-static int handle_eval(duk_context *ctx, char *code) {
-    int rc;
-
-    duk_push_false(ctx);
-    duk_push_pointer(ctx, (void *) code);
-    duk_push_uint(ctx, (duk_uint_t) strlen(code));
-    duk_push_string(ctx, "eval");
-
-    rc = duk_safe_call(ctx, wrapped_compile_execute, 4 /*nargs*/, 1 /*nret*/);
-    if (rc != DUK_EXEC_SUCCESS) {
-        print_pop_error(ctx, stderr);
-        return -1;
-    } else {
-        duk_pop(ctx);
-        return 0;
-    }
-}
-
-
-static int handle_interactive(duk_context *ctx) {
+static int handle_interactive(sjs_vm_t* vm) {
     const char *prompt = "sjs> ";
+    duk_context* ctx;
     char* line;
     char history_file[4096];
     int use_history;
-    int rc;
 
+    ctx = sjs_vm_get_duk_ctx(vm);
     duk_eval_string_noresult(ctx, SJS__CLI_GREET_CODE);
 
     /* setup history file
@@ -197,21 +108,8 @@ static int handle_interactive(duk_context *ctx) {
             linenoiseHistoryAdd(line);
         }
 
-        duk_push_true(ctx);
-        duk_push_pointer(ctx, (void *) line);
-        duk_push_uint(ctx, (duk_uint_t) strlen(line));
-        duk_push_string(ctx, "input");
-
-        rc = duk_safe_call(ctx, wrapped_compile_execute, 4 /*nargs*/, 1 /*nret*/);
-
+        sjs_vm_eval_code(vm, "input", line, strlen(line), stdout, stdout);
         free(line);
-
-        if (rc != DUK_EXEC_SUCCESS) {
-            /* in interactive mode, write to stdout */
-            print_pop_error(ctx, stdout);
-        } else {
-            duk_pop(ctx);
-        }
     }
 
     if (use_history) {
@@ -222,20 +120,8 @@ static int handle_interactive(duk_context *ctx) {
 }
 
 
-static int handle_file(duk_context *ctx, char* filename) {
-    if (duk_peval_file(ctx, filename) != 0) {
-        print_pop_error(ctx, stderr);
-        return -1;
-    } else {
-        duk_pop(ctx);
-        return 0;
-    }
-}
-
-
 int main(int argc, char *argv[]) {
     sjs_vm_t* vm = NULL;
-    duk_context *ctx = NULL;
     char* run_file = NULL;
     char* eval_code = NULL;
     int interactive = 0;
@@ -279,21 +165,20 @@ int main(int argc, char *argv[]) {
     /* Create VM */
     vm = sjs_vm_create();
     sjs_vm_setup_args(vm, argc, argv);
-    ctx = sjs_vm_get_duk_ctx(vm);
 
     /* run */
     if (run_file) {
-        if (handle_file(ctx, run_file) != 0) {
+        if (sjs_vm_eval_file(vm, run_file, NULL, stderr) != 0) {
             retval = 1;
             goto cleanup;
         }
     } else if (run_stdin) {
-        if (handle_stdin(ctx) != 0) {
+        if (handle_stdin(vm) != 0) {
             retval = 1;
             goto cleanup;
         }
     } else if (eval_code) {
-        if (handle_eval(ctx, eval_code) != 0) {
+        if (sjs_vm_eval_code(vm, "eval", eval_code, strlen(eval_code), NULL, stderr) != 0) {
             retval = 1;
             goto cleanup;
         }
@@ -301,7 +186,7 @@ int main(int argc, char *argv[]) {
 
     if (!isatty(STDIN_FILENO)) {
         interactive = 0;
-        if (handle_stdin(ctx) != 0) {
+        if (handle_stdin(vm) != 0) {
             retval = 1;
             goto cleanup;
         }
@@ -309,7 +194,7 @@ int main(int argc, char *argv[]) {
 
     /* Enter interactive mode, maybe */
     if (interactive) {
-        if (handle_interactive(ctx) != 0) {
+        if (handle_interactive(vm) != 0) {
             retval = 1;
             goto cleanup;
         }
@@ -318,7 +203,6 @@ int main(int argc, char *argv[]) {
 cleanup:
     sjs_vm_destroy(vm);
     vm = NULL;
-    ctx = NULL;
     return retval;
 
 usage:
