@@ -3,7 +3,6 @@
 #include <dlfcn.h>
 #include <errno.h>
 #include <pwd.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -14,47 +13,6 @@
 
 
 typedef duk_ret_t (*sjs_mod_init_f)(duk_context*);
-
-
-static ssize_t read_file(const char* path, char** data) {
-    FILE* f;
-    long fsize;
-
-    *data = NULL;
-
-    f = fopen(path, "rb");
-    if (!f) {
-        return -errno;
-    }
-
-    if (fseek(f, 0, SEEK_END) < 0) {
-        fclose(f);
-        return -errno;
-    }
-
-    fsize = ftell(f);
-    if (fsize < 0) {
-        fclose(f);
-        return -errno;
-    }
-    rewind(f);
-
-    *data = malloc(fsize);
-    if (!*data) {
-        fclose(f);
-        return -ENOMEM;
-    }
-
-    fread(*data, fsize, 1, f);
-    if (ferror(f)) {
-        fclose(f);
-        free(data);
-        return -EIO;
-    }
-
-    fclose(f);
-    return fsize;
-}
 
 
 /*
@@ -230,7 +188,7 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
             if (S_ISREG(st.st_mode)) {
                 /* file, check if .js or .jsdll */
                 if (str_endswith(tmp, ".js")) {
-                    len = read_file(tmp, &data);
+                    len = sjs__file_read(tmp, &data);
                     if (len < 0) {
                         continue;
                     }
@@ -247,7 +205,7 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
             } else if (S_ISDIR(st.st_mode)) {
                 /* directory, check for index.js or index.jsdll */
                 path_join(tmp, sizeof(tmp), "index.js");
-                len = read_file(tmp, &data);
+                len = sjs__file_read(tmp, &data);
                 if (len < 0) {
                     /* no index.js, try index.jsdll */
                     sjs__strlcat(tmp, "dll", sizeof(tmp));
@@ -271,7 +229,7 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
         } else {
             /* path doesn't exist, try to add .js or .jsdll */
             sjs__strlcat(tmp, ".js", sizeof(tmp));
-            len = read_file(tmp, &data);
+            len = sjs__file_read(tmp, &data);
             if (len < 0) {
                 /* no index.js, try index.jsdll */
                 sjs__strlcat(tmp, "dll", sizeof(tmp));

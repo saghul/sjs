@@ -231,6 +231,47 @@ static int sjs__get_error_stack(duk_context *ctx) {
 }
 
 
+ssize_t sjs__file_read(const char* path, char** data) {
+    FILE* f;
+    long fsize;
+
+    *data = NULL;
+
+    f = fopen(path, "rb");
+    if (!f) {
+        return -errno;
+    }
+
+    if (fseek(f, 0, SEEK_END) < 0) {
+        fclose(f);
+        return -errno;
+    }
+
+    fsize = ftell(f);
+    if (fsize < 0) {
+        fclose(f);
+        return -errno;
+    }
+    rewind(f);
+
+    *data = malloc(fsize);
+    if (!*data) {
+        fclose(f);
+        return -ENOMEM;
+    }
+
+    fread(*data, fsize, 1, f);
+    if (ferror(f)) {
+        fclose(f);
+        free(data);
+        return -EIO;
+    }
+
+    fclose(f);
+    return fsize;
+}
+
+
 DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
     sjs_vm_t* vm;
     vm = calloc(1, sizeof(*vm));
