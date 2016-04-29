@@ -28,17 +28,20 @@ static ssize_t read_file(const char* path, char** data) {
     }
 
     if (fseek(f, 0, SEEK_END) < 0) {
+        fclose(f);
         return -errno;
     }
 
     fsize = ftell(f);
     if (fsize < 0) {
+        fclose(f);
         return -errno;
     }
     rewind(f);
 
     *data = malloc(fsize);
     if (!*data) {
+        fclose(f);
         return -ENOMEM;
     }
 
