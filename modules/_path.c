@@ -11,8 +11,8 @@ static duk_ret_t path_basename(duk_context* ctx) {
     path = duk_require_string(ctx, 0);
     rpath = basename((char*) path);
     if (!rpath) {
-        /* TODO: throw instead? */
-        duk_push_undefined(ctx);
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
     } else {
         duk_push_string(ctx, rpath);
     }
@@ -27,8 +27,8 @@ static duk_ret_t path_dirname(duk_context* ctx) {
     path = duk_require_string(ctx, 0);
     rpath = dirname((char*) path);
     if (!rpath) {
-        /* TODO: throw instead? */
-        duk_push_undefined(ctx);
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
     } else {
         duk_push_string(ctx, rpath);
     }
@@ -39,11 +39,14 @@ static duk_ret_t path_dirname(duk_context* ctx) {
 static duk_ret_t path_normalize(duk_context* ctx) {
     const char* path;
     char rpath[8192];
+    int r;
 
     path = duk_require_string(ctx, 0);
-    if (sjs_path_normalize(path, rpath, sizeof(rpath)) < 0) {
-        /* TODO: throw instead? */
-        duk_push_undefined(ctx);
+    r = sjs_path_normalize(path, rpath, sizeof(rpath));
+    if (r < 0) {
+        /* 'r' contains the negated errno */
+        SJS_THROW_ERRNO_ERROR2(-r);
+        return -42;    /* control never returns here */
     } else {
         duk_push_string(ctx, rpath);
     }

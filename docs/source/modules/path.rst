@@ -40,7 +40,8 @@ This module provides path manipulation related functions.
 
 .. js:function:: path.normalize(p)
 
-    `Normalize` the given path by performing tilde expansion and then applying :man:`realpath(3)`.
+    `Normalize` the given path by performing tilde expansion and then applying :man:`realpath(3)`. In case of error it
+    returns the given path unchanged.
 
     ::
 

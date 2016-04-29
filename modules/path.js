@@ -29,9 +29,18 @@ function join() {
 }
 
 
+function normalize(p) {
+    try {
+        return _path.normalize(p);
+    } catch (e) {
+        return p;
+    }
+}
+
+
 module.exports = {
     basename: _path.basename,
     dirname: _path.dirname,
-    normalize: _path.normalize,
+    normalize: normalize,
     join: join
 };
