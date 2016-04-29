@@ -1,4 +1,3 @@
-'use strict';
 
 const _select = require('_select');
 

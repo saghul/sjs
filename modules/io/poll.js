@@ -1,4 +1,3 @@
-'use strict';
 
 const _poll = require('_poll');
 

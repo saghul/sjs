@@ -1,4 +1,3 @@
-'use strict';
 
 const errno = require('errno');
 const _gai = require('_gai');
