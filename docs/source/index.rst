@@ -7,6 +7,17 @@ It provides a simple way to write applications using JavaScript with a tradition
 to minimize abstractions and give the developer as much control as possible over the platform and low level APIs.
 
 
+Quickstart
+----------
+
+::
+
+    git clone https://github.com/saghul/sjs && cd sjs
+    make && make run
+    sjs> print('Hello JavaScript! \u2b22');
+    Hello JavaScript! ⬢
+
+
 Documentation
 -------------
 
