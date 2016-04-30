@@ -30,3 +30,44 @@ Documentation
     modules
     faq
 
+
+Building
+--------
+
+Compiling `sjs` is easy, the only dependency is the `CMake <https://cmake.org>`_ build system.
+
+Compile
+^^^^^^^
+
+For Debug builds (the default):
+
+::
+
+    make
+
+For Release builds:
+
+::
+
+    make BUILDTYPE=Release
+
+Install
+^^^^^^^
+
+::
+
+    make install
+
+Run the test suite
+^^^^^^^^^^^^^^^^^^
+
+::
+
+    make test
+
+Run the CLI without installing
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+::
+
+    make run
