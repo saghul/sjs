@@ -26,11 +26,11 @@ This module provies access to i/o primitives.
     .. note::
         This class is not exporetd by this module.
 
-.. js:function:: io.StdioStream.write(data)
+.. js:function:: io.StdioStream.prototype.write(data)
 
     Write data on the stream.
 
-.. js:function:: io.StdioStream.read([nread])
+.. js:function:: io.StdioStream.prototype.read([nread])
 
     Read data from the stream. If no amount of data to read is given in `nread` a default of 4096 is used.
 
