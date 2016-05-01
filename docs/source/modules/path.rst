@@ -16,7 +16,8 @@ This module provides path manipulation related functions.
         path.basename('foo/bar/baz.js');
         = baz.js
 
-    For more information see :man:`basename(3)`.
+    .. seealso::
+        :man:`basename(3)`.
 
 .. js:function:: path.dirname(p)
 
@@ -27,7 +28,8 @@ This module provides path manipulation related functions.
         path.dirname('foo/bar/baz.js');
         = foo/bar
 
-    For more information see :man:`dirname(3)`.
+    .. seealso::
+        :man:`dirname(3)`.
 
 .. js:function:: path.join(...)
 
