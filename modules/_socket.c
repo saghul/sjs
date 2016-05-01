@@ -16,19 +16,16 @@
  * Create a socket. Args:
  * - 0: domain
  * - 1: type
- * - 2: protocol
  */
 static duk_ret_t sock_socket(duk_context* ctx) {
     int domain;
     int type;
-    int protocol;
     int fd;
 
     domain = duk_require_int(ctx, 0);
     type = duk_require_int(ctx, 1);
-    protocol = duk_require_int(ctx, 2);
 
-    fd = socket(domain, type, protocol);
+    fd = socket(domain, type, 0);
     if (fd == -1) {
         SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
@@ -615,7 +612,7 @@ static const duk_number_list_entry module_consts[] = {
 
 static const duk_function_list_entry module_funcs[] = {
     /* name, function, nargs */
-    { "socket", sock_socket, 3 },
+    { "socket", sock_socket, 2 },
     { "close", sock_close, 1 },
     { "bind", sock_bind, 3 },
     { "connect", sock_connect, 3 },

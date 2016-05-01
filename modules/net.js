@@ -5,19 +5,17 @@ const _socket = require('_socket');
 const outil = require('objectutil');
 
 
-function Socket(domain, type, protocol, options) {
-    var protocol = protocol >>> 0;
+function Socket(domain, type, options) {
     var options = options || {};
 
     if (options.fd !== undefined && options.fd > -1) {
         this._fd = options.fd;
     } else {
-        this._fd = _socket.socket(domain, type, protocol);
+        this._fd = _socket.socket(domain, type);
     }
 
     this._domain = domain;
     this._type = type;
-    this._proto = protocol;
 
     this._nonblock = !!options.nonBlocking;
     if (this._nonblock) {
@@ -44,7 +42,7 @@ Socket.prototype.accept = function() {
     checkSocket.call(this);
     var fd = _socket.accept(this._fd);
     var options = {fd: fd, nonBlocking: this._nonblock};
-    return new Socket(this._domain, this._type, this._proto, options);
+    return new Socket(this._domain, this._type, options);
 }
 
 
