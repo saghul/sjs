@@ -80,7 +80,7 @@ Socket.prototype.getpeername = function() {
 
 Socket.prototype.listen = function(backlog) {
     checkSocket.call(this);
-    var backlog = backlog >>> 0;
+    var backlog = (backlog >>> 0) || 128;
     _socket.listen(this._fd, backlog);
 }
 
