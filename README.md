@@ -17,15 +17,15 @@ JavaScript runtime look like if there were no browsers?".
 
 ## Documentation
 
-Check it out [here](TODO).
+Check it out [here](http://sjs.saghul.net).
 
 ## Building
 
-Skookum JS currently supports Linux and OSX. See compilation instructions [here](TODO).
+Skookum JS currently supports Linux and OSX. See compilation instructions [here](http://sjs.saghul.net/en/latest/#building).
 
 ## License
 
-Check [the LICENSE file](TODO). Hint: it's MIT.
+Check [the LICENSE file](https://github.com/saghul/sjs/blob/master/LICENSE). Hint: it's MIT.
 
 ## Author
 
@@ -33,7 +33,7 @@ Saúl Ibarra Corretgé ([**@saghul**](https://github.com/saghul))
 
 ## Contributing
 
-Please see [CONTRIBUTING](TODO).
+Please see [CONTRIBUTING](https://github.com/saghul/sjs/blob/master/CONTRIBUTING.md).
 
 ## Acknowledgements
 
