@@ -1,15 +1,44 @@
 
+.. _usage:
+
+Usage
+=====
+
+Following its design, `sjs` can be used in 2 ways: the CLI and the C API.
+
+
+CLI
+---
+
+This is the typical way to run JavaScript applications with `sjs`, by using the ``sjs`` binary.
+
+::
+
+    sjs -h
+    Usage: sjs [options] [ <code> | <file> | - ]
+
+    -h         show help text
+    -i         enter interactive mode after executing argument file(s) / eval code
+    -e CODE    evaluate code
+
+    If <file> is omitted, interactive mode is started automatically.
+
+With the `sjs` CLI you can execute a file, eval some code directly from the command line, or enter the interactive
+mode.
+
+
 .. _vmapi:
 
-VM API
-======
+Embedding sjs in your application
+---------------------------------
 
 The `sjs` VM API allows applications to execute JavaScript code using the `sjs` engine. The prime example is the `sjs`
 CLI, see ``src/cli/main.c``.
 
+With this C API applications willing to run JavaScript code can embed the `sjs` engine or link with `libsjs`.
 
 Data types
-----------
+^^^^^^^^^^
 
 .. c:type:: sjs_vm_t
 
@@ -21,10 +50,9 @@ Opaque type encapsulating the Duktape engine.
 
 
 API
----
+^^^
 
-Main VM API
-^^^^^^^^^^^
+**Main VM API**
 
 .. c:function:: sjs_vm_t* sjs_vm_create(void)
 
@@ -75,8 +103,7 @@ Main VM API
     :param ferror: Stream where to print errors, if any (can be NULL).
     :returns: 0 if the code was evaluated without errors, != 0 otherwise.
 
-Utility functions
-^^^^^^^^^^^^^^^^^
+**Utility functions**
 
 .. c:function:: int sjs_path_normalize(const char* path, char* normalized_path, size_t normalized_path_len)
 

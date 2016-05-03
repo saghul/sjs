@@ -26,7 +26,7 @@ Documentation
 
     features
     design
-    vmapi
+    usage
     modules
     faq
 
