@@ -206,7 +206,7 @@ cleanup:
     return retval;
 
 usage:
-    fprintf(stderr, "Usage: duk [options] [ <code> | <file> | - ]\n"
+    fprintf(stderr, "Usage: sjs [options] [ <code> | <file> | - ]\n"
                     "\n"
                     "   -h         show help text\n"
                     "   -i         enter interactive mode after executing argument file(s) / eval code\n"
