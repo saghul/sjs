@@ -1,12 +1,13 @@
 /*
- *  Duktape public API for Duktape 1.4.99.
+ *  Duktape public API for Duktape 1.5.0.
+ *
  *  See the API reference for documentation on call semantics.
  *  The exposed API is inside the DUK_API_PUBLIC_H_INCLUDED
  *  include guard.  Other parts of the header are Duktape
  *  internal and related to platform/compiler/feature detection.
  *
- *  Git commit f1e68db97161690049a42a0f6f6c3b70b0de03f2 (v1.4.0-356-gf1e68db).
- *  Git branch master.
+ *  Git commit 83d557704ee63f68ab40b6fcb00995c9b3d6777c (v1.5.0).
+ *  Git branch HEAD.
  *
  *  See Duktape AUTHORS.rst and LICENSE.txt for copyright and
  *  licensing information.
@@ -73,6 +74,7 @@
  *  * Bruce Pascoe <fatcerberus1@gmail.com>
  *  * Ren\u00e9 Hollander <rene@rene8888.at>
  *  * Julien Hamaide (https://github.com/crazyjul)
+ *  * Sebastian G\u00f6tte (https://github.com/jaseg)
  *  
  *  Other contributions
  *  ===================
@@ -216,16 +218,16 @@ struct duk_number_list_entry {
  * have 99 for patch level (e.g. 0.10.99 would be a development version
  * after 0.10.0 but before the next official release).
  */
-#define DUK_VERSION                       10499L
+#define DUK_VERSION                       10500L
 
 /* Git commit, describe, and branch for Duktape build.  Useful for
  * non-official snapshot builds so that application code can easily log
  * which Duktape snapshot was used.  Not available in the Ecmascript
  * environment.
  */
-#define DUK_GIT_COMMIT                    "f1e68db97161690049a42a0f6f6c3b70b0de03f2"
-#define DUK_GIT_DESCRIBE                  "v1.4.0-356-gf1e68db"
-#define DUK_GIT_BRANCH                    "master"
+#define DUK_GIT_COMMIT                    "83d557704ee63f68ab40b6fcb00995c9b3d6777c"
+#define DUK_GIT_DESCRIBE                  "v1.5.0"
+#define DUK_GIT_BRANCH                    "HEAD"
 
 /* Duktape debug protocol version used by this build. */
 #define DUK_DEBUG_PROTOCOL_VERSION        1
