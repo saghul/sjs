@@ -48,8 +48,6 @@ set_target_properties(sjs
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set_target_properties(sjs PROPERTIES
         MACOSX_RPATH                ON
-        BUILD_WITH_INSTALL_RPATH    1
-        INSTALL_NAME_DIR            "@rpath"
     )
 endif()
 
