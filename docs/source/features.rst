@@ -4,20 +4,21 @@
 Features
 ========
 
-Skookum JS gets most of its features though Duktape.
-
 * `Ecmascript E5/E5.1 <http://www.ecma-international.org/ecma-262/5.1/>`_ compliant, some features borrowed
   from `Ecmascript E6 <http://www.ecma-international.org/ecma-262/6.0/index.html>`_
 * `TypedArray <https://www.khronos.org/registry/typedarray/specs/latest/>`_ and
   `Buffer <https://nodejs.org/docs/v0.12.1/api/buffer.html>`_ support
 * Built-in regular expression engine
 * Built-in Unicode support
+* Tail call support
 * Combined reference counting and mark-and-sweep garbage collection with finalization
 * CommonJS-based module loading system
 * Support for native modules written in C
+* Always-on strict mode
+* Binary name 25% shorter than Node
 
 .. seealso::
-    The `Duktape <http://duktape.org>`_ main website.
+    Skookum JS gets most of its features through its engine: `Duktape <http://duktape.org>`_.
 
 
 ES6 support
