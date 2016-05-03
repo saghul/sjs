@@ -65,10 +65,16 @@ static void sjs__setup_system_module(sjs_vm_t* vm) {
 
     /* system.versions */
     {
+        char duktape_version[16];
+
         duk_push_object(ctx);
         /* -> [ ... system obj ] */
 
-        duk_push_string(ctx, DUK_GIT_DESCRIBE);
+        snprintf(duktape_version, sizeof(duktape_version), "v%ld.%ld.%ld",
+                                                           DUK_VERSION / 10000,
+                                                           DUK_VERSION % 10000 / 100,
+                                                           DUK_VERSION % 100);
+        duk_push_string(ctx, duktape_version);
         duk_put_prop_string(ctx, -2, "duktape");
         duk_push_lstring(ctx, DUK_GIT_COMMIT, 7);
         duk_put_prop_string(ctx, -2, "duktapeCommit");
