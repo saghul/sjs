@@ -6,9 +6,9 @@
 
 
 #define SJS_VERSION_MAJOR 0
-#define SJS_VERSION_MINOR 0
-#define SJS_VERSION_PATCH 1
-#define SJS_VERSION_SUFFIX "dev"
+#define SJS_VERSION_MINOR 1
+#define SJS_VERSION_PATCH 0
+#define SJS_VERSION_SUFFIX ""
 
 DUK_EXTERNAL_DECL const char* sjs_version(void);
 
