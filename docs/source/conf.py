@@ -120,8 +120,11 @@ html_theme_options = {
     'github_user': 'saghul',
     'github_repo': 'sjs',
     'github_banner': True,
+    'travis_button': True,
     'show_powered_by': False,
     'sidebar_width': '230px',
+    'logo_name': True,
+    'description': 'A JavaScript runtime',
 }
 
 # Add any paths that contain custom themes here, relative to this directory.
