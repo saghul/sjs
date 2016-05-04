@@ -28,6 +28,9 @@ static const char SJS__CLI_GREET_CODE[] = {
 
 #define SJS_CLI_STDIN_BUF_SIZE    65536
 
+/* exit if user presses Ctrl-C twice */
+static int got_sigint = 0;
+
 
 static int handle_stdin(sjs_vm_t* vm) {
     char *buf;
@@ -104,6 +107,9 @@ static int handle_interactive(sjs_vm_t* vm) {
     }
 
     while((line = linenoise(prompt)) != NULL) {
+        /* reset sigint signal state */
+        got_sigint = 0;
+
         if (line[0] != '\0') {
             linenoiseHistoryAdd(line);
         }
@@ -120,6 +126,18 @@ static int handle_interactive(sjs_vm_t* vm) {
 }
 
 
+static void handle_sigint(int sig) {
+    assert(sig == SIGINT);
+    if (got_sigint == 1) {
+        exit(0);
+    } else {
+        got_sigint = 1;
+        fprintf(stdout, "\r\n(^C again to exit)\r\n");
+        fflush(stdout);
+    }
+}
+
+
 int main(int argc, char *argv[]) {
     sjs_vm_t* vm = NULL;
     char* run_file = NULL;
@@ -127,9 +145,6 @@ int main(int argc, char *argv[]) {
     int interactive = 0;
     int run_stdin = 0;
     int retval = 0;
-
-    /* Signal handling setup */
-    signal(SIGPIPE, SIG_IGN);
 
     /* Parse options */
     for (int i = 1; i < argc; i++) {
@@ -192,8 +207,12 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    /* Enter interactive mode, maybe */
+    /* Enter interactive mode */
     if (interactive) {
+        /* setup signal handling */
+        signal(SIGPIPE, SIG_IGN);
+        signal(SIGINT, handle_sigint);
+
         if (handle_interactive(vm) != 0) {
             retval = 1;
             goto cleanup;
