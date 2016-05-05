@@ -13,7 +13,10 @@ build: $(CMAKE_MK)
 	@$(MAKE) -C build VERBOSE=$(VERBOSE)
 
 $(CMAKE_MK):
-	cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=$(BUILDTYPE)
+	@mkdir -p build;                           \
+	cd build;                                  \
+	cmake ../ -DCMAKE_BUILD_TYPE=$(BUILDTYPE); \
+	cd ..
 
 install: $(CMAKE_MK)
 	@$(MAKE) -C build install
