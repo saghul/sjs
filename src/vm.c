@@ -184,8 +184,12 @@ static void sjs__setup_modsearch(sjs_vm_t* vm) {
     duk_context* ctx = vm->ctx;
 
     duk_get_global_string(ctx, "Duktape");
+    duk_push_string(ctx, "modSearch");
     duk_push_c_function(ctx, sjs__modsearch, 4 /* nargs */);
-    duk_put_prop_string(ctx, -2, "modSearch");
+    duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE |
+                          DUK_DEFPROP_CLEAR_WRITABLE |
+                          DUK_DEFPROP_CLEAR_ENUMERABLE |
+                          DUK_DEFPROP_CLEAR_CONFIGURABLE);
     duk_pop(ctx);
 }
 
