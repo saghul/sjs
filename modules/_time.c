@@ -29,9 +29,10 @@ static duk_ret_t time_time(duk_context* ctx) {
  */
 static duk_ret_t time_hrtime(duk_context* ctx) {
     uint64_t t = sjs_time_hrtime();
-    uint64_t sec = t / NANOS_PER_SEC;
-    uint64_t nsec = t % NANOS_PER_SEC;
+    uint64_t sec;
+    uint64_t nsec;
     if (duk_is_array(ctx, 0)) {
+        uint64_t t0;
         uint64_t sec0;
         uint64_t nsec0;
         duk_get_prop_index(ctx, 0, 0);
@@ -40,10 +41,11 @@ static duk_ret_t time_hrtime(duk_context* ctx) {
         duk_get_prop_index(ctx, 0, 1);
         nsec0 = duk_require_uint(ctx, -1);
         duk_pop(ctx);
-        sec -= sec0;
-        nsec -= nsec0;
-        /* TODO: overflow? */
+        t0 = sec0 * NANOS_PER_SEC + nsec0;
+        t -= t0;
     }
+    sec = t / NANOS_PER_SEC;
+    nsec = t % NANOS_PER_SEC;
     duk_push_array(ctx);
     duk_push_uint(ctx, sec);
     duk_put_prop_index(ctx, -2, 0);
