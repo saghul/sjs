@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 
 #ifdef __APPLE__
 # include <crt_externs.h>
@@ -244,7 +245,9 @@ static int sjs__get_error_stack(duk_context *ctx) {
 
 ssize_t sjs__file_read(const char* path, char** data) {
     FILE* f;
-    long fsize;
+    int fd;
+    struct stat st;
+    size_t fsize;
 
     *data = NULL;
 
@@ -253,17 +256,15 @@ ssize_t sjs__file_read(const char* path, char** data) {
         return -errno;
     }
 
-    if (fseek(f, 0, SEEK_END) < 0) {
+    fd = fileno(f);
+    assert(fd != -1);
+
+    if (fstat(fd, &st) < 0) {
         fclose(f);
         return -errno;
     }
 
-    fsize = ftell(f);
-    if (fsize < 0) {
-        fclose(f);
-        return -errno;
-    }
-    rewind(f);
+    fsize = st.st_size;
 
     *data = malloc(fsize);
     if (!*data) {
