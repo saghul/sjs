@@ -52,27 +52,22 @@ assert.AssertionError = function AssertionError(options) {
     this.generatedMessage = true;
   }
   var stackStartFunction = options.stackStartFunction || fail;
+  var err = new Error(this.message);
+  if (err.stack) {
+    var out = err.stack;
 
-  if (Error.captureStackTrace) {
-    Error.captureStackTrace(this, stackStartFunction);
-  }
-  else {
-    // non v8 browsers so we can have a stacktrace
-    var err = new Error();
-    if (err.stack) {
-      var out = err.stack;
-
-      // try to strip useless frames
-      var fn_name = stackStartFunction.name;
-      var idx = out.indexOf('\n' + fn_name);
-      if (idx >= 0) {
-        // once we have located the function frame
-        // we need to strip out everything before it (and its line)
-        var next_line = out.indexOf('\n', idx + 1);
-        out = out.substring(next_line + 1);
+    // try to strip useless frames
+    var fn_name = stackStartFunction.name;
+    var idx = out.indexOf('\n    at ' + fn_name);
+    if (idx >= 0) {
+      // once we have located the function frame
+      // we need to strip out everything before it (and its line)
+      var next_line = out.indexOf('\n', idx + 1);
+      var prefix = this.name;
+      if (this.message) {
+          prefix += ': ' + this.message;
       }
-
-      this.stack = out;
+      this.stack = prefix + '\n' + out.substring(next_line + 1);
     }
   }
 };
