@@ -5,11 +5,27 @@ matrix:
       dist: trusty
       sudo: required
       compiler: clang
+      env: BUILDTYPE=Debug
+    - os: linux
+      dist: trusty
+      sudo: required
+      compiler: clang
+      env: BUILDTYPE=Release
     - os: linux
       dist: trusty
       sudo: required
       compiler: gcc
+      env: BUILDTYPE=Debug
+    - os: linux
+      dist: trusty
+      sudo: required
+      compiler: gcc
+      env: BUILDTYPE=Release
     - os: osx
       osx_image: xcode7.3
+      env: BUILDTYPE=Debug
+    - os: osx
+      osx_image: xcode7.3
+      env: BUILDTYPE=Release
 install: true
 script: make && make test
