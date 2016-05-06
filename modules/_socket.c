@@ -121,17 +121,29 @@ static int sock__obj2addr(duk_context* ctx, duk_idx_t addr_idx, struct sockaddr_
         case AF_UNIX:
         {
             /* 'address' is a string, representing the path */
-            /* TODO: handle Linux abstract sockets */
             struct sockaddr_un* addru;
             const char* path;
             size_t path_len;
             addru = (struct sockaddr_un*) ss;
             duk_get_prop_string(ctx, addr_idx, "path");
             path = duk_require_lstring(ctx, -1, &path_len);
-            strncpy(addru->sun_path, path, sizeof(addru->sun_path) - 1);
-            addru->sun_path[sizeof(addru->sun_path) - 1] = '\0';
+#ifdef __linux__
+            if (path_len > 0 && path[0] == '\0') {
+                if (path_len > sizeof(addru->sun_path)) {
+                    duk_pop(ctx);
+                    duk_push_error_object(ctx, DUK_ERR_RANGE_ERROR, "invalid abstract socket name");
+                    return -1;
+                }
+                memcpy(addru->sun_path, path, path_len);
+                *addrlen = offsetof(struct sockaddr_un, sun_path) + path_len;
+            } else
+#endif
+            {
+                strncpy(addru->sun_path, path, sizeof(addru->sun_path) - 1);
+                addru->sun_path[sizeof(addru->sun_path) - 1] = '\0';
+                *addrlen = sizeof(*addru);
+            }
             addru->sun_family = AF_UNIX;
-            *addrlen = sizeof(*addru);
             duk_pop(ctx);
             break;
         }
@@ -145,7 +157,7 @@ static int sock__obj2addr(duk_context* ctx, duk_idx_t addr_idx, struct sockaddr_
 /*
  * Create a socket address object out of a struct sockaddr*. The resulting object is at the top of the stack.
  */
-static void sock__addr2obj(duk_context* ctx, const struct sockaddr* addr) {
+static void sock__addr2obj(duk_context* ctx, const struct sockaddr* addr, const socklen_t addrlen) {
     switch (addr->sa_family) {
         case AF_INET:
         {
@@ -189,11 +201,19 @@ static void sock__addr2obj(duk_context* ctx, const struct sockaddr* addr) {
         }
         case AF_UNIX:
         {
-            /* TODO: handle Linux abstract sockets */
             struct sockaddr_un* addru;
             size_t len;
             addru = (struct sockaddr_un*) addr;
-            len = strlen(addru->sun_path);
+#ifdef __linux__
+            if (addru->sun_path[0] == '\0') {
+                /* Linux abstract namespace */
+                len = addrlen - offsetof(struct sockaddr_un, sun_path);
+            }
+            else
+#endif
+            {
+                len = strlen(addru->sun_path);
+            }
             duk_push_lstring(ctx, addru->sun_path, len);
             break;
         }
@@ -287,7 +307,7 @@ static duk_ret_t sock__getsockpeername(duk_context* ctx, sjs__socknamefunc func)
         return -42;    /* control never returns here */
     }
 
-    sock__addr2obj(ctx, (const struct sockaddr*) &ss);
+    sock__addr2obj(ctx, (const struct sockaddr*) &ss, len);
 
     return 1;
 }
@@ -491,7 +511,7 @@ static duk_ret_t sock_recvfrom(duk_context* ctx) {
         }
         duk_put_prop_string(ctx, -2, "data");
         if (addrlen > 0) {
-            sock__addr2obj(ctx, (const struct sockaddr*) &ss);
+            sock__addr2obj(ctx, (const struct sockaddr*) &ss, addrlen);
         } else {
             duk_push_undefined(ctx);
         }
