@@ -22,7 +22,7 @@ typedef duk_ret_t (*sjs_mod_init_f)(duk_context*);
  * TODO: keep track of the loaded modules to dlclose() them on shutdown.
  */
 static int load_jsdll(duk_context* ctx, const char* path) {
-    void* lib = dlopen(path, RTLD_NOW|RTLD_LOCAL);
+    void* lib = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
     if (lib) {
         sjs_mod_init_f mod_init;
         *(void**)(&mod_init) = dlsym(lib, "sjs_mod_init");
