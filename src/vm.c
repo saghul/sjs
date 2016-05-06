@@ -39,6 +39,7 @@ static const char* default_search_paths[] = {
 
 
 static void sjs__duk_fatal_handler(duk_context *ctx, duk_errcode_t code, const char *msg) {
+    (void) ctx;
     fprintf(stderr, "FATAL %ld: %s\n", (long) code, (const char *) (msg ? msg : "null"));
     fflush(stderr);
     abort();

@@ -158,6 +158,7 @@ static int sock__obj2addr(duk_context* ctx, duk_idx_t addr_idx, struct sockaddr_
  * Create a socket address object out of a struct sockaddr*. The resulting object is at the top of the stack.
  */
 static void sock__addr2obj(duk_context* ctx, const struct sockaddr* addr, const socklen_t addrlen) {
+    (void) addrlen;  /* avoid compilation warning on OSX */
     switch (addr->sa_family) {
         case AF_INET:
         {
