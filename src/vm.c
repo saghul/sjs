@@ -301,7 +301,7 @@ DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
     sjs__setup_modsearch(vm);
 
     /* setup es6 shim */
-    duk_eval_string_noresult(vm->ctx, (char*) sjs__es6shim_src);
+    duk_eval_string_noresult(vm->ctx, sjs__es6shim_src);
 
     /* run bootstrap code */
     duk_eval_string_noresult(vm->ctx, SJS__BOOTSTRAP_CODE);
