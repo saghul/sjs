@@ -4,7 +4,7 @@ const select = require('io/select');
 
 
 function sleep(delay) {
-    select.select([], [], [], delay >>> 0);
+    select.select([], [], [], delay);
     // TODO: handle EINTR? return remaining time?
 }
 
