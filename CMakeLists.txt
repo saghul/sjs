@@ -6,6 +6,7 @@ if (NOT CMAKE_BUILD_TYPE)
 	message(STATUS "No build type selected, default to Debug")
 	set(CMAKE_BUILD_TYPE "Debug")
 endif()
+message(STATUS "Building in ${CMAKE_BUILD_TYPE} mode")
 
 set(CMAKE_C_FLAGS "-pedantic -std=c99 -Wall -fstrict-aliasing -fno-omit-frame-pointer")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wextra -O0 -g3")
