@@ -91,6 +91,7 @@ target_link_libraries(sjs_cli
 if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
     target_link_libraries(sjs_cli
         dl
+		rt
     )
 endif()
 
