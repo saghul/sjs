@@ -14,9 +14,12 @@ environment.
 
     ::
 
-        = { duktape: 'v1.4.0-356-gf1e68db',
-        duktapeCommit: 'f1e68db',
-        sjs: '0.0.1dev' }
+        sjs> print(JSON.stringify(system.versions, null, 4))
+        {
+            "duktape": "v1.5.0",
+            "duktapeCommit": "83d5577",
+            "sjs": "0.1.0"
+        }
 
 .. js:data:: system.env
 
