@@ -2,3 +2,4 @@ build/
 original/
 *.swp
 *.pyc
+include/sjs/build.h

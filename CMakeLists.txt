@@ -7,12 +7,34 @@ if (NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "Debug")
 endif()
 message(STATUS "Building in ${CMAKE_BUILD_TYPE} mode")
+message(STATUS "Building with ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION} on ${CMAKE_SYSTEM}")
 
 set(CMAKE_C_FLAGS "-pedantic -std=c99 -Wall -fstrict-aliasing -fno-omit-frame-pointer")
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -Wextra -O0 -g3")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS} -O2 -g")
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
+
+# Defines for system.build
+#
+if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")
+    set(SJS__BUILD_COMPILER "GCC")
+else()
+    set(SJS__BUILD_COMPILER "${CMAKE_C_COMPILER_ID}")
+endif()
+set(SJS__BUILD_COMPILER_VERSION "${CMAKE_C_COMPILER_VERSION}")
+set(SJS__BUILD_TYPE "${CMAKE_BUILD_TYPE}")
+if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    set(SJS__BUILD_CFLAGS "${CMAKE_C_FLAGS_DEBUG}")
+else()
+    set(SJS__BUILD_CFLAGS "${CMAKE_C_FLAGS_RELEASE}")
+endif()
+set(SJS__BUILD_SYSTEM "${CMAKE_SYSTEM}")
+string(TIMESTAMP SJS__BUILD_TIMESTAMP UTC)
+configure_file (
+    "${CMAKE_SOURCE_DIR}/include/sjs/build.h.in"
+    "${CMAKE_SOURCE_DIR}/include/sjs/build.h"
+)
 
 
 # RPATH shenanigans

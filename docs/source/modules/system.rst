@@ -46,6 +46,22 @@ environment.
 
     Set of command line arguments that were given to the process.
 
+.. js:data:: system.build
+
+    Object providing various information about the build and the system where it was produced:
+
+    ::
+
+        sjs> print(JSON.stringify(system.build, null, 4))
+        {
+            "compiler": "GCC",
+            "compilerVersion": "5.3.1",
+            "system": "Linux-4.5.0-1-amd64",
+            "cflags": "-pedantic -std=c99 -Wall -fstrict-aliasing -fno-omit-frame-pointer -Wextra -O0 -g3",
+            "timestamp": "2016-05-07T17:37:46Z",
+            "type": "Debug"
+        }
+
 .. js:function:: system.exit(code)
 
     Ends the process with the specified `code`.

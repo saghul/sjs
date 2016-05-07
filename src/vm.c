@@ -16,6 +16,7 @@ extern char** environ;
 #include "version.h"
 #include "internal.h"
 #include "es6shim.h"
+#include "build.h"
 
 
 struct sjs_vm_t {
@@ -176,6 +177,28 @@ static void sjs__setup_system_module(sjs_vm_t* vm) {
     {
         duk_push_c_function(ctx, sjs__exit, 1 /* nargs */);
         duk_put_prop_string(ctx, -2, "exit");
+    }
+
+    /* system.build */
+    {
+        duk_push_object(ctx);
+        /* -> [ ... system obj ] */
+
+        duk_push_string(ctx, SJS_BUILD_COMPILER);
+        duk_put_prop_string(ctx, -2, "compiler");
+        duk_push_string(ctx, SJS_BUILD_COMPILER_VERSION);
+        duk_put_prop_string(ctx, -2, "compilerVersion");
+        duk_push_string(ctx, SJS_BUILD_SYSTEM);
+        duk_put_prop_string(ctx, -2, "system");
+        duk_push_string(ctx, SJS_BUILD_CFLAGS);
+        duk_put_prop_string(ctx, -2, "cflags");
+        duk_push_string(ctx, SJS_BUILD_TIMESTAMP);
+        duk_put_prop_string(ctx, -2, "timestamp");
+        duk_push_string(ctx, SJS_BUILD_TYPE);
+        duk_put_prop_string(ctx, -2, "type");
+
+        duk_put_prop_string(ctx, -2, "build");
+        /* -> [ ... system ] */
     }
 
     duk_pop(ctx);
