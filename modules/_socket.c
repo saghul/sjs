@@ -411,37 +411,49 @@ static duk_ret_t sock_accept(duk_context* ctx) {
 /*
  * Read data from a socket. Args:
  * - 0: fd
- * - 1: nread
- * TODO:
- *  - use buffers
- *  - accept a list of buffers and use readv
+ * - 1: nrecv (a number or a Buffer-ish object)
  */
 static duk_ret_t sock_recv(duk_context* ctx) {
     int fd;
     ssize_t r;
-    size_t nread;
+    size_t nrecv;
     char* buf;
+    char* alloc_buf = NULL;
 
     fd = duk_require_int(ctx, 0);
-    nread = duk_require_int(ctx, 1);
-    buf = malloc(nread);
-    if (!buf) {
-        SJS_THROW_ERRNO_ERROR2(ENOMEM);
-        return -42;    /* control never returns here */
+    if (duk_is_number(ctx, 1)) {
+        nrecv = duk_require_int(ctx, 1);
+        alloc_buf = malloc(nrecv);
+        if (!alloc_buf) {
+            SJS_THROW_ERRNO_ERROR2(ENOMEM);
+            return -42;    /* control never returns here */
+        }
+        buf = alloc_buf;
+    } else {
+        buf = duk_require_buffer_data(ctx, 1, &nrecv);
+        if (buf == NULL || nrecv == 0) {
+            duk_error(ctx, DUK_ERR_TYPE_ERROR, "invalid buffer");
+            return -42;    /* control never returns here */
+        }
     }
 
-    r = recv(fd, buf, nread, 0);
+    r = recv(fd, buf, nrecv, 0);
     if (r < 0) {
+        free(alloc_buf);
         SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
-    } else if (r == 0) {
-        /* EOF */
-        duk_push_string(ctx, "");
     } else {
-        duk_push_lstring(ctx, buf, r);
-    }
+        if (alloc_buf) {
+            /* return the string we read */
+            duk_push_lstring(ctx, buf, r);
+        } else {
+            /* the data was written to the buffer, return how much we read */
+            duk_push_int(ctx, r);
+        }
 
-    return 1;
+        free(alloc_buf);
+        return 1;
+    }
 }
 
 
@@ -449,9 +461,6 @@ static duk_ret_t sock_recv(duk_context* ctx) {
  * Write data to a socket. Args:
  * - 0: fd
  * - 1: data
- * TODO:
- *  - use buffers
- *  - accept a list of buffers and use readv
  */
 static duk_ret_t sock_send(duk_context* ctx) {
     int fd;
@@ -460,7 +469,11 @@ static duk_ret_t sock_send(duk_context* ctx) {
     const char* buf;
 
     fd = duk_require_int(ctx, 0);
-    buf = duk_require_lstring(ctx, 1, &len);
+    if (duk_is_string(ctx, 1)) {
+        buf = duk_require_lstring(ctx, 1, &len);
+    } else {
+        buf = duk_require_buffer_data(ctx, 1, &len);
+    }
 
     r = send(fd, buf, len, 0);
     if (r < 0) {
@@ -478,48 +491,59 @@ static duk_ret_t sock_send(duk_context* ctx) {
  * Receive data from a socket. Returns an object with
  * 'data' and 'address'. Args:
  * - 0: fd
- * - 1: nread
- * TODO:
- *  - use buffers
+ * - 1: nrecv (a number or a Buffer-ish object)
  */
 static duk_ret_t sock_recvfrom(duk_context* ctx) {
     int fd;
     ssize_t r;
-    size_t nread;
+    size_t nrecv;
     char* buf;
     struct sockaddr_storage ss;
     socklen_t addrlen;
+    char* alloc_buf = NULL;
 
     addrlen = sizeof(ss);
     fd = duk_require_int(ctx, 0);
-    nread = duk_require_int(ctx, 1);
-    buf = malloc(nread);
-    if (!buf) {
-        SJS_THROW_ERRNO_ERROR2(ENOMEM);
-        return -42;    /* control never returns here */
+    if (duk_is_number(ctx, 1)) {
+        nrecv = duk_require_int(ctx, 1);
+        alloc_buf = malloc(nrecv);
+        if (!alloc_buf) {
+            SJS_THROW_ERRNO_ERROR2(ENOMEM);
+            return -42;    /* control never returns here */
+        }
+        buf = alloc_buf;
+    } else {
+        buf = duk_require_buffer_data(ctx, 1, &nrecv);
+        if (buf == NULL || nrecv == 0) {
+            duk_error(ctx, DUK_ERR_TYPE_ERROR, "invalid buffer");
+            return -42;    /* control never returns here */
+        }
     }
 
-    r = recvfrom(fd, buf, nread, 0, (struct sockaddr*) &ss, &addrlen);
+    r = recvfrom(fd, buf, nrecv, 0, (struct sockaddr*) &ss, &addrlen);
     if (r < 0) {
+        free(alloc_buf);
         SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
     } else {
         duk_push_object(ctx);
-        if (r == 0) {
-            duk_push_string(ctx, "");
-        } else {
+        if (alloc_buf) {
             duk_push_lstring(ctx, buf, r);
+            duk_put_prop_string(ctx, -2, "data");
+        } else {
+            duk_push_int(ctx, r);
+            duk_put_prop_string(ctx, -2, "nrecv");
         }
-        duk_put_prop_string(ctx, -2, "data");
         if (addrlen > 0) {
             sock__addr2obj(ctx, (const struct sockaddr*) &ss, addrlen);
         } else {
             duk_push_undefined(ctx);
         }
         duk_put_prop_string(ctx, -2, "address");
-    }
 
-    return 1;
+        free(alloc_buf);
+        return 1;
+    }
 }
 
 
@@ -528,8 +552,6 @@ static duk_ret_t sock_recvfrom(duk_context* ctx) {
  * - 0: fd
  * - 1: data
  * - 2: address
- * TODO:
- *  - use buffers
  */
 static duk_ret_t sock_sendto(duk_context* ctx) {
     int fd;
@@ -540,7 +562,11 @@ static duk_ret_t sock_sendto(duk_context* ctx) {
     socklen_t addrlen;
 
     fd = duk_require_int(ctx, 0);
-    buf = duk_require_lstring(ctx, 1, &len);
+    if (duk_is_string(ctx, 1)) {
+        buf = duk_require_lstring(ctx, 1, &len);
+    } else {
+        buf = duk_require_buffer_data(ctx, 1, &len);
+    }
 
     if (sock__obj2addr(ctx, 2, &ss, &addrlen) != 0) {
         /* the stack top contains the error object */

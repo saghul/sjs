@@ -79,12 +79,13 @@ The `Socket` object is a thin object oriented wrapper around :man:`socket(2)` an
     .. seealso::
         :man:`listen(2)`
 
-.. js:function:: net.Socket.prototype.recv([count])
+.. js:function:: net.Socket.prototype.recv([nrecv])
 
     Receive data from a socket. It can only be used in a connected socket.
 
-    :param count: Maximum amount of data to receive. If not specified it defaults to 4096.
-    :returns: The data that was read as a string.
+    :param nrecv: Maximum amount of data to receive. If not specified it defaults to 4096. Alternatively, a `Buffer`
+        can be passed, and data will be read into it.
+    :returns: The data that was read as a string or the amount of data read as a number, if a `Buffer` was passed.
 
     .. seealso::
         :man:`recv(2)`
@@ -93,18 +94,18 @@ The `Socket` object is a thin object oriented wrapper around :man:`socket(2)` an
 
     Transmit a message to the other socket. It can only be used with connected sockets.
 
-    :param data: The message that will be transmitted.
+    :param data: The message that will be transmitted (can be a string or a `Buffer`).
     :returns: The number of bytes from `data` which were actually sent.
 
     .. seealso::
         :man:`send(2)`
 
-.. js:function:: net.Socket.prototype.recvfrom([count])
+.. js:function:: net.Socket.prototype.recvfrom([nrecv])
 
     Similar to :js:func:`net.Socket.prototype.recv` but it can also be used in non-connected sockets.
 
-    :returns: An object with 2 properties: `data`, which contains the received message, and `address`, with the
-        address of the sender.
+    :returns: An object with 2 properties: `address`, which contains the address of the sender and `nread` if a
+        `Buffer` was used, or `data`, with the data as a string.
 
     .. seealso::
         :man:`recvfrom(2)`

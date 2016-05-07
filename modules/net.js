@@ -85,10 +85,13 @@ Socket.prototype.listen = function(backlog) {
 }
 
 
-Socket.prototype.recv = function(nread) {
+Socket.prototype.recv = function(nrecv) {
     checkSocket.call(this);
-    var nread = (nread >>> 0) || 4096;
-    return _socket.recv(this._fd, nread);
+    if (nrecv === undefined || typeof nrecv === 'number') {
+        nrecv = (nrecv >>> 0) || 4096;
+    }
+    // we will validate if the passed argument is a buffer in C
+    return _socket.recv(this._fd, nrecv);
 }
 
 
@@ -98,10 +101,13 @@ Socket.prototype.send = function(data) {
 }
 
 
-Socket.prototype.recvfrom = function(nread) {
+Socket.prototype.recvfrom = function(nrecv) {
     checkSocket.call(this);
-    var nread = (nread >>> 0) || 4096;
-    return _socket.recvfrom(this._fd, nread);
+    if (nrecv === undefined || typeof nrecv === 'number') {
+        nrecv = (nrecv >>> 0) || 4096;
+    }
+    // we will validate if the passed argument is a buffer in C
+    return _socket.recvfrom(this._fd, nrecv);
 }
 
 
