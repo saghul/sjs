@@ -243,25 +243,21 @@ function normalizeAddress(domain, address) {
 }
 
 
-// - exports
-
-module.exports = {
-    Socket        : Socket,
-    socketpair    : socketpair,
-    getaddrinfo   : getaddrinfo,
-    gai_strerror  : _gai.gai_strerror,
-    gai_error_map : new Map(),
-    isIP          : isIP,
-    isIPv4        : isIPv4,
-    isIPv6        : isIPv6
-};
+exports.Socket        = Socket;
+exports.socketpair    = socketpair;
+exports.getaddrinfo   = getaddrinfo;
+exports.gai_strerror  = _gai.gai_strerror;
+exports.gai_error_map = new Map();
+exports.isIP          = isIP;
+exports.isIPv4        = isIPv4;
+exports.isIPv6        = isIPv6;
 
 // extract constants
 for (var k in _gai.c) {
     var val = _gai.c[k];
-    module.exports[k] = val;
-    module.exports.gai_error_map.set(val, k);
+    exports[k] = val;
+    exports.gai_error_map.set(val, k);
 }
 for (var k in _socket.c) {
-    module.exports[k] = _socket.c[k];
+    exports[k] = _socket.c[k];
 }

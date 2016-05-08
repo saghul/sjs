@@ -14,10 +14,11 @@ function poll(pfds, timeout) {
     return _poll.poll(pfds, timeout);
 }
 
-module.exports.poll = poll;
+
+exports.poll = poll;
 
 // extract constants
 for (var k in _poll.c) {
     var val = _poll.c[k];
-    module.exports[k] = val;
+    exports[k] = val;
 }

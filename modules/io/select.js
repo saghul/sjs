@@ -16,7 +16,5 @@ function select(rfds, wfds, xfds, timeout) {
 }
 
 
-module.exports = {
-    select: select,
-    FD_SETSIZE: _select.c.FD_SETSIZE
-};
+exports.select     = select;
+exports.FD_SETSIZE = _select.c.FD_SETSIZE;

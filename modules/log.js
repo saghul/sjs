@@ -19,13 +19,11 @@ function getLogger(name) {
 }
 
 
-module.exports = {
-    defaultLogger: defaultLogger,
-    getLogger: getLogger,
-    trace: Logger.prototype.trace.bind(defaultLogger),
-    debug: Logger.prototype.debug.bind(defaultLogger),
-    info: Logger.prototype.info.bind(defaultLogger),
-    warn: Logger.prototype.warn.bind(defaultLogger),
-    error: Logger.prototype.error.bind(defaultLogger),
-    fatal: Logger.prototype.fatal.bind(defaultLogger)
-};
+exports.defaultLogger = defaultLogger;
+exports.getLogger     = getLogger;
+exports.trace         = Logger.prototype.trace.bind(defaultLogger);
+exports.debug         = Logger.prototype.debug.bind(defaultLogger);
+exports.info          = Logger.prototype.info.bind(defaultLogger);
+exports.warn          = Logger.prototype.warn.bind(defaultLogger);
+exports.error         = Logger.prototype.error.bind(defaultLogger);
+exports.fatal         = Logger.prototype.fatal.bind(defaultLogger);

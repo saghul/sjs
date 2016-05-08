@@ -31,7 +31,5 @@ function decode(encoding, data) {
 }
 
 
-module.exports = {
-    encode: encode,
-    decode: decode
-};
+exports.encode = encode;
+exports.decode= decode;

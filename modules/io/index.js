@@ -30,8 +30,6 @@ const stdout = new StdioStream(_io.c.STDOUT_FILENO);
 const stderr = new StdioStream(_io.c.STDERR_FILENO);
 
 
-module.exports = {
-    stdin: stdin,
-    stdout: stdout,
-    stderr: stderr
-};
+exports.stdin  = stdin;
+exports.stdout = stdout;
+exports.stderr = stderr;

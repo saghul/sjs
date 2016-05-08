@@ -38,9 +38,7 @@ function normalize(p) {
 }
 
 
-module.exports = {
-    basename: _path.basename,
-    dirname: _path.dirname,
-    normalize: normalize,
-    join: join
-};
+exports.basename  = _path.basename;
+exports.dirname   = _path.dirname;
+exports.normalize = normalize;
+exports.join      = join;

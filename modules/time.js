@@ -9,8 +9,6 @@ function sleep(delay) {
 }
 
 
-module.exports = {
-    time   : _time.time,
-    hrtime : _time.hrtime,
-    sleep  : sleep
-};
+exports.time   = _time.time;
+exports.hrtime = _time.hrtime;
+exports.sleep  = sleep;
