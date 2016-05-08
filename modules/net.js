@@ -130,6 +130,22 @@ Socket.prototype.setNonBlocking = function(set) {
 }
 
 
+Socket.prototype.setsockopt = function(level, option, value) {
+    checkSocket.call(this);
+    if (typeof value === 'boolean') {
+        // convert to integer
+        value = +value;
+    }
+    _socket.setsockopt(this._fd, level, option, value);
+}
+
+
+Socket.prototype.getsockopt = function(level, option, size) {
+    checkSocket.call(this);
+    return _socket.getsockopt(this._fd, level, option, size);
+}
+
+
 function getaddrinfo(hostname, servname, hints) {
     var hints = hints || {};
     return _gai.getaddrinfo(hostname, servname, hints);

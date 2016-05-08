@@ -126,6 +126,63 @@ The `Socket` object is a thin object oriented wrapper around :man:`socket(2)` an
     .. seealso::
         :man:`shutdown(2)`
 
+.. js:function:: net.Socket.prototype.setsockopt(level, option, value)
+
+    Set a socket option on the given `level`. `value` may contain either a number (for numeric or boolean  options) or
+    a string containing the binary representation of the value. Use of `Buffer` objects is recommended to build the
+    binary value.
+
+    Example, setting a numeric or boolean option:
+
+    ::
+
+        var sock = new net.Socket(net.AF_INET, net.SOCK_STREAM);
+        sock.setsockopt(net.SOL_SOCKET, net.SO_REUSEADDR, true);
+
+    Example, setting a binary option:
+
+    ::
+
+        var sock = new net.Socket(net.AF_INET, net.SOCK_STREAM);
+        var lingerOpts = new Buffer(8);
+        lingerOpts.writeInt32LE(1, 0);    // enable lingering
+        lingerOpts.writeInt32LE(100, 4);    // linger for 100 seconds
+        sock.setsockopt(net.SOL_SOCKET, net.SO_LINGER, lingerOpts.toString());
+
+    .. seealso::
+        :man:`setsockopt(2)`
+
+.. js:function:: net.Socket.prototype.getsockopt(level, option, [size])
+
+    Get the value for a socket `option` on the given `level`. When `size` is omitted, the value is assumed to be
+    an integer, but when a number is given a buffer of `size` size is used. A `Buffer` object can be used to parse
+    the result.
+
+    Example, getting a numeric or boolean option:
+
+    ::
+
+        var sock = new net.Socket(net.AF_INET, net.SOCK_STREAM);
+        sock.setsockopt(net.SOL_SOCKET, net.SO_REUSEADDR, true);
+        var r = sock.getsockopt(net.SOL_SOCKET, net.SO_REUSEADDR);
+
+    Example, getting a binary option:
+
+    ::
+
+        var sock = new net.Socket(net.AF_INET, net.SOCK_STREAM);
+        var lingerOpts = new Buffer(8);
+        lingerOpts.writeInt32LE(1, 0);    // enable lingering
+        lingerOpts.writeInt32LE(100, 4);    // linger for 100 seconds
+        sock.setsockopt(net.SOL_SOCKET, net.SO_LINGER, lingerOpts.toString());
+        var r = sock.sgetsockopt(net.SOL_SOCKET, net.SO_LINGER, 8);
+        var resBuf = new Buffer(r);
+        assert.equal(resBuf.readInt32LE(0), 1)
+        assert.equal(resBuf.readInt32LE(4), 100)
+
+    .. seealso::
+        :man:`getsockopt(2)`
+
 .. js:function:: net.Socket.prototype.setNonBlocking(set)
 
     Sets the socket in non-blocking mode if ``true``, or blocking mode if ``false``.
@@ -254,6 +311,18 @@ getaddrinfo
 
     All error codes :js:func:`net.getaddrinfo` could give.
     See :man:`getaddrinfo(3)` for details.
+
+.. js:data:: net.SOL_*
+.. js:data:: net.IPPROTO_*
+
+    Levels to be used with :js:func:`net.Socket.prototype.setsockopt` and :js:func:`net.Socket.prototype.setsockopt`.
+
+.. js:data:: net.SO_*
+.. js:data:: net.IP_*
+.. js:data:: net.IPV6_*
+.. js:data:: net.TCP_*
+
+    Options to be used with :js:func:`net.Socket.prototype.setsockopt` and :js:func:`net.Socket.prototype.setsockopt`.
 
 
 Utilities

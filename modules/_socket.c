@@ -2,6 +2,7 @@
 #include <arpa/inet.h>
 #include <assert.h>
 #include <errno.h>
+#include <netinet/tcp.h>
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
@@ -639,6 +640,84 @@ static duk_ret_t sock_set_nonblocking(duk_context* ctx) {
 }
 
 
+/*
+ * Set a socket option
+ * - 0: fd
+ * - 1: level
+ * - 2: option
+ * - 3: value
+ */
+static duk_ret_t sock_setsockopt(duk_context* ctx) {
+    int r, fd, level, option;
+
+    fd = duk_require_int(ctx, 0);
+    level = duk_require_int(ctx, 1);
+    option = duk_require_int(ctx, 2);
+
+    if (duk_is_number(ctx, 3)) {
+        int flag;
+        flag = duk_require_int(ctx, 3);
+        r = setsockopt(fd, level, option, (char*) &flag, sizeof(flag));
+    } else {
+        const char* opt;
+        size_t len;
+        opt = duk_require_lstring(ctx, 3, &len);
+        r = setsockopt(fd, level, option, opt, len);
+    }
+
+    if (r) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    }
+
+    duk_push_undefined(ctx);
+    return 1;
+}
+
+
+/*
+ * Get a socket option
+ * - 0: fd
+ * - 1: level
+ * - 2: option
+ * - 3: size (for non integer options)
+ */
+static duk_ret_t sock_getsockopt(duk_context* ctx) {
+    int r, fd, level, option;
+    socklen_t optlen;
+
+    fd = duk_require_int(ctx, 0);
+    level = duk_require_int(ctx, 1);
+    option = duk_require_int(ctx, 2);
+
+    if (duk_is_undefined(ctx, 3)) {
+        int value;
+        optlen = sizeof(value);
+        r = getsockopt(fd, level, option, (void*) &value, &optlen);
+        if (r) {
+            SJS_THROW_ERRNO_ERROR();
+            return -42;    /* control never returns here */
+        }
+        duk_push_int(ctx, value);
+        return 1;
+    } else {
+        char opt[1024];
+        optlen = duk_require_uint(ctx, 3);
+        if (optlen > sizeof(opt)) {
+            duk_error(ctx, DUK_ERR_TYPE_ERROR, "option size");
+            return -42;    /* control never returns here */
+        }
+        r = getsockopt(fd, level, option, opt, &optlen);
+        if (r) {
+            SJS_THROW_ERRNO_ERROR();
+            return -42;    /* control never returns here */
+        }
+        duk_push_lstring(ctx, opt, optlen);
+        return 1;
+    }
+}
+
+
 #define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
     /* socket domain */
@@ -652,6 +731,36 @@ static const duk_number_list_entry module_consts[] = {
     X(SHUT_RD),
     X(SHUT_WR),
     X(SHUT_RDWR),
+    /* level for getsockopt/setsockopt */
+    X(SOL_SOCKET),
+    X(IPPROTO_TCP),
+    X(IPPROTO_IP),
+    X(IPPROTO_IPV6),
+    /* options for getsockopt/setsockopt */
+    X(SO_DEBUG),
+    X(SO_REUSEADDR),
+    X(SO_REUSEPORT),
+    X(SO_KEEPALIVE),
+    X(SO_DONTROUTE),
+    X(SO_LINGER),
+    X(SO_BROADCAST),
+    X(SO_OOBINLINE),
+    X(SO_SNDBUF),
+    X(SO_RCVBUF),
+    X(SO_ERROR),
+    X(TCP_NODELAY),
+    X(TCP_KEEPCNT),
+    X(TCP_KEEPINTVL),
+#ifdef TCP_KEEPALIVE
+    X(TCP_KEEPALIVE),
+#endif
+#ifdef TCP_KEEPIDLE
+    X(TCP_KEEPIDLE),
+#endif
+#ifdef TCP_CORK
+    X(TCP_CORK),
+#endif
+    X(IPV6_V6ONLY),
     { NULL, 0.0 }
 };
 #undef X
@@ -674,6 +783,8 @@ static const duk_function_list_entry module_funcs[] = {
     { "sendto", sock_sendto, 4 },
     { "inet_pton", sock_inet_pton, 2 },
     { "set_nonblocking", sock_set_nonblocking, 2 },
+    { "setsockopt", sock_setsockopt, 4 },
+    { "getsockopt", sock_getsockopt, 4 },
     { NULL, NULL, 0 }
 };
 
