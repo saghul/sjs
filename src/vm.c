@@ -399,6 +399,12 @@ DUK_EXTERNAL int sjs_vm_eval_code(const sjs_vm_t* vm, const char* filename, cons
         }
     } else {
         if (foutput) {
+            /* TODO: make this optional with a parameter? */
+            /* beautify output */
+            duk_eval_string(ctx, "(function (v) { return Duktape.enc('jx', v, null, 4); })");
+            duk_insert(ctx, -2);
+            duk_call(ctx, 1);
+
             fprintf(foutput, "= %s\n", duk_safe_to_string(ctx, -1));
             fflush(foutput);
         }

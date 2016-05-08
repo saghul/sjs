@@ -26,6 +26,9 @@ This is the typical way to run JavaScript applications with `sjs`, by using the 
 With the `sjs` CLI you can execute a file, eval some code directly from the command line, or enter the interactive
 mode.
 
+.. note::
+    When using the CLI `sjs` will try to pretify the output of every command by serializing it using a JSON variant
+    called `JX <http://duktape.org/guide.html#customjson.2>`_ which Duktape includes.
 
 .. _vmapi:
 
