@@ -25,11 +25,14 @@ JavaScript runtime look like if there were no browsers?".
 
 ## Hello, world
 
-    Skookum JS 0.0.1dev on osx (x64)
-    [Duktape v1.4.0-356-gf1e68db (f1e68db)]
+    Skookum JS 0.1.0 running on linux x64
+    [Engine: Duktape v1.5.0 (83d5577)]
+    [Build: Debug on 2016-05-08T11:05:16Z]
+    [GCC 5.3.1 on Linux-4.5.0-1-amd64]
     sjs> print('hello world!');
     hello world!
     = undefined
+    sjs>
 
 ## Documentation
 
