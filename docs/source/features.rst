@@ -4,8 +4,9 @@
 Features
 ========
 
-* `Ecmascript E5/E5.1 <http://www.ecma-international.org/ecma-262/5.1/>`_ compliant, some features borrowed
-  from `Ecmascript E6 <http://www.ecma-international.org/ecma-262/6.0/index.html>`_
+* Small footprint
+* `Ecmascript ES5/ES5.1 <http://www.ecma-international.org/ecma-262/5.1/>`_ compliant, some features borrowed
+  from `Ecmascript ES6 <http://www.ecma-international.org/ecma-262/6.0/index.html>`_
 * `TypedArray <https://www.khronos.org/registry/typedarray/specs/latest/>`_ and
   `Buffer <https://nodejs.org/docs/v0.12.1/api/buffer.html>`_ support
 * Built-in regular expression engine
