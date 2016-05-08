@@ -201,6 +201,17 @@ static void sjs__setup_system_module(sjs_vm_t* vm) {
         /* -> [ ... system ] */
     }
 
+    /* system.endianness */
+    {
+        const int i = 1;
+        if (*(char*)&i == 0) {
+            duk_push_string(ctx, "big");
+        } else {
+            duk_push_string(ctx, "little");
+        }
+        duk_put_prop_string(ctx, -2, "endianness");
+    }
+
     duk_pop(ctx);
 }
 

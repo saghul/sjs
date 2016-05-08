@@ -71,3 +71,7 @@ environment.
 
     .. note::
         At the moment no clean shutdown is performed.
+
+.. js:data:: system.endianness
+
+    Returns ``big`` if the system is Big Engian, or ``little`` if the system is Little Endian. This is determined at runtime.
