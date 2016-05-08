@@ -625,9 +625,9 @@ static duk_ret_t sock_set_nonblocking(duk_context* ctx) {
     fd = duk_require_int(ctx, 0);
     set = duk_require_boolean(ctx, 1);
 
-    do
-	r = ioctl(fd, FIONBIO, &set);
-    while (r == -1 && errno == EINTR);
+    do {
+	    r = ioctl(fd, FIONBIO, &set);
+    } while (r == -1 && errno == EINTR);
 
     if (r) {
         SJS_THROW_ERRNO_ERROR();
