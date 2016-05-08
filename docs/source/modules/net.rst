@@ -213,6 +213,20 @@ The `Socket` object is a thin object oriented wrapper around :man:`socket(2)` an
 
     Shutdown modes for :js:func:`net.Socket.prototype.shutdown`.
 
+.. js::function net.socketpair(domain, type, [options])
+
+    Create a pair of conntected :js:class:`net.Socket` objects.
+
+    :param domain: Socket domain (one of :js:data:`net.AF_INET`, :js:data:`net.AF_INET6` or :js:data:`net.AF_UNIX`).
+        Typically only :js:data:`net.AF_UNIX` is supported.
+    :param type: Socket type (one of :js:data:`net.SOCK_STREAM` or :js:data:`net.SOCK_DGRAM`).
+    :param options: Optional object which may contain the following properties:
+
+        * `nonBlocking`: if specified and ``true``, the sockets will be breated in non-blocking mode.
+
+    .. seealso::
+        :man:`socketpair(2)`
+
 
 .. _sockaddrs:
 

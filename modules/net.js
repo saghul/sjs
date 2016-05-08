@@ -152,6 +152,21 @@ function getaddrinfo(hostname, servname, hints) {
 }
 
 
+function socketpair(domain, type, options) {
+    var options = options || {};
+    var fds = _socket.socketpair(domain, type);
+    var sock1, sock2;
+    sock1 = new Socket(domain, type, {fd: fds[0], nonBlocking: !!options.nonBlocking});
+    try {
+        sock2 = new Socket(domain, type, {fd: fds[1], nonBlocking: !!options.nonBlocking});
+    } catch (e) {
+        sock1.close();
+        throw e;
+    }
+    return [sock1, sock2];
+}
+
+
 function isIPv4(address) {
     return _socket.inet_pton(_socket.c.AF_INET, address) !== undefined;
 }
@@ -232,6 +247,7 @@ function normalizeAddress(domain, address) {
 
 module.exports = {
     Socket        : Socket,
+    socketpair    : socketpair,
     getaddrinfo   : getaddrinfo,
     gai_strerror  : _gai.gai_strerror,
     gai_error_map : new Map(),

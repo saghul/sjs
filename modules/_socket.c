@@ -718,6 +718,33 @@ static duk_ret_t sock_getsockopt(duk_context* ctx) {
 }
 
 
+/*
+ * Create a socketpair. Args:
+ * - 0: domain
+ * - 1: type
+ */
+static duk_ret_t sock_socketpair(duk_context* ctx) {
+    int domain, type, r;
+    int fds[2];
+
+    domain = duk_require_int(ctx, 0);
+    type = duk_require_int(ctx, 1);
+
+    r = socketpair(domain, type, 0, fds);
+    if (r == -1) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    } else {
+        duk_push_array(ctx);
+        duk_push_int(ctx, fds[0]);
+        duk_put_prop_index(ctx, -2, 0);
+        duk_push_int(ctx, fds[1]);
+        duk_put_prop_index(ctx, -2, 1);
+        return 1;
+    }
+}
+
+
 #define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
     /* socket domain */
@@ -785,6 +812,7 @@ static const duk_function_list_entry module_funcs[] = {
     { "set_nonblocking", sock_set_nonblocking, 2 },
     { "setsockopt", sock_setsockopt, 4 },
     { "getsockopt", sock_getsockopt, 4 },
+    { "socketpair", sock_socketpair, 2 },
     { NULL, NULL, 0 }
 };
 
