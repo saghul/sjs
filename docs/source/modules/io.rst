@@ -9,30 +9,15 @@ This module provies access to i/o primitives.
 
 .. js:data:: io.stdin
 
-    Object of type :js:class:`io.StdioStream` representing the standard input.
+    Object of type :js:class:`fs.File` representing the standard input.
 
 .. js:data:: io.stdout
 
-    Object of type :js:class:`io.StdioStream` representing the standard output.
+    Object of type :js:class:`fs.File` representing the standard output.
 
 .. js:data:: io.stderr
 
-    Object of type :js:class:`io.StdioStream` representing the standard error.
-
-.. js:class:: io.StdioStream
-
-    Object encapsulating a stdio (`stdin`, `stdout` or `stderr`) stream.
-
-    .. note::
-        This class is not exporetd by this module.
-
-.. js:function:: io.StdioStream.prototype.write(data)
-
-    Write data on the stream.
-
-.. js:function:: io.StdioStream.prototype.read([nread])
-
-    Read data from the stream. If no amount of data to read is given in `nread` a default of 4096 is used.
+    Object of type :js:class:`fs.File` representing the standard error.
 
 
 io/select

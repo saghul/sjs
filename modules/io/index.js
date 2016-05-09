@@ -1,33 +1,11 @@
 
-const _io = require('_io');
+const fs = require('fs');
+const _fs = require('_fs');
 
 
-function StdioStream(fd) {
-    this._fd = fd;
-
-    Object.defineProperty(this, 'fd', {
-        get: function() {
-            return this._fd;
-        }
-    });
-}
-
-
-StdioStream.prototype.read = function(nread) {
-    var nread = (nread >>> 0) || 4096;
-    return _io.read(this._fd, nread);
-}
-
-
-StdioStream.prototype.write = function(data) {
-    return _io.write(this._fd, data);
-}
-
-
-// TODO: fix, this is not always the case
-const stdin = new StdioStream(_io.c.STDIN_FILENO);
-const stdout = new StdioStream(_io.c.STDOUT_FILENO);
-const stderr = new StdioStream(_io.c.STDERR_FILENO);
+const stdin = new fs.File('<stdin>', _fs.stdin(), 'r');
+const stdout = new fs.File('<stdout>', _fs.stdout(), 'w');
+const stderr = new fs.File('<stderr>', _fs.stderr(), 'w');
 
 
 exports.stdin  = stdin;

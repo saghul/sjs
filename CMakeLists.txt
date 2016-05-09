@@ -152,3 +152,5 @@ include(modules/time.cmake)
 # io
 include(modules/io.cmake)
 
+# fs
+include(modules/fs.cmake)
