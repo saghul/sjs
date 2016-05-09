@@ -401,7 +401,13 @@ DUK_EXTERNAL int sjs_vm_eval_code(const sjs_vm_t* vm, const char* filename, cons
         if (foutput) {
             /* TODO: make this optional with a parameter? */
             /* beautify output */
-            duk_eval_string(ctx, "(function (v) { return Duktape.enc('jx', v, null, 4); })");
+            duk_eval_string(ctx, "(function (v) {\n"
+                                 "    try {\n"
+                                 "        return Duktape.enc('jx', v, null, 4);\n"
+                                 "    } catch (e) {\n"
+                                 "        return String(v);\n"
+                                 "    }\n"
+                                 "})");
             duk_insert(ctx, -2);
             duk_call(ctx, 1);
 
