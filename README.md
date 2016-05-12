@@ -20,7 +20,6 @@ JavaScript runtime look like if there were no browsers?".
 * Combined reference counting and mark-and-sweep garbage collection with finalization
 * CommonJS-based module loading system
 * Support for native modules written in C
-* Always-on strict mode
 * Binary name 25% shorter than Node
 
 ## Hello, world

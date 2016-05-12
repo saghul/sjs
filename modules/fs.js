@@ -1,3 +1,4 @@
+'use strict';
 
 const errno = require('errno');
 const _fs = require('_fs');

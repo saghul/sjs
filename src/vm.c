@@ -246,7 +246,7 @@ static int sjs__compile_execute(duk_context *ctx) {
 
     code = duk_require_pointer(ctx, -3);
     len = duk_require_uint(ctx, -2);
-    duk_compile_lstring_filename(ctx, DUK_COMPILE_STRICT, code, len);
+    duk_compile_lstring_filename(ctx, 0, code, len);
 
     /* [ ... code len function ] */
 

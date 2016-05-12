@@ -1,3 +1,4 @@
+'use strict';
 
 const _path = require('_path');
 

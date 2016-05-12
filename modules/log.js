@@ -1,3 +1,4 @@
+'use strict';
 
 var Logger = Duktape.Logger;
 var loggers = new Map();

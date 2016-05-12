@@ -1,3 +1,4 @@
+'use strict';
 
 const _errno = require('_errno');
 

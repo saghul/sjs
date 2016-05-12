@@ -1,3 +1,4 @@
+'use strict';
 
 var encoders = {
     'base64': Duktape.enc.bind(Duktape, 'base64'),

@@ -1,3 +1,5 @@
+'use trict';
+
 // http://wiki.commonjs.org/wiki/Unit_Testing/1.0
 //
 // Originally from narwhal.js (http://narwhaljs.org)

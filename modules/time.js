@@ -1,3 +1,4 @@
+'use strict';
 
 const _time = require('_time');
 const select = require('io/select');
