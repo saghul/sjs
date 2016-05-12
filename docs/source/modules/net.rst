@@ -26,6 +26,10 @@ The `Socket` object is a thin object oriented wrapper around :man:`socket(2)` an
     .. seealso::
         :man:`socket(2)`
 
+.. js:attribute:: net.Socket.fd
+
+    Returns the file descriptor representing the socket.
+
 .. js:function:: net.Socket.prototype.accept
 
     Waits for an incoming connection and accepts it. Only works on listening sockets.
