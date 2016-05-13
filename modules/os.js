@@ -31,6 +31,13 @@ function read(fd, nread) {
 }
 
 
+Object.defineProperty(exports, 'cwd', {
+    get: function() {
+        return _os.getcwd();
+    }
+});
+
+
 // internal helpers
 
 function stringToFlags(flag) {

@@ -181,6 +181,21 @@ static duk_ret_t os_ttyname(duk_context* ctx) {
 }
 
 
+static duk_ret_t os_getcwd(duk_context* ctx) {
+    char* r;
+    char path[8192];
+
+    r = getcwd(path, sizeof(path));
+    if (r == NULL) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    } else {
+        duk_push_string(ctx, path);
+        return 1;
+    }
+}
+
+
 #define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
     X(O_APPEND),
@@ -206,6 +221,7 @@ static const duk_function_list_entry module_funcs[] = {
     { "pipe", os_pipe, 0 },
     { "isatty", os_isatty, 1 },
     { "ttyname", os_ttyname, 1 },
+    { "getcwd", os_getcwd, 0 },
     { NULL, NULL, 0 }
 };
 
