@@ -10,7 +10,7 @@ message(STATUS "Building in ${CMAKE_BUILD_TYPE} mode")
 message(STATUS "Building with ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION} on ${CMAKE_SYSTEM}")
 
 set(CMAKE_C_FLAGS "-pedantic -std=c99 -Wall -fstrict-aliasing -fno-omit-frame-pointer")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -Wextra -O0 -g3")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -Wextra -Werror -O0 -g3")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS} -O2 -g")
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
