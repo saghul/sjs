@@ -151,26 +151,8 @@ install(DIRECTORY modules
         PATTERN "*.h" EXCLUDE
         PATTERN "*.swp" EXCLUDE)
 
+
 # modules
 #
 
-# path
-include(modules/path.cmake)
-
-# errno
-include(modules/errno.cmake)
-
-# net
-include(modules/net.cmake)
-
-# time
-include(modules/time.cmake)
-
-# io
-include(modules/io.cmake)
-
-# fs
-include(modules/fs.cmake)
-
-# os
-include(modules/os.cmake)
+include(modules/modules.cmake)
