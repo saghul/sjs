@@ -72,7 +72,7 @@ target_include_directories(duktape
 )
 
 set_target_properties(duktape
-    PROPERTIES COMPILE_FLAGS "-fPIC"
+    PROPERTIES COMPILE_FLAGS "-fPIC -Wno-unused-function"
 )
 
 
