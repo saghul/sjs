@@ -61,10 +61,24 @@ if("${isSystemDir}" STREQUAL "-1")
 endif()
 
 
+# duktape
+#
+add_library(duktape STATIC
+    src/duktape.c
+)
+
+target_include_directories(duktape
+    PRIVATE ${CMAKE_SOURCE_DIR}/include/sjs
+)
+
+set_target_properties(duktape
+    PROPERTIES COMPILE_FLAGS "-fPIC"
+)
+
+
 # libsjs
 #
 set(SOURCES
-    src/duktape.c
     src/modules.c
     src/util.c
     src/vm.c
@@ -93,6 +107,9 @@ set_target_properties(sjs
     PROPERTIES COMPILE_DEFINITIONS "_GNU_SOURCE"
 )
 
+target_link_libraries(sjs
+    duktape
+)
 
 # sjs
 #
