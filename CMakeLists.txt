@@ -154,3 +154,6 @@ include(modules/io.cmake)
 
 # fs
 include(modules/fs.cmake)
+
+# os
+include(modules/os.cmake)

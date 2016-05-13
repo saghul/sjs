@@ -50,6 +50,7 @@ Standard library
     modules/log
     modules/net
     modules/objectutil
+    modules/os
     modules/path
     modules/system
     modules/time
