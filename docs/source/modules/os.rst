@@ -75,6 +75,13 @@ This module exposes low level operating system facilities / syscalls.
     .. seealso::
         :man:`read(2)`
 
+.. js:function:: os.scandir(path)
+
+    Lists all files in the given `path`.
+
+    .. seealso::
+        :man:`scandir(3)`
+
 .. js:function:: os.ttyname(fd)
 
     Returns the related device name of the given `fd` for which :js:func:`os.isatty` is ``true``.

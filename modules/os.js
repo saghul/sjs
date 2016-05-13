@@ -81,14 +81,15 @@ function modeNum(m, def) {
 }
 
 
-exports.abort = _os.abort;
-exports.open  = open;
-exports.read  = read;
-exports.write = _os.write;
-exports.close = _os.close;
-exports.pipe  = _os.pipe;
-exports.isatty = _os.isatty;
+exports.abort   = _os.abort;
+exports.open    = open;
+exports.read    = read;
+exports.write   = _os.write;
+exports.close   = _os.close;
+exports.pipe    = _os.pipe;
+exports.isatty  = _os.isatty;
 exports.ttyname = _os.ttyname;
+exports.scandir = _os.scandir;
 
 // extract constants
 for (var k in _os.c) {

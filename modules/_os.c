@@ -1,4 +1,5 @@
 
+#include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/types.h>
@@ -196,6 +197,36 @@ static duk_ret_t os_getcwd(duk_context* ctx) {
 }
 
 
+static int sjs__scandir_filter(const struct dirent* dent) {
+    return strcmp(dent->d_name, ".") != 0 && strcmp(dent->d_name, "..") != 0;
+}
+
+static duk_ret_t os_scandir(duk_context* ctx) {
+    int r;
+    struct dirent** dents;
+    struct dirent* dent;
+    const char* path;
+
+    path = duk_require_string(ctx, 0);
+
+    r = scandir(path, &dents, sjs__scandir_filter, alphasort);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    } else {
+        duk_push_array(ctx);
+        for (int i = 0; i < r; i++) {
+            dent = dents[i];
+            duk_push_string(ctx, dent->d_name);
+            duk_put_prop_index(ctx, -2, i);
+            free(dent);
+        }
+        free(dents);
+        return 1;
+    }
+}
+
+
 #define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
     X(O_APPEND),
@@ -222,6 +253,7 @@ static const duk_function_list_entry module_funcs[] = {
     { "isatty", os_isatty, 1 },
     { "ttyname", os_ttyname, 1 },
     { "getcwd", os_getcwd, 0 },
+    { "scandir", os_scandir, 1 },
     { NULL, NULL, 0 }
 };
 
