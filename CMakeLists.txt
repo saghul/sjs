@@ -61,6 +61,13 @@ if("${isSystemDir}" STREQUAL "-1")
 endif()
 
 
+add_definitions(
+    -D_GNU_SOURCE
+    -D_LARGEFILE_SOURCE
+    -D_FILE_OFFSET_BITS=64
+)
+
+
 # duktape
 #
 add_library(duktape STATIC
@@ -103,10 +110,6 @@ target_include_directories(sjs
     PRIVATE ${CMAKE_SOURCE_DIR}/include/sjs
 )
 
-set_target_properties(sjs
-    PROPERTIES COMPILE_DEFINITIONS "_GNU_SOURCE"
-)
-
 target_link_libraries(sjs
     duktape
 )
@@ -120,7 +123,6 @@ add_executable(sjs_cli
 
 set_target_properties(sjs_cli PROPERTIES
     OUTPUT_NAME "sjs"
-    COMPILE_DEFINITIONS "_GNU_SOURCE"
 )
 
 target_link_libraries(sjs_cli

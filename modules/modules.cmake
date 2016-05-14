@@ -13,6 +13,7 @@ set_target_properties(_errno PROPERTIES
     SUFFIX ".jsdll"
 )
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    # for getting the POSIX version of strerror_r
     set_target_properties(_errno PROPERTIES
         COMPILE_DEFINITIONS "_POSIX_C_SOURCE=200112"
     )
@@ -35,11 +36,6 @@ set_target_properties(_fs PROPERTIES
     PREFIX ""
     SUFFIX ".jsdll"
 )
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    set_target_properties(_fs PROPERTIES
-        COMPILE_DEFINITIONS "_POSIX_C_SOURCE=200112"
-    )
-endif()
 install(TARGETS _fs
         DESTINATION lib/sjs/modules
 )
@@ -70,7 +66,6 @@ target_link_libraries(_poll
 set_target_properties(_poll PROPERTIES
     PREFIX ""
     SUFFIX ".jsdll"
-    COMPILE_DEFINITIONS "_GNU_SOURCE"
 )
 install(TARGETS _poll
         DESTINATION lib/sjs/modules
@@ -103,11 +98,6 @@ set_target_properties(_gai PROPERTIES
     PREFIX ""
     SUFFIX ".jsdll"
 )
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    set_target_properties(_gai PROPERTIES
-        COMPILE_DEFINITIONS "_POSIX_C_SOURCE=200112"
-    )
-endif()
 install(TARGETS _gai
         DESTINATION lib/sjs/modules
 )
@@ -126,11 +116,6 @@ set_target_properties(_os PROPERTIES
     PREFIX ""
     SUFFIX ".jsdll"
 )
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    set_target_properties(_os PROPERTIES
-        COMPILE_DEFINITIONS "_GNU_SOURCE"
-    )
-endif()
 install(TARGETS _os
         DESTINATION lib/sjs/modules
 )
