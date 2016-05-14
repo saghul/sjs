@@ -38,6 +38,91 @@ Object.defineProperty(exports, 'cwd', {
 });
 
 
+function buildStat(
+        dev,
+        mode,
+        nlink,
+        uid,
+        gid,
+        rdev,
+        ino,
+        size,
+        blksize,
+        blocks,
+        flags,
+        gen,
+        atim_msec,
+        mtim_msec,
+        ctim_msec,
+        birthtim_msec) {
+    this.dev = dev;
+    this.mode = mode;
+    this.nlink = nlink;
+    this.uid = uid;
+    this.gid = gid;
+    this.rdev = rdev;
+    this.ino = ino;
+    this.size = size;
+    this.blksize = blksize;
+    this.blocks = blocks;
+    this.flags = flags;
+    this.gen = gen;
+    this.atime = new Date(atim_msec);
+    this.mtime = new Date(mtim_msec);
+    this.ctime = new Date(ctim_msec);
+    this.birthtime = new Date(birthtim_msec);
+
+    return this;
+}
+
+function stat(path) {
+    return _os.stat(path, buildStat);
+}
+
+// stat things
+
+function S_IMODE(mode) {
+    return mode & 4095; /* 07777 */
+}
+
+function S_IFMT(mode) {
+    return mode & 61440; /* 0170000 */
+}
+
+// Constants used as S_IFMT() for various file types
+// (not all are implemented on all systems)
+
+// Functions to test for each file type
+
+function S_ISDIR(mode) {
+    return S_IFMT(mode) === _os.c.S_IFDIR;
+}
+
+function S_ISCHR(mode) {
+    return S_IFMT(mode) === _os.c.S_IFCHR;
+}
+
+function S_ISBLK(mode) {
+    return S_IFMT(mode) === _os.c.S_IFBLK;
+}
+
+function S_ISREG(mode) {
+    return S_IFMT(mode) === _os.c.S_IFREG;
+}
+
+function S_ISFIFO(mode) {
+    return S_IFMT(mode) === _os.c.S_IFIFO;
+}
+
+function S_ISLNK(mode) {
+    return S_IFMT(mode) === _os.c.S_IFLNK;
+}
+
+function S_ISSOCK(mode) {
+    return S_IFMT(mode) === _os.c.S_IFSOCK;
+}
+
+
 // internal helpers
 
 function stringToFlags(flag) {
@@ -81,15 +166,24 @@ function modeNum(m, def) {
 }
 
 
-exports.abort   = _os.abort;
-exports.open    = open;
-exports.read    = read;
-exports.write   = _os.write;
-exports.close   = _os.close;
-exports.pipe    = _os.pipe;
-exports.isatty  = _os.isatty;
-exports.ttyname = _os.ttyname;
-exports.scandir = _os.scandir;
+exports.abort    = _os.abort;
+exports.open     = open;
+exports.read     = read;
+exports.write    = _os.write;
+exports.close    = _os.close;
+exports.pipe     = _os.pipe;
+exports.isatty   = _os.isatty;
+exports.ttyname  = _os.ttyname;
+exports.scandir  = _os.scandir;
+exports.stat     = stat;
+exports.S_IMODE  = S_IMODE;
+exports.S_ISDIR  = S_ISDIR;
+exports.S_ISCHR  = S_ISCHR;
+exports.S_ISBLK  = S_ISBLK;
+exports.S_ISREG  = S_ISREG;
+exports.S_ISFIFO = S_ISFIFO;
+exports.S_ISLNK  = S_ISLNK;
+exports.S_ISSOCK = S_ISSOCK;
 
 // extract constants
 for (var k in _os.c) {

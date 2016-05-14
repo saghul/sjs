@@ -227,8 +227,75 @@ static duk_ret_t os_scandir(duk_context* ctx) {
 }
 
 
+#if defined(__APPLE__)
+static inline double sjs__timespec2ms(const struct timespec ts) {
+    return (double)(ts.tv_sec * 1000) + (double)(ts.tv_nsec / 1000000);
+}
+#endif
+
+/*
+ * stat(2). Args:
+ * - 0: path
+ * - 1: function to build the stat result
+ */
+static duk_ret_t os_stat(duk_context* ctx) {
+    int r;
+    const char* path;
+    struct stat st;
+
+    path = duk_require_string(ctx, 0);
+    duk_require_function(ctx, 1);
+
+    r = stat(path, &st);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    } else {
+        /* prepare the call to the given function */
+        duk_dup(ctx, 1);
+        duk_push_object(ctx);
+        /* [... func obj ] */
+
+        duk_push_uint(ctx, st.st_dev);
+        duk_push_uint(ctx, st.st_mode);
+        duk_push_uint(ctx, st.st_nlink);
+        duk_push_uint(ctx, st.st_uid);
+        duk_push_uint(ctx, st.st_gid);
+        duk_push_uint(ctx, st.st_rdev);
+        duk_push_uint(ctx, st.st_ino);
+        duk_push_uint(ctx, st.st_size);
+        duk_push_uint(ctx, st.st_blksize);
+        duk_push_uint(ctx, st.st_blocks);
+#if defined(__APPLE__)
+        duk_push_uint(ctx, st.st_flags);
+        duk_push_uint(ctx, st.st_gen);
+#else
+        duk_push_uint(ctx, 0);    /* st_flags */
+        duk_push_uint(ctx, 0);    /* st_gen */
+#endif
+
+	/* times, convert to ms */
+#if defined(__APPLE__)
+        duk_push_number(ctx, sjs__timespec2ms(st.st_atimespec));
+        duk_push_number(ctx, sjs__timespec2ms(st.st_mtimespec));
+        duk_push_number(ctx, sjs__timespec2ms(st.st_ctimespec));
+        duk_push_number(ctx, sjs__timespec2ms(st.st_birthtimespec));
+#else
+	duk_push_number(ctx, st.st_atime * 1000);
+	duk_push_number(ctx, st.st_mtime * 1000);
+	duk_push_number(ctx, st.st_ctime * 1000);
+	duk_push_number(ctx, st.st_ctime * 1000);    /* st_birthtim */
+#endif
+
+        duk_call_method(ctx, 16 /* number of args */);
+        return 1;
+    }
+}
+
+
 #define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
+    /* flags for open */
     X(O_APPEND),
     X(O_CREAT),
     X(O_EXCL),
@@ -237,6 +304,33 @@ static const duk_number_list_entry module_consts[] = {
     X(O_SYNC),
     X(O_TRUNC),
     X(O_WRONLY),
+    /* stat types */
+    X(S_IFDIR),
+    X(S_IFCHR),
+    X(S_IFBLK),
+    X(S_IFREG),
+    X(S_IFIFO),
+    X(S_IFLNK),
+    X(S_IFSOCK),
+    /* names of permissions bits */
+    X(S_ISUID),
+    X(S_ISGID),
+    X(S_ISVTX),
+    X(S_IREAD),
+    X(S_IWRITE),
+    X(S_IEXEC),
+    X(S_IRWXU),
+    X(S_IRUSR),
+    X(S_IWUSR),
+    X(S_IXUSR),
+    X(S_IRWXG),
+    X(S_IRGRP),
+    X(S_IWGRP),
+    X(S_IXGRP),
+    X(S_IRWXO),
+    X(S_IROTH),
+    X(S_IWOTH),
+    X(S_IXOTH),
     { NULL, 0.0 }
 };
 #undef X
@@ -254,6 +348,7 @@ static const duk_function_list_entry module_funcs[] = {
     { "ttyname", os_ttyname, 1 },
     { "getcwd", os_getcwd, 0 },
     { "scandir", os_scandir, 1 },
+    { "stat", os_stat, 2 },
     { NULL, NULL, 0 }
 };
 

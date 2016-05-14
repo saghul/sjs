@@ -82,6 +82,35 @@ This module exposes low level operating system facilities / syscalls.
     .. seealso::
         :man:`scandir(3)`
 
+.. js:function:: os.stat(path)
+
+    Obtain information about the file pointed to by `path`.
+
+    Returns an object with the following properties:
+
+    * dev
+    * mode
+    * nlink
+    * uid
+    * gid
+    * rdev
+    * ino
+    * size
+    * blksize
+    * blocks
+    * flags
+    * gen
+    * atime
+    * mtime
+    * ctime
+    * birthtime
+
+    The ``atime``, ``mtime``, ``ctime`` and ``birthtime`` fields are of type
+    `Date <https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date>`_.
+
+    .. seealso::
+        :man:`stat(2)`
+
 .. js:function:: os.ttyname(fd)
 
     Returns the related device name of the given `fd` for which :js:func:`os.isatty` is ``true``.
@@ -99,6 +128,50 @@ This module exposes low level operating system facilities / syscalls.
     .. seealso::
         :man:`write(2)`
 
+.. js:function:: os.S_IMODE(mode)
+
+    Returns the permissions bits out of the mode field obtained with :js:func:`os.stat`.
+
+.. js:function:: os.S_ISDIR(mode)
+
+    Returns ``true`` if the `mode` of the file indicates it's a directory.
+
+.. js:function:: os.S_ISCHR(mode)
+
+    Returns ``true`` if the `mode` of the file indicates it's a character device.
+
+.. js:function:: os.S_ISBLK(mode)
+
+    Returns ``true`` if the `mode` of the file indicates it's a block device.
+
+.. js:function:: os.S_ISREG(mode)
+
+    Returns ``true`` if the `mode` of the file indicates it's a regular file.
+
+.. js:function:: os.S_ISFIFO(mode)
+
+    Returns ``true`` if the `mode` of the file indicates it's a FIFO.
+
+.. js:function:: os.S_ISLINK(mode)
+
+    Returns ``true`` if the `mode` of the file indicates it's a symbolic link.
+
+.. js:function:: os.S_ISSOCK(mode)
+
+    Returns ``true`` if the `mode` of the file indicates it's a socket.
+
+
+Constants
+^^^^^^^^^
+
 .. js:attribute:: os.O_*
 
     Constants used as flags in :js:func:`os.open`.
+
+.. js:attribute:: os.S_IF*
+
+    Flags used to check the file type in :js:func:`os.stat`.
+
+.. js:attribute:: os.S_I*
+
+    Flags for file mode used in :js:func:`os.stat`.
