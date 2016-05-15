@@ -1,5 +1,6 @@
 
 #include <assert.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -241,14 +242,23 @@ static void sjs__setup_global_module(sjs_vm_t* vm) {
 static int sjs__compile_execute(duk_context *ctx) {
     const char *code;
     duk_size_t len;
+    bool use_strict;
+    int flags;
 
-    /* [ ... code len filename ] */
+    /* [ ... use_strict code len filename ] */
 
+    use_strict = duk_require_boolean(ctx, -4);
     code = duk_require_pointer(ctx, -3);
     len = duk_require_uint(ctx, -2);
-    duk_compile_lstring_filename(ctx, 0, code, len);
 
-    /* [ ... code len function ] */
+    flags = 0;
+    if (use_strict) {
+        flags |= DUK_COMPILE_STRICT;
+    }
+
+    duk_compile_lstring_filename(ctx, flags, code, len);
+
+    /* [ ... use_strict code len function ] */
 
     duk_push_global_object(ctx);  /* 'this' binding */
     duk_call_method(ctx, 0);
@@ -380,17 +390,24 @@ DUK_EXTERNAL void sjs_vm_setup_args(sjs_vm_t* vm, int argc, char* argv[]) {
 }
 
 
-DUK_EXTERNAL int sjs_vm_eval_code(const sjs_vm_t* vm, const char* filename, const char* code, size_t len, FILE* foutput, FILE* ferror) {
+DUK_EXTERNAL int sjs_vm_eval_code(const sjs_vm_t* vm,
+                                  const char* filename,
+                                  const char* code,
+                                  size_t len,
+                                  FILE* foutput,
+                                  FILE* ferror,
+                                  bool use_strict) {
     int r;
 
     assert(vm);
     duk_context* ctx = vm->ctx;
 
+    duk_push_boolean(ctx, use_strict);
     duk_push_pointer(ctx, (void *) code);
     duk_push_uint(ctx, len);
     duk_push_string(ctx, filename);
 
-    r = duk_safe_call(ctx, sjs__compile_execute, 3 /*nargs*/, 1 /*nret*/);
+    r = duk_safe_call(ctx, sjs__compile_execute, 4 /*nargs*/, 1 /*nret*/);
     if (r != DUK_EXEC_SUCCESS) {
         if (ferror) {
             duk_safe_call(ctx, sjs__get_error_stack, 1 /*nargs*/, 1 /*nrets*/);
@@ -421,7 +438,11 @@ DUK_EXTERNAL int sjs_vm_eval_code(const sjs_vm_t* vm, const char* filename, cons
 }
 
 
-DUK_EXTERNAL int sjs_vm_eval_file(const sjs_vm_t* vm, const char* filename, FILE* foutput, FILE* ferror) {
+DUK_EXTERNAL int sjs_vm_eval_file(const sjs_vm_t* vm,
+                                  const char* filename,
+                                  FILE* foutput,
+                                  FILE* ferror,
+                                  bool use_strict) {
     int r;
     char* data;
 
@@ -433,7 +454,7 @@ DUK_EXTERNAL int sjs_vm_eval_file(const sjs_vm_t* vm, const char* filename, FILE
         free(data);
         return r;
     } else {
-        r = sjs_vm_eval_code(vm, filename, data, r, foutput, ferror);
+        r = sjs_vm_eval_code(vm, filename, data, r, foutput, ferror, use_strict);
         free(data);
         return r;
     }

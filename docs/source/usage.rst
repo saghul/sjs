@@ -21,10 +21,12 @@ This is the typical way to run JavaScript applications with `sjs`, by using the 
     -i         enter interactive mode after executing argument file(s) / eval code
     -e CODE    evaluate code
 
+    --use_strict    evaluate the code in strict mode
+
     If <file> is omitted, interactive mode is started automatically.
 
 With the `sjs` CLI you can execute a file, eval some code directly from the command line, or enter the interactive
-mode.
+mode. By default strict mode is not used, unless ``--use_strict`` is used.
 
 .. note::
     When using the CLI `sjs` will try to pretify the output of every command by serializing it using a JSON variant
@@ -84,7 +86,7 @@ API
     :param vm: The VM reference.
     :returns: The Duktape context.
 
-.. c:function:: int sjs_vm_eval_code(const sjs_vm_t* vm, const char* filename, const char* code, size_t len, FILE* foutput, FILE* ferror)
+.. c:function:: int sjs_vm_eval_code(const sjs_vm_t* vm, const char* filename, const char* code, size_t len, FILE* foutput, FILE* ferror, bool use_strict)
 
     Evaluate the given JavaScript `code`.
 
@@ -94,9 +96,10 @@ API
     :param len: Length of the code.
     :param foutput: Stream where to print the result of the evaulated code (can be NULL).
     :param ferror: Stream where to print errors, if any (can be NULL).
+    :param use_strict: Indicates if the code should be evaluated in strict mode or not.
     :returns: 0 if the code was evaluated without errors, != 0 otherwise.
 
-.. c:function:: int sjs_vm_eval_file(const sjs_vm_t* vm, const char* filename, FILE* foutput, FILE* ferror)
+.. c:function:: int sjs_vm_eval_file(const sjs_vm_t* vm, const char* filename, FILE* foutput, FILE* ferror, bool use_strict)
 
     Evaluate the given file as JavaScript code.
 
@@ -104,6 +107,7 @@ API
     :param filename: The file to be evaluated.
     :param foutput: Stream where to print the result of the evaulated code (can be NULL).
     :param ferror: Stream where to print errors, if any (can be NULL).
+    :param use_strict: Indicates if the file should be evaluated in strict mode or not.
     :returns: 0 if the code was evaluated without errors, != 0 otherwise.
 
 **Utility functions**

@@ -14,6 +14,8 @@
 /* exit if user presses Ctrl-C twice */
 static int got_sigint = 0;
 
+static int use_strict = 0;
+
 
 static int handle_stdin(sjs_vm_t* vm) {
     char *buf;
@@ -51,7 +53,7 @@ static int handle_stdin(sjs_vm_t* vm) {
         bufoff += got;
     }
 
-    r = sjs_vm_eval_code(vm, "stdin", buf, bufoff, NULL, stderr);
+    r = sjs_vm_eval_code(vm, "stdin", buf, bufoff, NULL, stderr, use_strict);
 
     free(buf);
     buf = NULL;
@@ -97,7 +99,7 @@ static int handle_interactive(sjs_vm_t* vm) {
             linenoiseHistoryAdd(line);
         }
 
-        sjs_vm_eval_code(vm, "input", line, strlen(line), stdout, stdout);
+        sjs_vm_eval_code(vm, "input", line, strlen(line), stdout, stdout, use_strict);
         free(line);
     }
 
@@ -133,7 +135,9 @@ int main(int argc, char *argv[]) {
     for (int i = 1; i < argc; i++) {
         char *arg = argv[i];
         assert(arg);
-        if (strcmp(arg, "-i") == 0) {
+        if (strcmp(arg, "--use_strict") == 0) {
+            use_strict = 1;
+        } else if (strcmp(arg, "-i") == 0) {
             interactive = 1;
         } else if (strcmp(arg, "-h") == 0) {
             goto usage;
@@ -166,7 +170,7 @@ int main(int argc, char *argv[]) {
 
     /* run */
     if (run_file) {
-        if (sjs_vm_eval_file(vm, run_file, NULL, stderr) != 0) {
+        if (sjs_vm_eval_file(vm, run_file, NULL, stderr, use_strict) != 0) {
             retval = 1;
             goto cleanup;
         }
@@ -176,7 +180,7 @@ int main(int argc, char *argv[]) {
             goto cleanup;
         }
     } else if (eval_code) {
-        if (sjs_vm_eval_code(vm, "eval", eval_code, strlen(eval_code), NULL, stderr) != 0) {
+        if (sjs_vm_eval_code(vm, "eval", eval_code, strlen(eval_code), NULL, stderr, use_strict) != 0) {
             retval = 1;
             goto cleanup;
         }
@@ -213,6 +217,8 @@ usage:
                     "   -h         show help text\n"
                     "   -i         enter interactive mode after executing argument file(s) / eval code\n"
                     "   -e CODE    evaluate code\n"
+                    "\n"
+                    "   --use_strict    evaluate the code in strict mode\n"
                     "\n"
                     "If <file> is omitted, interactive mode is started automatically.\n");
     fflush(stderr);
