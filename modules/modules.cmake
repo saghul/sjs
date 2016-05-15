@@ -23,25 +23,25 @@ install(TARGETS _errno
 )
 
 
-# fs
+# io
 #
 
-add_library(_fs MODULE
-    modules/_fs.c
+add_library(_io MODULE
+    modules/_io.c
 )
-target_link_libraries(_fs
+target_link_libraries(_io
     sjs
 )
-set_target_properties(_fs PROPERTIES
+set_target_properties(_io PROPERTIES
     PREFIX ""
     SUFFIX ".jsdll"
 )
-install(TARGETS _fs
+install(TARGETS _io
         DESTINATION lib/sjs/modules
 )
 
 
-# io
+# io/select io/poll
 #
 
 add_library(_select MODULE
@@ -57,6 +57,7 @@ set_target_properties(_select PROPERTIES
 install(TARGETS _select
         DESTINATION lib/sjs/modules
 )
+
 add_library(_poll MODULE
     modules/_poll.c
 )

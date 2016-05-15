@@ -45,7 +45,6 @@ Standard library
     modules/assert
     modules/codecs
     modules/errno
-    modules/fs
     modules/io
     modules/log
     modules/net

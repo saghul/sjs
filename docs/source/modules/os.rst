@@ -118,6 +118,13 @@ This module exposes low level operating system facilities / syscalls.
     .. seealso::
         :man:`ttyname(3)`
 
+.. js:function:: os.unlink(path)
+
+    Unlinks (usually this means completely removing) the given `path`.
+
+    .. seealso::
+        :man:`unlink(3)`
+
 .. js:function:: os.write(data)
 
     Write data on the file descriptor.

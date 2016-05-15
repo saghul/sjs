@@ -14,7 +14,7 @@
  * - 0: path
  * - 1: mode
  */
-static duk_ret_t fs_fopen(duk_context* ctx) {
+static duk_ret_t io_fopen(duk_context* ctx) {
     const char* path;
     const char* mode;
     FILE* f;
@@ -38,7 +38,7 @@ static duk_ret_t fs_fopen(duk_context* ctx) {
  * - 0: FILE
  * - 1: nread (a number or a Buffer-ish object)
  */
-static duk_ret_t fs_fread(duk_context* ctx) {
+static duk_ret_t io_fread(duk_context* ctx) {
     FILE* f;
     size_t nread, r;
     char* buf;
@@ -87,7 +87,7 @@ static duk_ret_t fs_fread(duk_context* ctx) {
  * - 0: FILE
  * - 1: data
  */
-static duk_ret_t fs_fwrite(duk_context* ctx) {
+static duk_ret_t io_fwrite(duk_context* ctx) {
     FILE* f;
     size_t len, r;
     const char* buf;
@@ -115,7 +115,7 @@ static duk_ret_t fs_fwrite(duk_context* ctx) {
  * Close the file. Args:
  * - 0: FILE
  */
-static duk_ret_t fs_fclose(duk_context* ctx) {
+static duk_ret_t io_fclose(duk_context* ctx) {
     FILE* f;
 
     f = duk_require_pointer(ctx, 0);
@@ -130,7 +130,7 @@ static duk_ret_t fs_fclose(duk_context* ctx) {
  * Flush the file write buffer. Args:
  * - 0: FILE
  */
-static duk_ret_t fs_fflush(duk_context* ctx) {
+static duk_ret_t io_fflush(duk_context* ctx) {
     FILE* f;
     int r;
 
@@ -151,7 +151,7 @@ static duk_ret_t fs_fflush(duk_context* ctx) {
  * Get the fd associated with a file. Args:
  * - 0: FILE
  */
-static duk_ret_t fs_fileno(duk_context* ctx) {
+static duk_ret_t io_fileno(duk_context* ctx) {
     FILE* f;
     int fd;
 
@@ -163,36 +163,19 @@ static duk_ret_t fs_fileno(duk_context* ctx) {
 }
 
 
-static duk_ret_t fs_unlink(duk_context* ctx) {
-    const char* path;
-    int r;
-
-    path = duk_require_string(ctx, 0);
-
-    r = unlink(path);
-    if (r < 0) {
-        SJS_THROW_ERRNO_ERROR();
-        return -42;    /* control never returns here */
-    } else {
-        duk_push_undefined(ctx);
-        return 1;
-    }
-}
-
-
-static duk_ret_t fs_stdin(duk_context* ctx) {
+static duk_ret_t io_stdin(duk_context* ctx) {
     duk_push_pointer(ctx, (void*) stdin);
     return 1;
 }
 
 
-static duk_ret_t fs_stdout(duk_context* ctx) {
+static duk_ret_t io_stdout(duk_context* ctx) {
     duk_push_pointer(ctx, (void*) stdout);
     return 1;
 }
 
 
-static duk_ret_t fs_stderr(duk_context* ctx) {
+static duk_ret_t io_stderr(duk_context* ctx) {
     duk_push_pointer(ctx, (void*) stderr);
     return 1;
 }
@@ -207,16 +190,15 @@ static const duk_number_list_entry module_consts[] = {
 
 static const duk_function_list_entry module_funcs[] = {
     /* name, function, nargs */
-    { "fopen", fs_fopen, 2 },
-    { "fread", fs_fread, 2 },
-    { "fwrite", fs_fwrite, 2 },
-    { "fclose", fs_fclose, 1 },
-    { "fflush", fs_fflush, 1 },
-    { "fileno", fs_fileno, 1 },
-    { "unlink", fs_unlink, 1 },
-    { "stdin", fs_stdin, 0 },
-    { "stdout", fs_stdout, 0 },
-    { "stderr", fs_stderr, 0 },
+    { "fopen", io_fopen, 2 },
+    { "fread", io_fread, 2 },
+    { "fwrite", io_fwrite, 2 },
+    { "fclose", io_fclose, 1 },
+    { "fflush", io_fflush, 1 },
+    { "fileno", io_fileno, 1 },
+    { "stdin", io_stdin, 0 },
+    { "stdout", io_stdout, 0 },
+    { "stderr", io_stderr, 0 },
     { NULL, NULL, 0 }
 };
 

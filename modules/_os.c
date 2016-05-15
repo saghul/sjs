@@ -293,6 +293,23 @@ static duk_ret_t os_stat(duk_context* ctx) {
 }
 
 
+static duk_ret_t os_unlink(duk_context* ctx) {
+    const char* path;
+    int r;
+
+    path = duk_require_string(ctx, 0);
+
+    r = unlink(path);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    } else {
+        duk_push_undefined(ctx);
+        return 1;
+    }
+}
+
+
 #define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
     /* flags for open */
@@ -349,6 +366,7 @@ static const duk_function_list_entry module_funcs[] = {
     { "getcwd", os_getcwd, 0 },
     { "scandir", os_scandir, 1 },
     { "stat", os_stat, 2 },
+    { "unlink", os_unlink, 1 },
     { NULL, NULL, 0 }
 };
 

@@ -176,6 +176,7 @@ exports.isatty   = _os.isatty;
 exports.ttyname  = _os.ttyname;
 exports.scandir  = _os.scandir;
 exports.stat     = stat;
+exports.unlink   = _os.unlink;
 exports.S_IMODE  = S_IMODE;
 exports.S_ISDIR  = S_ISDIR;
 exports.S_ISCHR  = S_ISCHR;

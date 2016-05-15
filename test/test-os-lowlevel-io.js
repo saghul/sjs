@@ -2,7 +2,6 @@
 
 const assert = require('assert');
 const os = require('os');
-const fs = require('fs');
 
 const TEST_FILE = 'test123';
 const TEST_DATA = 'hello sjs!';
@@ -28,7 +27,7 @@ safeUnlink(TEST_FILE);
 
 function safeUnlink(path) {
     try {
-        fs.unlink(path);
+        os.unlink(path);
     } catch (e) {
         // ignore
     }
