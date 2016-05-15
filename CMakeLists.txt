@@ -112,7 +112,15 @@ target_include_directories(sjs
 
 target_link_libraries(sjs
     duktape
+    m
 )
+if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+    target_link_libraries(sjs
+        dl
+        rt
+    )
+endif()
+
 
 # sjs
 #
@@ -127,15 +135,7 @@ set_target_properties(sjs_cli PROPERTIES
 
 target_link_libraries(sjs_cli
     sjs
-    m
 )
-if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
-    target_link_libraries(sjs_cli
-        dl
-        rt
-    )
-endif()
-
 
 # install target
 #
