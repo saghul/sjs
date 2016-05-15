@@ -15,6 +15,19 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS} -O2 -g")
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
+
+# Version
+#
+set(SJS__VERSION_MAJOR 0)
+set(SJS__VERSION_MINOR 1)
+set(SJS__VERSION_PATCH 99)
+set(SJS__VERSION_SUFFIX "dev")
+configure_file (
+    "${CMAKE_SOURCE_DIR}/include/sjs/version.h.in"
+    "${CMAKE_SOURCE_DIR}/include/sjs/version.h"
+)
+
+
 # Defines for system.build
 #
 if("${CMAKE_C_COMPILER_ID}" STREQUAL "GNU")

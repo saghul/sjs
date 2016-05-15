@@ -3,3 +3,4 @@ original/
 *.swp
 *.pyc
 include/sjs/build.h
+include/sjs/version.h

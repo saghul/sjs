@@ -1,0 +1,16 @@
+
+#ifndef SJS_VERSION_H
+#define SJS_VERSION_H
+
+#include "duktape.h"
+
+
+#define SJS_VERSION_MAJOR @SJS__VERSION_MAJOR@
+#define SJS_VERSION_MINOR @SJS__VERSION_MINOR@
+#define SJS_VERSION_PATCH @SJS__VERSION_PATCH@
+#define SJS_VERSION_SUFFIX "@SJS__VERSION_SUFFIX@"
+
+DUK_EXTERNAL_DECL const char* sjs_version(void);
+
+#endif
+
