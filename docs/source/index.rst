@@ -51,12 +51,32 @@ For Release builds:
 
     make BUILDTYPE=Release
 
+The installation prefix can be specified by setting ``PREFIX``, it defaults to ``/usr/local``.
+
+::
+
+    make PREFIX=/usr
+
 Install
 ^^^^^^^
 
 ::
 
     make install
+
+By default `sjs` will be installed to the directory indicated by ``PREFIX`` (``/usr/local`` by default) with the
+following structure:
+
+* ``PREFIX``/bin: `sjs` binary
+* ``PREFIX``/lib: `libsjs` library
+* ``PREFIX``/lib/sjs/modules: modules
+
+The destination of the files can be further altered by setting ``DESTDIR``. This will be prepended to ``PREFIX``.
+Confusing, I know.
+
+::
+
+    make DESTDIR=/tmp/testsjs install
 
 Run the test suite
 ^^^^^^^^^^^^^^^^^^
