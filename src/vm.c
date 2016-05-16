@@ -445,8 +445,13 @@ DUK_EXTERNAL int sjs_vm_eval_file(const sjs_vm_t* vm,
                                   bool use_strict) {
     int r;
     char* data;
+    char path[8192];
 
-    r = sjs__file_read(filename, &data);
+    r = sjs__path_normalize(filename, path, sizeof(path));
+    if (r < 0) {
+        return r;
+    }
+    r = sjs__file_read(path, &data);
     if (r < 0) {
         return r;
     } else if (r == 0) {
@@ -454,7 +459,7 @@ DUK_EXTERNAL int sjs_vm_eval_file(const sjs_vm_t* vm,
         free(data);
         return r;
     } else {
-        r = sjs_vm_eval_code(vm, filename, data, r, foutput, ferror, use_strict);
+        r = sjs_vm_eval_code(vm, path, data, r, foutput, ferror, use_strict);
         free(data);
         return r;
     }
