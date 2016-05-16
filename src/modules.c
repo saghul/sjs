@@ -246,7 +246,9 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
 
     if (found_js) {
         duk_pop_2(ctx);    /* pop the enum and path off the stack */
+        duk_push_sprintf(ctx, "var __file__ = \"%s\";", tmp);
         duk_push_lstring(ctx, data, len);
+        duk_concat(ctx, 2);
         free(data);
         return 1;
     } else if (found_jsdll) {

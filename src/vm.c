@@ -241,6 +241,7 @@ static void sjs__setup_global_module(sjs_vm_t* vm) {
 
 static int sjs__compile_execute(duk_context *ctx) {
     const char *code;
+    const char* filename;
     duk_size_t len;
     bool use_strict;
     int flags;
@@ -250,6 +251,7 @@ static int sjs__compile_execute(duk_context *ctx) {
     use_strict = duk_require_boolean(ctx, -4);
     code = duk_require_pointer(ctx, -3);
     len = duk_require_uint(ctx, -2);
+    filename = duk_require_string(ctx, -1);
 
     flags = 0;
     if (use_strict) {
@@ -261,6 +263,8 @@ static int sjs__compile_execute(duk_context *ctx) {
     /* [ ... use_strict code len function ] */
 
     duk_push_global_object(ctx);  /* 'this' binding */
+    duk_push_string(ctx, filename);
+    duk_put_prop_string(ctx, -2, "__file__");
     duk_call_method(ctx, 0);
 
     return 1;    /* either the result or error are on the stack top */
