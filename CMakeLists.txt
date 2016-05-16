@@ -19,9 +19,9 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 # Version
 #
 set(SJS__VERSION_MAJOR 0)
-set(SJS__VERSION_MINOR 1)
-set(SJS__VERSION_PATCH 99)
-set(SJS__VERSION_SUFFIX "dev")
+set(SJS__VERSION_MINOR 2)
+set(SJS__VERSION_PATCH 0)
+set(SJS__VERSION_SUFFIX "")
 configure_file (
     "${CMAKE_SOURCE_DIR}/include/sjs/version.h.in"
     "${CMAKE_SOURCE_DIR}/include/sjs/version.h"
