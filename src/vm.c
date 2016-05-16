@@ -258,6 +258,11 @@ static int sjs__compile_execute(duk_context *ctx) {
         flags |= DUK_COMPILE_STRICT;
     }
 
+    /* remove shebang if present */
+    if (strncmp(code, "#!", 2) == 0) {
+        memcpy((void*) code, "//", 2);
+    }
+
     duk_compile_lstring_filename(ctx, flags, code, len);
 
     /* [ ... use_strict code len function ] */
