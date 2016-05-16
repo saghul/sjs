@@ -33,6 +33,12 @@ These functions / objects are accessible globally.
 
     Utility function to write `data` to stdout.
 
+.. js:data:: __file__
+
+    A sort of global attribute containing the absolute path to the file. In the global scope it constains the filename
+    which is currently being executed, ``input`` if running the REPL or ``eval`` if evaluating code straight from
+    the CLI. Inside a module, it contains the absolute path to the module file.
+
 
 .. _stdlib:
 
