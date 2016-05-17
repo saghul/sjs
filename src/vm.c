@@ -458,10 +458,18 @@ DUK_EXTERNAL int sjs_vm_eval_file(const sjs_vm_t* vm,
 
     r = sjs__path_normalize(filename, path, sizeof(path));
     if (r < 0) {
+        if (ferror) {
+            fprintf(ferror, "sjs: cannot open file '%s': [Errno %d] %s\n", filename, -r, strerror(-r));
+            fflush(ferror);
+        }
         return r;
     }
     r = sjs__file_read(path, &data);
     if (r < 0) {
+        if (ferror) {
+            fprintf(ferror, "sjs: cannot open file '%s': [Errno %d] %s\n", filename, -r, strerror(-r));
+            fflush(ferror);
+        }
         return r;
     } else if (r == 0) {
         /* also return in case of a 0 sized file */
