@@ -38,6 +38,25 @@ Object.defineProperty(exports, 'cwd', {
 });
 
 
+function urandom(bytes) {
+    if (typeof bytes === 'number') {
+        if (bytes <= 0 || Number.isNaN(bytes)) {
+            throw new RangeError('"bytes" must be > 0');
+        }
+        var buf = Buffer(bytes);
+    } else if (bytes instanceof Buffer) {
+        var buf = bytes;
+        if (buf.length === 0) {
+            throw new RangeError('buffer length must be > 0');
+        }
+    } else {
+        throw new TypeError('only numbers and Buffer objects are allowed');
+    }
+    _os.urandom(buf);
+    return buf;
+}
+
+
 function buildStat(
         dev,
         mode,
@@ -177,6 +196,8 @@ exports.ttyname  = _os.ttyname;
 exports.scandir  = _os.scandir;
 exports.stat     = stat;
 exports.unlink   = _os.unlink;
+exports.urandom  = urandom;
+
 exports.S_IMODE  = S_IMODE;
 exports.S_ISDIR  = S_ISDIR;
 exports.S_ISCHR  = S_ISCHR;

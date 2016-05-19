@@ -4,6 +4,7 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/syscall.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -310,6 +311,89 @@ static duk_ret_t os_unlink(duk_context* ctx) {
 }
 
 
+/* read `size` bytes from /dev/urandom */
+static int sjs__urandom(void* vbuf, size_t size) {
+    int fd;
+    ssize_t r;
+    char* buf = vbuf;
+
+    fd = open("/dev/urandom", O_RDONLY);
+    if (fd < 0) {
+        return -errno;
+    }
+
+    while (size > 0) {
+        do {
+            r = read(fd, buf, size);
+        } while (r < 0 && errno == EINTR);
+        if (r < 0) {
+            r = -errno;
+            close(fd);
+            return r;
+        }
+        buf += r;
+        size -= r;
+    }
+
+    close(fd);
+    return 0;
+}
+
+#ifdef SYS_getrandom
+/* Linux getrandom(2) */
+static int sjs__getrandom(void* vbuf, size_t size) {
+    int r;
+    char* buf = vbuf;
+
+    while (size > 0) {
+        do {
+            r = syscall(SYS_getrandom, vbuf, size, 0);
+        } while (r < 0 && errno == EINTR);
+        if (r < 0) {
+            return -errno;
+        }
+        buf += r;
+        size -= r;
+    }
+    return 0;
+}
+#endif
+
+/* read `size` bytes from the system random source (CSPRNG) */
+static int sjs__sys_random(void* vbuf, size_t size) {
+#ifdef SYS_getrandom
+    static int no_getrandom;
+    if (!no_getrandom) {
+        int r = sjs__getrandom(vbuf, size);
+        if (r == -ENOSYS) {
+            no_getrandom = 1;
+        } else {
+            return r;
+        }
+    }
+#endif
+    return sjs__urandom(vbuf, size);
+}
+
+static duk_ret_t os_urandom(duk_context* ctx) {
+    char* buf;
+    size_t nbytes;
+    int r;
+
+    buf = duk_require_buffer_data(ctx, 0, &nbytes);
+
+    /* TODO: use getrandom(2) on Linux */
+    r = sjs__sys_random(buf, nbytes);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR2(-r);
+        return -42;    /* control never returns here */
+    } else {
+        duk_push_undefined(ctx);
+        return 1;
+    }
+}
+
+
 #define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
     /* flags for open */
@@ -367,6 +451,7 @@ static const duk_function_list_entry module_funcs[] = {
     { "scandir", os_scandir, 1 },
     { "stat", os_stat, 2 },
     { "unlink", os_unlink, 1 },
+    { "urandom", os_urandom, 1 },
     { NULL, NULL, 0 }
 };
 

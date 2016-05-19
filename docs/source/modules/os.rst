@@ -125,6 +125,15 @@ This module exposes low level operating system facilities / syscalls.
     .. seealso::
         :man:`unlink(3)`
 
+.. js:function:: os.urandom(bytes)
+
+    Get `bytes` from the system `CSPRNG <https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator>`_.
+    This is implemented by reading from ``/dev/urandom`` except on Linux systems supporting the :man:`getrandom(2)`
+    syscall.
+
+    `bytes` can be an integer or a ``Buffer`` object. If it's an integer a ``Buffer`` will be returned of the specified
+    size. If it's already a ``Buffer``, if will be filled.
+
 .. js:function:: os.write(data)
 
     Write data on the file descriptor.
