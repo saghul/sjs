@@ -207,12 +207,6 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
                 path_join(tmp, sizeof(tmp), "index.js");
                 len = sjs__file_read(tmp, &data);
                 if (len < 0) {
-                    /* no index.js, try index.jsdll */
-                    sjs__strlcat(tmp, "dll", sizeof(tmp));
-                    if (load_jsdll(ctx, tmp) == 0) {
-                        found_jsdll = 1;
-                        break;
-                    }
                     continue;
                 }
                 /* fix require.id */
