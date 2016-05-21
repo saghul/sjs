@@ -203,36 +203,38 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
                     continue;
                 }
             } else if (S_ISDIR(st.st_mode)) {
-                /* directory, check for index.js or index.jsdll */
+                /* directory, check for index.js */
                 path_join(tmp, sizeof(tmp), "index.js");
                 len = sjs__file_read(tmp, &data);
-                if (len < 0) {
-                    continue;
-                }
-                /* fix require.id */
-                {
+                if (len >= 0) {
+                    /* fix require.id */
                     char tmpid[1024];
                     snprintf(tmpid, sizeof(tmpid), "%s/index", id);
                     duk_push_string(ctx, "id");
                     duk_push_string(ctx, tmpid);
                     duk_def_prop(ctx, 1 /* index of 'require' */, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_FORCE);
+                    found_js = 1;
+                    break;
+                } else {
+                    /* no index file found, fallback to checking if a file with the directory file exists */
+                    char* ptr = strrchr(tmp, '/');
+                    assert(ptr != NULL);
+                    *ptr = '\0';
                 }
-                found_js = 1;
+            }
+        }
+
+        /* path doesn't exist or is not a directory nor a file, try to add .js or .jsdll */
+        sjs__strlcat(tmp, ".js", sizeof(tmp));
+        len = sjs__file_read(tmp, &data);
+        if (len < 0) {
+            /* no index.js, try index.jsdll */
+            sjs__strlcat(tmp, "dll", sizeof(tmp));
+            if (load_jsdll(ctx, tmp) == 0) {
+                found_jsdll = 1;
                 break;
             }
         } else {
-            /* path doesn't exist, try to add .js or .jsdll */
-            sjs__strlcat(tmp, ".js", sizeof(tmp));
-            len = sjs__file_read(tmp, &data);
-            if (len < 0) {
-                /* no index.js, try index.jsdll */
-                sjs__strlcat(tmp, "dll", sizeof(tmp));
-                if (load_jsdll(ctx, tmp) == 0) {
-                    found_jsdll = 1;
-                    break;
-                }
-                continue;
-            }
             found_js = 1;
             break;
         }
