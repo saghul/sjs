@@ -31,7 +31,7 @@ assert.equal(r, TEST_DATA.length);
 function recvData(data) {
     client.recv(data);
 }
-var data = ['aaaaa', {}, null, new Buffer(0), new Uint8Array(0)];
+var data = ['aaaaa', {}, new Buffer(0), new Uint8Array(0)];
 for (var i = 0, len = data.length; i < len; i++) {
     assert.throws(recvData.bind(this, data[i]), TypeError);
 }

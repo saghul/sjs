@@ -81,15 +81,15 @@ Socket.prototype.getpeername = function() {
 
 Socket.prototype.listen = function(backlog) {
     checkSocket.call(this);
-    var backlog = (backlog >>> 0) || 128;
+    backlog = positiveInt(backlog, 128);
     _socket.listen(this._fd, backlog);
 }
 
 
 Socket.prototype.recv = function(nrecv) {
     checkSocket.call(this);
-    if (nrecv === undefined || typeof nrecv === 'number') {
-        nrecv = (nrecv >>> 0) || 4096;
+    if (nrecv == null || typeof nrecv === 'number') {
+        nrecv = positiveInt(nrecv, 4096);
     }
     // we will validate if the passed argument is a buffer in C
     return _socket.recv(this._fd, nrecv);
@@ -104,8 +104,8 @@ Socket.prototype.send = function(data) {
 
 Socket.prototype.recvfrom = function(nrecv) {
     checkSocket.call(this);
-    if (nrecv === undefined || typeof nrecv === 'number') {
-        nrecv = (nrecv >>> 0) || 4096;
+    if (nrecv == null || typeof nrecv === 'number') {
+        nrecv = positiveInt(nrecv, 4096);
     }
     // we will validate if the passed argument is a buffer in C
     return _socket.recvfrom(this._fd, nrecv);
@@ -236,6 +236,15 @@ function normalizeAddress(domain, addr) {
 
         return addr;
     }
+}
+
+
+function positiveInt(n, _default) {
+    if (n < 0) {
+        throw new RangeError('negative numbers are not allowed');
+    }
+    n >>>= 0;
+    return n || _default;
 }
 
 
