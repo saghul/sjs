@@ -230,12 +230,12 @@ function normalizeAddress(domain, address) {
             throw new Error('invalid IP address: ' + addr.host);
         } else if (iptype === 4) {
             addr.domain = _socket.c.AF_INET;
-            addr.port = addr.port >>> 0;
+            addr.port >>>= 0;
         } else {
             addr.domain = _socket.c.AF_INET6;
-            addr.port = addr.port >>> 0;
-            addr.flowinfo = addr.flowinfo >>> 0;
-            addr.scopeid = addr.scopeid >>> 0;
+            addr.port >>>= 0;
+            addr.flowinfo >>>= 0;
+            addr.scopeid >>>= 0;
         }
 
         return addr;
