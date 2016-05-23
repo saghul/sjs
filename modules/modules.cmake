@@ -140,6 +140,25 @@ install(TARGETS _path
 )
 
 
+# random
+#
+
+add_library(_random MODULE
+    modules/_random/mt19937ar.c
+    modules/_random/random.c
+)
+target_link_libraries(_random
+    sjs
+)
+set_target_properties(_random PROPERTIES
+    PREFIX ""
+    SUFFIX ".jsdll"
+)
+install(TARGETS _random
+        DESTINATION lib/sjs/modules
+)
+
+
 # time
 #
 
