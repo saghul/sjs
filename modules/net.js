@@ -120,7 +120,6 @@ Socket.prototype.sendto = function(data, address) {
 
 Socket.prototype.shutdown = function(how) {
     checkSocket.call(this);
-    var how = how >>> 0;
     _socket.shutdown(this._fd, how);
 }
 
