@@ -7,7 +7,7 @@ const outil = require('objectutil');
 
 
 function Socket(domain, type, options) {
-    var options = options || {};
+    options = Object.assign({}, options);
 
     if (options.fd !== undefined && options.fd > -1) {
         this._fd = options.fd;
@@ -147,15 +147,15 @@ Socket.prototype.getsockopt = function(level, option, size) {
 
 
 function getaddrinfo(hostname, servname, hints) {
-    var hints = hints || {};
+    hints = Object.assign({}, hints);
     return _gai.getaddrinfo(hostname, servname, hints);
 }
 
 
 function socketpair(domain, type, options) {
-    var options = options || {};
     var fds = _socket.socketpair(domain, type);
     var sock1, sock2;
+    options = Object.assign({}, options);
     sock1 = new Socket(domain, type, {fd: fds[0], nonBlocking: !!options.nonBlocking});
     try {
         sock2 = new Socket(domain, type, {fd: fds[1], nonBlocking: !!options.nonBlocking});
@@ -207,9 +207,7 @@ function checkSocket() {
 }
 
 
-function normalizeAddress(domain, address) {
-    var addr = address || {};
-
+function normalizeAddress(domain, addr) {
     if (domain === _socket.c.AF_UNIX) {
         if (typeof addr === 'string') {
             return {domain: _socket.c.AF_UNIX, path: addr};
@@ -217,9 +215,7 @@ function normalizeAddress(domain, address) {
             throw new TypeError('invalid address');
         }
     } else {
-        if (typeof addr !== 'object') {
-            throw new TypeError('invalid address');
-        }
+        addr = Object.assign({}, addr);
 
         if (!addr.host) {
             addr.host = domain === _socket.c.AF_INET6 ? '::' : '0.0.0.0';
