@@ -128,8 +128,8 @@ This module exposes low level operating system facilities / syscalls.
 .. js:function:: os.urandom(bytes)
 
     Get `bytes` from the system `CSPRNG <https://en.wikipedia.org/wiki/Cryptographically_secure_pseudorandom_number_generator>`_.
-    This is implemented by reading from ``/dev/urandom`` except on Linux systems supporting the :man:`getrandom(2)`
-    syscall.
+    This is implemented by reading from ``/dev/urandom``. On Linux systems supporting the :man:`getrandom(2)`
+    syscall that one is used, and in OSX :man:`arc4random_buf(3)`.
 
     `bytes` can be an integer or a ``Buffer`` object. If it's an integer a ``Buffer`` will be returned of the specified
     size. If it's already a ``Buffer``, if will be filled.

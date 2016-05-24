@@ -372,6 +372,10 @@ static int sjs__sys_random(void* vbuf, size_t size) {
         }
     }
 #endif
+#ifdef __APPLE__
+    arc4random_buf(vbuf, size);
+    return 0;
+#endif
     return sjs__urandom(vbuf, size);
 }
 
