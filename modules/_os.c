@@ -382,7 +382,6 @@ static duk_ret_t os_urandom(duk_context* ctx) {
 
     buf = duk_require_buffer_data(ctx, 0, &nbytes);
 
-    /* TODO: use getrandom(2) on Linux */
     r = sjs__sys_random(buf, nbytes);
     if (r < 0) {
         SJS_THROW_ERRNO_ERROR2(-r);
