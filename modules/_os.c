@@ -8,8 +8,40 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "../src/platform-inl.h"
 #include <sjs/sjs.h>
 
+
+static int sjs__open(const char *pathname, int flags, mode_t mode) {
+    static int no_cloexec_support;
+    int r;
+
+    if (no_cloexec_support == 0) {
+#if defined(O_CLOEXEC)
+        r = open(pathname, flags | O_CLOEXEC, mode);
+        if (r >= 0) {
+            return r;
+        }
+        if (errno != EINVAL) {
+            return -errno;
+        }
+        no_cloexec_support = 1;
+#endif
+    }
+
+    int fd;
+    r = open(pathname, flags, mode);
+    if (r < 0) {
+        return -errno;
+    }
+    fd = r;
+    r = sjs__cloexec(fd, 1);
+    if (r < 0) {
+        close(fd);
+        return r;
+    }
+    return fd;
+}
 
 /*
  * Open a file for low level I/O. Args:
@@ -25,9 +57,9 @@ static duk_ret_t os_open(duk_context* ctx) {
     flags = duk_require_int(ctx, 1);
     mode = duk_require_int(ctx, 2);
 
-    r = open(path, flags, mode);
-    if (r == -1) {
-        SJS_THROW_ERRNO_ERROR();
+    r = sjs__open(path, flags, mode);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR2(-r);
         return -42;    /* control never returns here */
     } else {
         duk_push_int(ctx, r);
@@ -137,13 +169,43 @@ static duk_ret_t os_abort(duk_context* ctx) {
 }
 
 
+static int sjs__pipe(int fds[2]) {
+    int r;
+#if defined(__linux__)
+    r = pipe2(fds, O_CLOEXEC);
+    if (r < 0) {
+        return -errno;
+    }
+    return r;
+#endif
+    r = pipe(fds);
+    if (r < 0) {
+        return -errno;
+    }
+    r = sjs__cloexec(fds[0], 1);
+    if (r < 0) {
+        goto error;
+    }
+    r = sjs__cloexec(fds[1], 1);
+    if (r < 0) {
+        goto error;
+    }
+    return r;
+error:
+    close(fds[0]);
+    close(fds[1]);
+    fds[0] = -1;
+    fds[1] = -1;
+    return r;
+}
+
 static duk_ret_t os_pipe(duk_context* ctx) {
     int fds[2];
     int r;
 
-    r = pipe(fds);
+    r = sjs__pipe(fds);
     if (r < 0) {
-        SJS_THROW_ERRNO_ERROR();
+        SJS_THROW_ERRNO_ERROR2(-r);
         return -42;    /* control never returns here */
     } else {
         duk_push_array(ctx);
