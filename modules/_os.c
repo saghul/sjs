@@ -210,9 +210,9 @@ static duk_ret_t os_pipe(duk_context* ctx) {
     } else {
         duk_push_array(ctx);
         duk_push_int(ctx, fds[0]);
-    	duk_put_prop_index(ctx, -2, 0);
+        duk_put_prop_index(ctx, -2, 0);
         duk_push_int(ctx, fds[1]);
-    	duk_put_prop_index(ctx, -2, 1);
+        duk_put_prop_index(ctx, -2, 1);
         return 1;
     }
 }
@@ -337,17 +337,17 @@ static duk_ret_t os_stat(duk_context* ctx) {
         duk_push_uint(ctx, 0);    /* st_gen */
 #endif
 
-	/* times, convert to ms */
+    /* times, convert to ms */
 #if defined(__APPLE__)
         duk_push_number(ctx, sjs__timespec2ms(st.st_atimespec));
         duk_push_number(ctx, sjs__timespec2ms(st.st_mtimespec));
         duk_push_number(ctx, sjs__timespec2ms(st.st_ctimespec));
         duk_push_number(ctx, sjs__timespec2ms(st.st_birthtimespec));
 #else
-	duk_push_number(ctx, st.st_atime * 1000);
-	duk_push_number(ctx, st.st_mtime * 1000);
-	duk_push_number(ctx, st.st_ctime * 1000);
-	duk_push_number(ctx, st.st_ctime * 1000);    /* st_birthtim */
+        duk_push_number(ctx, st.st_atime * 1000);
+        duk_push_number(ctx, st.st_mtime * 1000);
+        duk_push_number(ctx, st.st_ctime * 1000);
+        duk_push_number(ctx, st.st_ctime * 1000);    /* st_birthtim */
 #endif
 
         duk_call_method(ctx, 16 /* number of args */);
