@@ -313,13 +313,25 @@ static duk_ret_t os_unlink(duk_context* ctx) {
 
 /* read `size` bytes from /dev/urandom */
 static int sjs__urandom(void* vbuf, size_t size) {
-    int fd;
+    int fd, err;
     ssize_t r;
+    struct stat st;
     char* buf = vbuf;
 
-    fd = open("/dev/urandom", O_RDONLY);
-    if (fd < 0) {
+    err = open("/dev/urandom", O_RDONLY);
+    if (err < 0) {
         return -errno;
+    }
+    fd = err;
+    if (fstat(fd, &st) < 0) {
+        err = -errno;
+        close(fd);
+        return err;
+    }
+    if (!S_ISCHR(st.st_mode)) {
+        /* not a character device! */
+        close(fd);
+        return -EIO;
     }
 
     while (size > 0) {
