@@ -317,6 +317,11 @@ ssize_t sjs__file_read(const char* path, char** data) {
         return -errno;
     }
 
+    if (S_ISDIR(st.st_mode)) {
+        fclose(f);
+        return -EISDIR;
+    }
+
     fsize = st.st_size;
 
     *data = malloc(fsize);
