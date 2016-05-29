@@ -3,6 +3,7 @@
 const errno = require('errno');
 const _gai = require('_gai');
 const _socket = require('_socket');
+const os = require('os');
 const outil = require('objectutil');
 
 
@@ -21,7 +22,7 @@ function Socket(domain, type, options) {
     this._nonblock = !!options.nonBlocking;
     if (this._nonblock) {
         try {
-            _socket.set_nonblocking(this._fd, this._nonblock);
+            os.nonblock(this._fd, this._nonblock);
         } catch (e) {
             this.close();
             throw e;
@@ -126,7 +127,7 @@ Socket.prototype.shutdown = function(how) {
 
 Socket.prototype.setNonBlocking = function(set) {
     checkSocket.call(this);
-    _socket.set_nonblocking(this._fd, !!set);
+    os.nonblock(this._fd, !!set);
 }
 
 
