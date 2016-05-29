@@ -1,10 +1,12 @@
 
+#include <assert.h>
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
+#include <sys/wait.h>
 #include <stdlib.h>
 #include <unistd.h>
 
@@ -471,6 +473,172 @@ static duk_ret_t os_urandom(duk_context* ctx) {
 }
 
 
+static duk_ret_t os_fork(duk_context* ctx) {
+    pid_t pid;
+
+    pid = fork();
+    if (pid < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    }
+
+    duk_push_uint(ctx, pid);
+    return 1;
+}
+
+
+static duk_ret_t os_execve(duk_context* ctx) {
+    const char* filename;
+    size_t nargs, nenv;
+    int r;
+
+    filename = duk_require_string(ctx, 0);
+    assert(duk_is_array(ctx, 1));
+    assert(duk_is_array(ctx, 2));
+    nargs = duk_get_length(ctx, 1);
+    nenv = duk_get_length(ctx, 2);
+
+    char* args[nargs+1];
+    for (size_t i = 0; i < nargs; i++) {
+        duk_get_prop_index(ctx, 1, i);
+        args[i] = (char*) duk_require_string(ctx, -1);
+        duk_pop(ctx);
+    }
+    args[nargs] = NULL;
+
+    char* env[nenv+1];
+    for (size_t i = 0; i < nenv; i++) {
+        duk_get_prop_index(ctx, 2, i);
+        env[i] = (char*) duk_require_string(ctx, -1);
+        duk_pop(ctx);
+    }
+    env[nenv] = NULL;
+
+    r = execve(filename, args, env);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    }
+
+    return -42;    /* control never returns here */
+}
+
+
+static duk_ret_t os_waitpid(duk_context* ctx) {
+    pid_t pid, r;
+    int options, status;
+
+    pid = duk_require_int(ctx, 0);
+    options = duk_require_int(ctx, 1);
+    status = 0;
+
+    r = waitpid(pid, &status, options);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    } else {
+        duk_push_object(ctx);
+        duk_push_uint(ctx, r);
+        duk_put_prop_string(ctx, -2, "pid");
+        duk_push_int(ctx, status);
+        duk_put_prop_string(ctx, -2, "status");
+        return 1;
+    }
+}
+
+
+static duk_ret_t os_WIFEXITED(duk_context* ctx) {
+    int status;
+    status = duk_require_int(ctx, 0);
+    duk_push_boolean(ctx, WIFEXITED(status));
+    return 1;
+}
+
+
+static duk_ret_t os_WEXITSTATUS(duk_context* ctx) {
+    int status;
+    status = duk_require_int(ctx, 0);
+    duk_push_int(ctx, WEXITSTATUS(status));
+    return 1;
+}
+
+
+static duk_ret_t os_WIFSIGNALED(duk_context* ctx) {
+    int status;
+    status = duk_require_int(ctx, 0);
+    duk_push_boolean(ctx, WIFSIGNALED(status));
+    return 1;
+}
+
+
+static duk_ret_t os_WTERMSIG(duk_context* ctx) {
+    int status;
+    status = duk_require_int(ctx, 0);
+    duk_push_int(ctx, WTERMSIG(status));
+    return 1;
+}
+
+
+static duk_ret_t os_WIFSTOPPED(duk_context* ctx) {
+    int status;
+    status = duk_require_int(ctx, 0);
+    duk_push_boolean(ctx, WIFSTOPPED(status));
+    return 1;
+}
+
+
+static duk_ret_t os_WSTOPSIG(duk_context* ctx) {
+    int status;
+    status = duk_require_int(ctx, 0);
+    duk_push_int(ctx, WSTOPSIG(status));
+    return 1;
+}
+
+
+static duk_ret_t os_WIFCONTINUED(duk_context* ctx) {
+    int status;
+    status = duk_require_int(ctx, 0);
+    duk_push_boolean(ctx, WIFCONTINUED(status));
+    return 1;
+}
+
+
+static duk_ret_t os_cloexec(duk_context* ctx) {
+    int fd, r;
+    duk_bool_t set;
+
+    fd = duk_require_int(ctx, 0);
+    set = duk_require_boolean(ctx, 1);
+
+    r = sjs__cloexec(fd, set);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR2(-r);
+        return -42;    /* control never returns here */
+    } else {
+        duk_push_undefined(ctx);
+        return 1;
+    }
+}
+
+
+static duk_ret_t os_nonblock(duk_context* ctx) {
+    int fd, r;
+    duk_bool_t set;
+
+    fd = duk_require_int(ctx, 0);
+    set = duk_require_boolean(ctx, 1);
+
+    r = sjs__nonblock(fd, set);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR2(-r);
+        return -42;    /* control never returns here */
+    } else {
+        duk_push_undefined(ctx);
+        return 1;
+    }
+}
+
+
 #define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
     /* flags for open */
@@ -509,6 +677,10 @@ static const duk_number_list_entry module_consts[] = {
     X(S_IROTH),
     X(S_IWOTH),
     X(S_IXOTH),
+    /* options for waitpid */
+    X(WCONTINUED),
+    X(WNOHANG),
+    X(WUNTRACED),
     { NULL, 0.0 }
 };
 #undef X
@@ -516,19 +688,31 @@ static const duk_number_list_entry module_consts[] = {
 
 static const duk_function_list_entry module_funcs[] = {
     /* name, function, nargs */
-    { "open", os_open, 3 },
-    { "read", os_read, 2 },
-    { "write", os_write, 2 },
-    { "close", os_close, 1 },
-    { "abort", os_abort, 0 },
-    { "pipe", os_pipe, 0 },
-    { "isatty", os_isatty, 1 },
-    { "ttyname", os_ttyname, 1 },
-    { "getcwd", os_getcwd, 0 },
-    { "scandir", os_scandir, 1 },
-    { "stat", os_stat, 2 },
-    { "unlink", os_unlink, 1 },
-    { "urandom", os_urandom, 1 },
+    { "open",                   os_open,            3 },
+    { "read",                   os_read,            2 },
+    { "write",                  os_write,           2 },
+    { "close",                  os_close,           1 },
+    { "abort",                  os_abort,           0 },
+    { "pipe",                   os_pipe,            0 },
+    { "isatty",                 os_isatty,          1 },
+    { "ttyname",                os_ttyname,         1 },
+    { "getcwd",                 os_getcwd,          0 },
+    { "scandir",                os_scandir,         1 },
+    { "stat",                   os_stat,            2 },
+    { "unlink",                 os_unlink,          1 },
+    { "urandom",                os_urandom,         1 },
+    { "fork",                   os_fork,            0 },
+    { "execve",                 os_execve,          3 },
+    { "waitpid",                os_waitpid,         2 },
+    { "WIFEXITED",              os_WIFEXITED,       1 },
+    { "WEXITSTATUS",            os_WEXITSTATUS,     1 },
+    { "WIFSIGNALED",            os_WIFSIGNALED,     1 },
+    { "WTERMSIG",               os_WTERMSIG,        1 },
+    { "WIFSTOPPED",             os_WIFSTOPPED,      1 },
+    { "WSTOPSIG",               os_WSTOPSIG,        1 },
+    { "WIFCONTINUED",           os_WIFCONTINUED,    1 },
+    { "cloexec",                os_cloexec,         2 },
+    { "nonblock",               os_nonblock,        2 },
     { NULL, NULL, 0 }
 };
 

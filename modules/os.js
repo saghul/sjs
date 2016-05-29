@@ -142,6 +142,31 @@ function S_ISSOCK(mode) {
 }
 
 
+function execve(filename, argv, envp) {
+    // normalize argv
+    if (argv == null) {
+        argv = [filename];
+    } else if (!Array.isArray(argv)) {
+        throw new Error('"argv" must be null, undefined or an Array');
+    }
+    if (envp == null) {
+        envp = [];
+    } else {
+        var envArray = [];
+        for (var prop in envp) {
+            envArray.push(prop + '=' + envp[prop]);
+        }
+        envp = envArray;
+    }
+    _os.execve(filename, argv, envp);
+}
+
+
+function waitpid(pid, options) {
+    return _os.waitpid(pid, options >>> 0);
+}
+
+
 // internal helpers
 
 function stringToFlags(flag) {
@@ -206,6 +231,21 @@ exports.S_ISREG  = S_ISREG;
 exports.S_ISFIFO = S_ISFIFO;
 exports.S_ISLNK  = S_ISLNK;
 exports.S_ISSOCK = S_ISSOCK;
+
+exports.fork         = _os.fork;
+exports.execve       = execve;
+exports.waitpid      = waitpid;
+exports.WIFEXITED    = _os.WIFEXITED;
+exports.WEXITSTATUS  = _os.WEXITSTATUS;
+exports.WIFSIGNALED  = _os.WIFSIGNALED;
+exports.WTERMSIG     = _os.WTERMSIG;
+exports.WIFSTOPPED   = _os.WIFSTOPPED;
+exports.WSTOPSIG     = _os.WSTOPSIG;
+exports.WIFCONTINUED = _os.WIFCONTINUED;
+
+exports.cloexec  = _os.cloexec;
+exports.nonblock = _os.nonblock;
+
 
 // extract constants
 for (var k in _os.c) {

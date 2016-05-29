@@ -14,6 +14,11 @@ This module exposes low level operating system facilities / syscalls.
     .. seealso::
         :man:`abort(3)`
 
+.. js:function:: os.cloexec(fd, set)
+
+    Sets or clears the ``O_CLOEXEC`` flag on the given `fd`. Since version 0.3.0 all fds are created with
+    ``O_CLOEXEC`` set.
+
 .. js:function:: os.close(fd)
 
     Close the given file descriptor.
@@ -21,12 +26,36 @@ This module exposes low level operating system facilities / syscalls.
     .. seealso::
         :man:`close(2)`
 
+.. js:function:: os.execve(filename, [args], [envp])
+
+    Executes the program pointed to by `filename`.
+
+    :param filename: Program to be executed.
+    :param args: Arguments for the program. If an ``Array`` is passed, the first element should be the
+        program filename.
+    :param envp: Object containing the environment for the new program.
+
+    .. seealso::
+        :man:`execve(2)`
+
+.. js:function:: os.fork
+
+    Creates a new process duplicating the calling process. See :js:func:`os.waitpid` for how to wait for the
+    child process.
+
+    .. seealso::
+        :man:`fork(2)`
+
 .. js:function:: os.isatty(fd)
 
     Returns ``true`` if the given `fd` refers to a valid terminal type device, ``false`` otherwise.
 
     .. seealso::
         :man:`isatty(3)`
+
+.. js:function:: os.nonblock(fd, set)
+
+    Sets or clears the ``O_NONBLOCK`` flag on the given `fd`.
 
 .. js:function:: os.open(path, flags, mode)
 
@@ -63,6 +92,9 @@ This module exposes low level operating system facilities / syscalls.
 
     .. seealso::
         :man:`pipe(2)`
+
+    .. note::
+        Since version 0.3.0 the fds are created with ``O_CLOEXEC`` set. You can undo this using :js:func:`os.cloexec`.
 
 .. js:function:: os.read([nread])
 
@@ -134,6 +166,14 @@ This module exposes low level operating system facilities / syscalls.
     `bytes` can be an integer or a ``Buffer`` object. If it's an integer a ``Buffer`` will be returned of the specified
     size. If it's already a ``Buffer``, if will be filled.
 
+.. js:function:: os.waitpid(pid, [options])
+
+    Wait for state changes in a child of the calling process. The return value is an object with ``pid`` and ``status``
+    properties. The ``os.W*`` family of functions can be used to get more information about the status.
+
+    .. seealso::
+        :man:`waitpid(2)`
+
 .. js:function:: os.write(data)
 
     Write data on the file descriptor.
@@ -176,6 +216,15 @@ This module exposes low level operating system facilities / syscalls.
 
     Returns ``true`` if the `mode` of the file indicates it's a socket.
 
+.. js:funcion:: os.WIFEXITED(status)
+.. js:funcion:: os.WEXITSTATUS(status)
+.. js:funcion:: os.WIFSIGNALED(status)
+.. js:funcion:: os.WTERMSIG(status)
+.. js:funcion:: os.WIFSTOPPED(status)
+.. js:funcion:: os.WSTOPSIG(status)
+.. js:funcion:: os.WIFCONTINUED(status)
+
+    Helper functions to get status information from a child process. See the man page: :man:`waitpid(2)`.
 
 Constants
 ^^^^^^^^^
@@ -191,3 +240,7 @@ Constants
 .. js:attribute:: os.S_I*
 
     Flags for file mode used in :js:func:`os.stat`.
+
+.. js:attribute:: os.W*
+
+    Flags used in the options field on :js:func:`os.waitpid`.
