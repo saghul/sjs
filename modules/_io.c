@@ -58,6 +58,52 @@ static duk_ret_t io_fdopen(duk_context* ctx) {
 
 
 /*
+ * Read a line from a file. Args:
+ * - 0: FILE
+ * - 1: nread (a number or a Buffer-ish object)
+ */
+static duk_ret_t io_fgets(duk_context* ctx) {
+    FILE* f;
+    size_t nread;
+    char* r;
+    char* buf;
+    char* alloc_buf = NULL;
+
+    f = duk_require_pointer(ctx, 0);
+    if (duk_is_number(ctx, 1)) {
+        nread = duk_require_int(ctx, 1);
+        alloc_buf = malloc(nread);
+        if (!alloc_buf) {
+            SJS_THROW_ERRNO_ERROR2(ENOMEM);
+            return -42;    /* control never returns here */
+        }
+        buf = alloc_buf;
+    } else {
+        buf = duk_require_buffer_data(ctx, 1, &nread);
+        if (buf == NULL || nread == 0) {
+            duk_error(ctx, DUK_ERR_TYPE_ERROR, "invalid buffer");
+            return -42;    /* control never returns here */
+        }
+    }
+
+    r = fgets(buf, nread, f);
+    if (r == NULL) {
+        duk_push_string(ctx, "");
+    } else {
+        if (alloc_buf) {
+            /* return the string we read */
+            duk_push_string(ctx, r);
+        } else {
+            /* the data was written to the buffer, return how much we read */
+            duk_push_int(ctx, strlen(r));
+        }
+    }
+    free(alloc_buf);
+    return 1;
+}
+
+
+/*
  * Read data from a file. Args:
  * - 0: FILE
  * - 1: nread (a number or a Buffer-ish object)
@@ -216,6 +262,7 @@ static const duk_function_list_entry module_funcs[] = {
     /* name, function, nargs */
     { "fopen", io_fopen, 2 },
     { "fdopen", io_fdopen, 2 },
+    { "fgets", io_fgets, 2 },
     { "fread", io_fread, 2 },
     { "fwrite", io_fwrite, 2 },
     { "fclose", io_fclose, 1 },

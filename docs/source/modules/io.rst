@@ -43,6 +43,14 @@ File object
     .. seealso::
         :man:`fread(3)`
 
+.. js:function:: io.FIle.prototype.readline(nread)
+
+    Similar to :js:func:`io.FIle.prototype.read`, but stops at the newline (``\n``) character.
+    This is the recommended function to read from `stdin`, but not from binary files.
+
+    .. seealso::
+        :man:`fgets(3)`
+
 .. js:function:: io.FIle.prototype.write(data)
 
     Write data on the file.
