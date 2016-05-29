@@ -167,6 +167,14 @@ function waitpid(pid, options) {
 }
 
 
+function dup2(oldfd, newfd, cloexec) {
+    if (cloexec == null) {
+        cloexec = true;
+    }
+    return _os.dup2(oldfd, newfd, !!cloexec);
+}
+
+
 // internal helpers
 
 function stringToFlags(flag) {
@@ -224,6 +232,8 @@ exports.unlink   = _os.unlink;
 exports.urandom  = urandom;
 exports.getpid   = _os.getpid;
 exports.getppid  = _os.getppid;
+exports.dup      = _os.dup;
+exports.dup2     = dup2;
 
 exports.S_IMODE  = S_IMODE;
 exports.S_ISDIR  = S_ISDIR;

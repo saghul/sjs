@@ -653,6 +653,62 @@ static duk_ret_t os_getppid(duk_context* ctx) {
 }
 
 
+static duk_ret_t os_dup(duk_context* ctx) {
+    int oldfd, newfd, r;
+
+    oldfd = duk_require_int(ctx, 0);
+    r = dup(oldfd);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    }
+    newfd = r;
+    r = sjs__cloexec(newfd, 1);
+    if (r < 0) {
+        close(newfd);
+        SJS_THROW_ERRNO_ERROR2(-r);
+        return -42;    /* control never returns here */
+    }
+    duk_push_int(ctx, newfd);
+    return 1;
+}
+
+
+static duk_ret_t os_dup2(duk_context* ctx) {
+    int oldfd, newfd, r;
+    duk_bool_t cloexec;
+
+    oldfd = duk_require_int(ctx, 0);
+    newfd = duk_require_int(ctx, 1);
+    cloexec = duk_require_boolean(ctx, 2);
+
+#if defined(__linux__)
+    r = dup3(oldfd, newfd, cloexec ? O_CLOEXEC : 0);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    }
+    goto end;
+#endif
+    r = dup2(oldfd, newfd);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    }
+    r = sjs__cloexec(newfd, cloexec);
+    if (r < 0) {
+        close(newfd);
+        SJS_THROW_ERRNO_ERROR2(-r);
+        return -42;    /* control never returns here */
+    }
+    goto end;    /* pacify compiler */
+
+end:
+    duk_push_int(ctx, newfd);
+    return 1;
+}
+
+
 #define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
     /* flags for open */
@@ -729,6 +785,8 @@ static const duk_function_list_entry module_funcs[] = {
     { "nonblock",               os_nonblock,        2 },
     { "getpid",                 os_getpid,          0 },
     { "getppid",                os_getppid,         0 },
+    { "dup",                    os_dup,             1 },
+    { "dup2",                   os_dup2,            3 },
     { NULL, NULL, 0 }
 };
 

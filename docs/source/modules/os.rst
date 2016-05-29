@@ -26,6 +26,23 @@ This module exposes low level operating system facilities / syscalls.
     .. seealso::
         :man:`close(2)`
 
+.. js:function:: os.dup(oldfd)
+
+    Duplicates the given file descriptor, returning the lowest available one.
+
+    .. seealso::
+        :man:`dup(2)`
+
+    .. note::
+        Since version 0.3.0 the fds are created with ``O_CLOEXEC`` set. You can undo this using :js:func:`os.cloexec`.
+
+.. js:function:: os.dup2(oldfd, newfd, [cloexec])
+
+    Duplicates `oldfd` into `newfd`, setting the ``O_CLOEXEC`` flag if indicated. It defaults to ``true``;
+
+    .. seealso::
+        :man:`dup2(2)`
+
 .. js:function:: os.execve(filename, [args], [envp])
 
     Executes the program pointed to by `filename`.
