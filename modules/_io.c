@@ -34,6 +34,30 @@ static duk_ret_t io_fopen(duk_context* ctx) {
 
 
 /*
+ * Open a file given an fd. Args:
+ * - 0: fd
+ * - 1: mode
+ */
+static duk_ret_t io_fdopen(duk_context* ctx) {
+    int fd;
+    const char* mode;
+    FILE* f;
+
+    fd = duk_require_int(ctx, 0);
+    mode = duk_require_string(ctx, 1);
+
+    f = fdopen(fd, mode);
+    if (f == NULL) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    } else {
+        duk_push_pointer(ctx, (void*) f);
+        return 1;
+    }
+}
+
+
+/*
  * Read data from a file. Args:
  * - 0: FILE
  * - 1: nread (a number or a Buffer-ish object)
@@ -191,6 +215,7 @@ static const duk_number_list_entry module_consts[] = {
 static const duk_function_list_entry module_funcs[] = {
     /* name, function, nargs */
     { "fopen", io_fopen, 2 },
+    { "fdopen", io_fdopen, 2 },
     { "fread", io_fread, 2 },
     { "fwrite", io_fwrite, 2 },
     { "fclose", io_fclose, 1 },
