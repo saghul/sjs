@@ -639,6 +639,20 @@ static duk_ret_t os_nonblock(duk_context* ctx) {
 }
 
 
+static duk_ret_t os_getpid(duk_context* ctx) {
+    pid_t pid = getpid();
+    duk_push_uint(ctx, pid);
+    return 1;
+}
+
+
+static duk_ret_t os_getppid(duk_context* ctx) {
+    pid_t pid = getppid();
+    duk_push_uint(ctx, pid);
+    return 1;
+}
+
+
 #define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
     /* flags for open */
@@ -713,6 +727,8 @@ static const duk_function_list_entry module_funcs[] = {
     { "WIFCONTINUED",           os_WIFCONTINUED,    1 },
     { "cloexec",                os_cloexec,         2 },
     { "nonblock",               os_nonblock,        2 },
+    { "getpid",                 os_getpid,          0 },
+    { "getppid",                os_getppid,         0 },
     { NULL, NULL, 0 }
 };
 

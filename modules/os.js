@@ -222,6 +222,8 @@ exports.scandir  = _os.scandir;
 exports.stat     = stat;
 exports.unlink   = _os.unlink;
 exports.urandom  = urandom;
+exports.getpid   = _os.getpid;
+exports.getppid  = _os.getppid;
 
 exports.S_IMODE  = S_IMODE;
 exports.S_ISDIR  = S_ISDIR;

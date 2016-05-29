@@ -46,6 +46,20 @@ This module exposes low level operating system facilities / syscalls.
     .. seealso::
         :man:`fork(2)`
 
+.. js:function:: os:getpid
+
+    Returns the process id of the calling process.
+
+    .. seealso::
+        :man:`getpid(2)`
+
+.. js:function:: os:getppid
+
+    Returns the process id of the parent of the calling process.
+
+    .. seealso::
+        :man:`getppid(2)`
+
 .. js:function:: os.isatty(fd)
 
     Returns ``true`` if the given `fd` refers to a valid terminal type device, ``false`` otherwise.
