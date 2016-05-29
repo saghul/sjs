@@ -128,6 +128,7 @@ Socket.prototype.shutdown = function(how) {
 Socket.prototype.setNonBlocking = function(set) {
     checkSocket.call(this);
     os.nonblock(this._fd, !!set);
+    this._nonblock = !!set;
 }
 
 
