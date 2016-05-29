@@ -84,6 +84,9 @@ This module exposes low level operating system facilities / syscalls.
     .. seealso::
         :man:`open(2)`
 
+    .. note::
+        Since version 0.3.0 the fds are created with ``O_CLOEXEC`` set. You can undo this using :js:func:`os.cloexec`.
+
 .. js:function:: os.pipe
 
     Creates a `pipe` (an object that allows unidirectional data flow) and allocates a pair of file descriptors.

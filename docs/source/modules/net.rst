@@ -26,6 +26,9 @@ The `Socket` object is a thin object oriented wrapper around :man:`socket(2)` an
     .. seealso::
         :man:`socket(2)`
 
+    .. note::
+        Since version 0.3.0 the fds are created with ``O_CLOEXEC`` set. You can undo this using :js:func:`os.cloexec`.
+
 .. js:attribute:: net.Socket.fd
 
     Returns the file descriptor representing the socket.
@@ -230,6 +233,9 @@ The `Socket` object is a thin object oriented wrapper around :man:`socket(2)` an
 
     .. seealso::
         :man:`socketpair(2)`
+
+    .. note::
+        Since version 0.3.0 the fds are created with ``O_CLOEXEC`` set. You can undo this using :js:func:`os.cloexec`.
 
 
 .. _sockaddrs:
