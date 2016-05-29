@@ -328,7 +328,7 @@ ssize_t sjs__file_read(const char* path, char** data) {
     fread(*data, fsize, 1, f);
     if (ferror(f)) {
         fclose(f);
-        free(data);
+        free(*data);
         return -EIO;
     }
 
