@@ -250,13 +250,13 @@ This module exposes low level operating system facilities / syscalls.
 
     Returns ``true`` if the `mode` of the file indicates it's a socket.
 
-.. js:funcion:: os.WIFEXITED(status)
-.. js:funcion:: os.WEXITSTATUS(status)
-.. js:funcion:: os.WIFSIGNALED(status)
-.. js:funcion:: os.WTERMSIG(status)
-.. js:funcion:: os.WIFSTOPPED(status)
-.. js:funcion:: os.WSTOPSIG(status)
-.. js:funcion:: os.WIFCONTINUED(status)
+.. js:function:: os.WIFEXITED(status)
+.. js:function:: os.WEXITSTATUS(status)
+.. js:function:: os.WIFSIGNALED(status)
+.. js:function:: os.WTERMSIG(status)
+.. js:function:: os.WIFSTOPPED(status)
+.. js:function:: os.WSTOPSIG(status)
+.. js:function:: os.WIFCONTINUED(status)
 
     Helper functions to get status information from a child process. See the man page: :man:`waitpid(2)`.
 
