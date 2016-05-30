@@ -11,9 +11,16 @@ The `log` module provides a simple logging mechanism, backed by
 At the moment all output is sent to the system `stdout`.
 
 
+Constants
+---------
+
 .. js:data:: defaultLogger
 
     Attribute containing the default system logger.
+
+
+Functions
+---------
 
 .. js:function:: getLogger(name)
 

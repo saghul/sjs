@@ -13,6 +13,9 @@ automatically seeded on startup with data from :js:func:`os.urandom`.
     This module could use some peer review. If you are competent to do so, please get in touch.
 
 
+Random objects
+--------------
+
 .. js:class:: random.Random([seed])
 
     Class implementing the Mersenne Twister PRNG. While users are free to create multiple instances
@@ -29,6 +32,10 @@ automatically seeded on startup with data from :js:func:`os.urandom`.
 
     Return a random floating point number in the [0.0, 1.0) interval.
 
+
+SystemRandom objects
+--------------------
+
 .. js:class:: random.SystemRandom
 
     Class implementing a similar interface to :js:class:`random.Random`, but using :js:func:`os.urandom` as the source
@@ -37,6 +44,10 @@ automatically seeded on startup with data from :js:func:`os.urandom`.
 .. js:function:: random.SystemRandom.prototype.random
 
     Return a random floating point number in the [0.0, 1.0) interval.
+
+
+Functions
+---------
 
 .. js:function:: random.random
 

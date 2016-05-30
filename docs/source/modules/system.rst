@@ -8,6 +8,9 @@ This module provides information about the system where `sjs` is running as well
 environment.
 
 
+Attributes
+----------
+
 .. js:data:: system.versions
 
     An object containing information about the `sjs` and embedded `Duktape` versions.
@@ -65,13 +68,17 @@ environment.
             "type": "Debug"
         }
 
+.. js:data:: system.endianness
+
+    Returns ``big`` if the system is Big Engian, or ``little`` if the system is Little Endian. This is determined at runtime.
+
+
+Functions
+---------
+
 .. js:function:: system.exit(code)
 
     Ends the process with the specified `code`.
 
     .. note::
         At the moment no clean shutdown is performed.
-
-.. js:data:: system.endianness
-
-    Returns ``big`` if the system is Big Engian, or ``little`` if the system is Little Endian. This is determined at runtime.

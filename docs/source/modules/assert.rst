@@ -8,6 +8,9 @@ This module is primarily used to write tests. It originates from
 `this commonjs-assert module <https://github.com/defunctzombie/commonjs-assert>`_.
 
 
+Functions
+---------
+
 .. js:function:: assert.fail(value, expected, message, operator)
 
     Throws an exception that displays the values for `value` and `expected` separated by the provided `operator`.

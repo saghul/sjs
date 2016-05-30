@@ -7,6 +7,9 @@ os
 This module exposes low level operating system facilities / syscalls.
 
 
+Functions
+---------
+
 .. js:function:: os.abort
 
     Aborts the execution of the process and forces a core dump.
@@ -260,8 +263,9 @@ This module exposes low level operating system facilities / syscalls.
 
     Helper functions to get status information from a child process. See the man page: :man:`waitpid(2)`.
 
+
 Constants
-^^^^^^^^^
+---------
 
 .. js:attribute:: os.O_*
 

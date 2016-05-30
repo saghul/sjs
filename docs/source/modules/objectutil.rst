@@ -8,6 +8,9 @@ This module contains several utilities for working with objects. It oritinates f
 `this module <https://github.com/defunctzombie/node-util>`_.
 
 
+Functions
+---------
+
 .. js:function:: objectutil.format(format, [...])
 
     Returns a formatted string using the first argument as a ``printf``-like format.

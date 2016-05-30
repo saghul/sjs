@@ -7,6 +7,9 @@ path
 This module provides path manipulation related functions.
 
 
+Functions
+---------
+
 .. js:function:: path.basename(p)
 
     Returns the last component from the pathname in `path`, deleting any trailing ``/`` characters.
