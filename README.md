@@ -37,9 +37,13 @@ JavaScript runtime look like if there were no browsers?".
 
 Check it out [here](http://sjs.saghul.net).
 
+[![Documentation Status](https://readthedocs.org/projects/sjs/badge/?version=latest)](http://sjs.readthedocs.io/en/latest/?badge=latest)
+
 ## Building
 
 Skookum JS currently supports Linux and OSX. See compilation instructions [here](http://sjs.saghul.net/en/latest/#building).
+
+[![Build Status](https://travis-ci.org/saghul/sjs.svg?branch=master)](https://travis-ci.org/saghul/sjs)
 
 ## License
 
