@@ -98,7 +98,7 @@ function fdopen(fd, mode, path) {
 
 function fileDealloc(f) {
     if (f._f !== null) {
-        _io.close(f._f);
+        _io.fclose(f._f);
     }
 }
 
