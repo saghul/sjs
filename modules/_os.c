@@ -709,6 +709,22 @@ end:
 }
 
 
+static duk_ret_t os_chdir(duk_context* ctx) {
+    const char* path;
+    int r;
+
+    path = duk_require_string(ctx, 0);
+    r = chdir(path);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    }
+
+    duk_push_undefined(ctx);
+    return 1;
+}
+
+
 #define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
     /* flags for open */
@@ -787,6 +803,7 @@ static const duk_function_list_entry module_funcs[] = {
     { "getppid",                os_getppid,         0 },
     { "dup",                    os_dup,             1 },
     { "dup2",                   os_dup2,            3 },
+    { "chdir",                  os_chdir,           1 },
     { NULL, NULL, 0 }
 };
 

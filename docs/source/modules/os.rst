@@ -17,6 +17,13 @@ Functions
     .. seealso::
         :man:`abort(3)`
 
+.. js:function:: os.chdir(path)
+
+    Changes the current working directory of the calling process to the directory specified in `path`.
+
+    .. seealso::
+        :man:`chdir(2)`
+
 .. js:function:: os.cloexec(fd, set)
 
     Sets or clears the ``O_CLOEXEC`` flag on the given `fd`. Since version 0.3.0 all fds are created with

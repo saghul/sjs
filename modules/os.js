@@ -234,6 +234,7 @@ exports.getpid   = _os.getpid;
 exports.getppid  = _os.getppid;
 exports.dup      = _os.dup;
 exports.dup2     = dup2;
+exports.chdir    = _os.chdir;
 
 exports.S_IMODE  = S_IMODE;
 exports.S_ISDIR  = S_ISDIR;
