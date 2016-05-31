@@ -53,6 +53,13 @@ Functions
     .. seealso::
         :man:`dup2(2)`
 
+.. js:function:: os._exit(status)
+
+    Terminate the calling process "immediately".
+
+    .. seealso::
+        :man:`_exit(2)`
+
 .. js:function:: os.execve(filename, [args], [envp])
 
     Executes the program pointed to by `filename`.

@@ -235,6 +235,7 @@ exports.getppid  = _os.getppid;
 exports.dup      = _os.dup;
 exports.dup2     = dup2;
 exports.chdir    = _os.chdir;
+exports._exit    = _os._exit;
 
 exports.S_IMODE  = S_IMODE;
 exports.S_ISDIR  = S_ISDIR;
