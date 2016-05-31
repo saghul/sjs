@@ -39,7 +39,7 @@ static int sjs__open(const char *pathname, int flags, mode_t mode) {
     fd = r;
     r = sjs__cloexec(fd, 1);
     if (r < 0) {
-        close(fd);
+        sjs__close(fd);
         return r;
     }
     return fd;
@@ -154,10 +154,14 @@ static duk_ret_t os_write(duk_context* ctx) {
  * - 0: fd
  */
 static duk_ret_t os_close(duk_context* ctx) {
-    int fd;
+    int fd, r;
 
     fd = duk_require_int(ctx, 0);
-    close(fd);
+    r = sjs__close(fd);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR2(-r);
+        return -42;    /* control never returns here */
+    }
 
     duk_push_undefined(ctx);
     return 1;
@@ -194,8 +198,8 @@ static int sjs__pipe(int fds[2]) {
     }
     return r;
 error:
-    close(fds[0]);
-    close(fds[1]);
+    sjs__close(fds[0]);
+    sjs__close(fds[1]);
     fds[0] = -1;
     fds[1] = -1;
     return r;
@@ -388,13 +392,12 @@ static int sjs__urandom(void* vbuf, size_t size) {
     }
     fd = err;
     if (fstat(fd, &st) < 0) {
-        err = -errno;
-        close(fd);
-        return err;
+        sjs__close(fd);
+        return -errno;
     }
     if (!S_ISCHR(st.st_mode)) {
         /* not a character device! */
-        close(fd);
+        sjs__close(fd);
         return -EIO;
     }
 
@@ -403,15 +406,14 @@ static int sjs__urandom(void* vbuf, size_t size) {
             r = read(fd, buf, size);
         } while (r < 0 && errno == EINTR);
         if (r < 0) {
-            r = -errno;
-            close(fd);
-            return r;
+            sjs__close(fd);
+            return -errno;
         }
         buf += r;
         size -= r;
     }
 
-    close(fd);
+    sjs__close(fd);
     return 0;
 }
 
@@ -665,7 +667,7 @@ static duk_ret_t os_dup(duk_context* ctx) {
     newfd = r;
     r = sjs__cloexec(newfd, 1);
     if (r < 0) {
-        close(newfd);
+        sjs__close(newfd);
         SJS_THROW_ERRNO_ERROR2(-r);
         return -42;    /* control never returns here */
     }
@@ -697,7 +699,7 @@ static duk_ret_t os_dup2(duk_context* ctx) {
     }
     r = sjs__cloexec(newfd, cloexec);
     if (r < 0) {
-        close(newfd);
+        sjs__close(newfd);
         SJS_THROW_ERRNO_ERROR2(-r);
         return -42;    /* control never returns here */
     }

@@ -56,7 +56,7 @@ Socket.prototype.bind = function(address) {
 
 Socket.prototype.close = function() {
     if (this._fd !== -1) {
-        _socket.close(this._fd);
+        os.close(this._fd);
         this._fd = -1;
     }
 }
@@ -195,7 +195,7 @@ function isIP(address) {
 // finalizer: will get called when a Socket is garbage collected
 function socketDealloc(sock) {
     if (sock._fd !== -1) {
-        _socket.close(sock._fd);
+        os.close(sock._fd);
     }
 }
 

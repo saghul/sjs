@@ -36,4 +36,23 @@ static int sjs__nonblock(int fd, int set) {
     return 0;
 }
 
+
+ __attribute__((unused))
+int sjs__close(int fd) {
+  int saved_errno;
+  int r;
+
+  saved_errno = errno;
+  r = close(fd);
+  if (r == -1) {
+    r = -errno;
+    if (r == -EINTR || r == -EINPROGRESS) {
+      r = 0;    /* The close is in progress, not an error. */
+    }
+    errno = saved_errno;
+  }
+
+  return r;
+}
+
 #endif

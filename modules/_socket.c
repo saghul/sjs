@@ -30,7 +30,7 @@ static int sjs__socket(int domain, int type, int protocol) {
     fd = r;
     r = sjs__cloexec(fd, 1);
     if (r < 0) {
-        close(fd);
+        sjs__close(fd);
         return r;
     }
     return fd;
@@ -349,21 +349,6 @@ static duk_ret_t sock_getpeername(duk_context* ctx) {
 
 
 /*
- * Close the socket. Args:
- * - 0: fd
- */
-static duk_ret_t sock_close(duk_context* ctx) {
-    int fd;
-
-    fd = duk_require_int(ctx, 0);
-    close(fd);
-
-    duk_push_undefined(ctx);
-    return 1;
-}
-
-
-/*
  * Shutdown the socket. Args:
  * - 0: fd
  * - 1: how
@@ -428,7 +413,7 @@ static int sjs__accept(int sockfd) {
     fd = r;
     r = sjs__cloexec(fd, 1);
     if (r < 0) {
-        close(fd);
+        sjs__close(fd);
         return r;
     }
     return fd;
@@ -761,8 +746,8 @@ static int sjs__socketpair(int domain, int type, int protocol, int sv[2]) {
     }
     return r;
 error:
-    close(sv[0]);
-    close(sv[1]);
+    sjs__close(sv[0]);
+    sjs__close(sv[1]);
     sv[0] = -1;
     sv[1] = -1;
     return r;
@@ -846,7 +831,6 @@ static const duk_number_list_entry module_consts[] = {
 static const duk_function_list_entry module_funcs[] = {
     /* name, function, nargs */
     { "socket", sock_socket, 2 },
-    { "close", sock_close, 1 },
     { "bind", sock_bind, 3 },
     { "connect", sock_connect, 3 },
     { "getsockname", sock_getsockname, 1 },
