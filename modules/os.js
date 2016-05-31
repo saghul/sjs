@@ -175,6 +175,12 @@ function dup2(oldfd, newfd, cloexec) {
 }
 
 
+function exit(status) {
+    // TODO: properly tear down the vm
+    _os.exit(status >>> 0);
+}
+
+
 // internal helpers
 
 function stringToFlags(flag) {
@@ -235,6 +241,7 @@ exports.getppid  = _os.getppid;
 exports.dup      = _os.dup;
 exports.dup2     = dup2;
 exports.chdir    = _os.chdir;
+exports.exit     = exit;
 exports._exit    = _os._exit;
 
 exports.S_IMODE  = S_IMODE;

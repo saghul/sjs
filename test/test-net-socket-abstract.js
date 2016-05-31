@@ -2,11 +2,12 @@
 
 const assert = require('assert');
 const net = require('net');
+const os = require('os');
 
 
 if (system.platform !== 'linux') {
     // the test only works on Linux
-    system.exit(0);
+    os.exit(0);
 }
 
 

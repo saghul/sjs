@@ -49,14 +49,6 @@ static void sjs__duk_fatal_handler(duk_context *ctx, duk_errcode_t code, const c
 }
 
 
-static duk_ret_t sjs__exit(duk_context* ctx) {
-    int code = duk_require_int(ctx, 0);
-    /* TODO: properly tear down the vm */
-    exit(code);
-    return -42;    /* control never returns here */
-}
-
-
 static void sjs__setup_system_module(sjs_vm_t* vm) {
     duk_context* ctx = vm->ctx;
 
@@ -172,12 +164,6 @@ static void sjs__setup_system_module(sjs_vm_t* vm) {
         sjs__executable(buf, sizeof(buf));
         duk_push_string(ctx, buf);
         duk_put_prop_string(ctx, -2, "executable");
-    }
-
-    /* system.exit(x) */
-    {
-        duk_push_c_function(ctx, sjs__exit, 1 /* nargs */);
-        duk_put_prop_string(ctx, -2, "exit");
     }
 
     /* system.build */

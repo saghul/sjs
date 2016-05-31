@@ -71,14 +71,3 @@ Attributes
 .. js:data:: system.endianness
 
     Returns ``big`` if the system is Big Engian, or ``little`` if the system is Little Endian. This is determined at runtime.
-
-
-Functions
----------
-
-.. js:function:: system.exit(code)
-
-    Ends the process with the specified `code`.
-
-    .. note::
-        At the moment no clean shutdown is performed.

@@ -8,7 +8,7 @@ var pid = os.fork();
 
 if (pid == 0) {
     // child
-    system.exit(42);
+    os.exit(42);
 } else {
     // parent
     var r = os.waitpid(pid);

@@ -53,13 +53,6 @@ Functions
     .. seealso::
         :man:`dup2(2)`
 
-.. js:function:: os._exit(status)
-
-    Terminate the calling process "immediately".
-
-    .. seealso::
-        :man:`_exit(2)`
-
 .. js:function:: os.execve(filename, [args], [envp])
 
     Executes the program pointed to by `filename`.
@@ -71,6 +64,23 @@ Functions
 
     .. seealso::
         :man:`execve(2)`
+
+.. js:function:: os.exit([status])
+
+    Ends the process with the specified `status`. It defaults to 0.
+
+    .. seealso::
+        :man:`exit(3)`
+
+    .. note::
+        At the moment no clean shutdown is performed.
+
+.. js:function:: os._exit(status)
+
+    Terminate the calling process "immediately".
+
+    .. seealso::
+        :man:`_exit(2)`
 
 .. js:function:: os.fork
 

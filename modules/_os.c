@@ -727,6 +727,13 @@ static duk_ret_t os_chdir(duk_context* ctx) {
 }
 
 
+static duk_ret_t os_exit(duk_context* ctx) {
+    int status = duk_require_int(ctx, 0);
+    exit(status);
+    return -42;    /* control never returns here */
+}
+
+
 static duk_ret_t os__exit(duk_context* ctx) {
     int status = duk_require_int(ctx, 0);
     _exit(status);
@@ -813,6 +820,7 @@ static const duk_function_list_entry module_funcs[] = {
     { "dup",                    os_dup,             1 },
     { "dup2",                   os_dup2,            3 },
     { "chdir",                  os_chdir,           1 },
+    { "exit",                   os_exit,            1 },
     { "_exit",                  os__exit,           1 },
     { NULL, NULL, 0 }
 };

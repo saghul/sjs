@@ -1,6 +1,7 @@
 'use strict';
 
 const io = require('io');
+const os = require('os');
 
 
 var data = io.stdin.readline();
@@ -9,4 +10,4 @@ io.stdout.flush();
 io.stderr.write(data);
 io.stderr.flush();
 
-system.exit(0);
+os.exit(0);
