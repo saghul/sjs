@@ -4,6 +4,7 @@ const assert = require('assert');
 const io = require('io');
 const os = require('os');
 const path = require('path');
+const system = require('system');
 
 const TEXT = 'hello sjs!\n';
 

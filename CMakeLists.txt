@@ -100,6 +100,7 @@ set_target_properties(duktape
 #
 set(SOURCES
     src/modules.c
+    src/system.c
     src/util.c
     src/vm.c
     src/version.c

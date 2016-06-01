@@ -166,7 +166,7 @@ duk_ret_t sjs__modsearch(duk_context* ctx) {
     id = duk_get_string(ctx, 0);
 
     /* iterate over system.path */
-    duk_get_global_string(ctx, "system");
+    duk_get_global_string(ctx, "_system");
     duk_get_prop_string(ctx, -1, "path");
     duk_remove(ctx, -2);
     duk_enum(ctx, -1, DUK_ENUM_ARRAY_INDICES_ONLY | DUK_ENUM_SORT_ARRAY_INDICES);

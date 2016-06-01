@@ -2,6 +2,7 @@
 
 const assert = require('assert');
 const os = require('os');
+const system = require('system');
 
 
 var stat = os.stat(system.executable);

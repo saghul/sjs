@@ -39,10 +39,6 @@ These functions / objects are accessible globally.
 
     A reference to the global scope. This can be used to attach functions / objects which will be accesible globally.
 
-.. js:data:: system
-
-    A reference to the :ref:`modsystem` module.
-
 .. js:function:: require(id)
 
     Function for loading a `Common JS <http://wiki.commonjs.org/wiki/Modules/1.1>`_ module.

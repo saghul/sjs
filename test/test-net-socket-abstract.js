@@ -3,6 +3,7 @@
 const assert = require('assert');
 const net = require('net');
 const os = require('os');
+const system = require('system');
 
 
 if (system.platform !== 'linux') {
