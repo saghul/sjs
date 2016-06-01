@@ -243,6 +243,7 @@ exports.dup2     = dup2;
 exports.chdir    = _os.chdir;
 exports.exit     = exit;
 exports._exit    = _os._exit;
+exports.setsid   = _os.setsid;
 
 exports.S_IMODE  = S_IMODE;
 exports.S_ISDIR  = S_ISDIR;

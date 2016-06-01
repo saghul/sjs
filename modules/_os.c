@@ -741,6 +741,19 @@ static duk_ret_t os__exit(duk_context* ctx) {
 }
 
 
+static duk_ret_t os_setsid(duk_context* ctx) {
+    pid_t r;
+    r = setsid();
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    } else {
+        duk_push_uint(ctx, r);
+        return 1;
+    }
+}
+
+
 #define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
     /* flags for open */
@@ -822,6 +835,7 @@ static const duk_function_list_entry module_funcs[] = {
     { "chdir",                  os_chdir,           1 },
     { "exit",                   os_exit,            1 },
     { "_exit",                  os__exit,           1 },
+    { "setsid",                 os_setsid,          0 },
     { NULL, NULL, 0 }
 };
 

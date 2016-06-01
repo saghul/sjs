@@ -175,6 +175,13 @@ Functions
     .. seealso::
         :man:`scandir(3)`
 
+.. js:function:: os.setsid
+
+    Create a new session if the calling process is not a process group leader.
+
+    .. seealso::
+        :man:`setsid(2)`
+
 .. js:function:: os.stat(path)
 
     Obtain information about the file pointed to by `path`.
