@@ -25,6 +25,7 @@ Standard library
     modules/objectutil
     modules/os
     modules/path
+    modules/process
     modules/random
     modules/system
     modules/time
