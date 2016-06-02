@@ -116,7 +116,7 @@ html_theme = 'alabaster'
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-    'logo': 'sjs.png',
+    'logo': 'sjs-logo-icon.png',
     'github_user': 'saghul',
     'github_repo': 'sjs',
     'github_banner': True,

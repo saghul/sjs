@@ -1,5 +1,7 @@
 
-# Skookum JS
+![sjs](https://raw.githubusercontent.com/saghul/sjs/master/docs/source/.static/sjs-logo.png)
+
+# Overview
 
 Skookum JS, or *sjs* for short, is a JavaScript runtime focused on giving
 unobtrusive and straight abstractions to low level platform facilities.
@@ -7,7 +9,7 @@ unobtrusive and straight abstractions to low level platform facilities.
 The motivation for this project comes from answering the question "how would a
 JavaScript runtime look like if there were no browsers?".
 
-## Features
+# Features
 
 * Small footprint
 * [Ecmascript ES5/ES5.1](http://www.ecma-international.org/ecma-262/5.1/) compliant, some features borrowed
@@ -22,7 +24,7 @@ JavaScript runtime look like if there were no browsers?".
 * Support for native modules written in C
 * Binary name 25% shorter than Node
 
-## Hello, world
+# Hello, world
 
     Skookum JS 0.1.0 running on linux x64
     [Engine: Duktape v1.5.0 (83d5577)]
@@ -33,31 +35,31 @@ JavaScript runtime look like if there were no browsers?".
     = undefined
     sjs>
 
-## Documentation
+# Documentation
 
 Check it out [here](http://sjs.saghul.net).
 
 [![Documentation Status](https://readthedocs.org/projects/sjs/badge/?version=latest)](http://sjs.readthedocs.io/en/latest/?badge=latest)
 
-## Building
+# Building
 
 Skookum JS currently supports Linux and OSX. See compilation instructions [here](http://sjs.saghul.net/en/latest/#building).
 
 [![Build Status](https://travis-ci.org/saghul/sjs.svg?branch=master)](https://travis-ci.org/saghul/sjs)
 
-## License
+# License
 
 Check [the LICENSE file](https://github.com/saghul/sjs/blob/master/LICENSE). Hint: it's MIT.
 
-## Author
+# Author
 
 Saúl Ibarra Corretgé ([**@saghul**](https://github.com/saghul))
 
-## Contributing
+# Contributing
 
 Please see [CONTRIBUTING](https://github.com/saghul/sjs/blob/master/CONTRIBUTING.md).
 
-## Acknowledgements
+# Acknowledgements
 
 sjs would not have been possible without some other projects existing. Some served
 as a source of inspiration, some as a source of actual code, and the author would like to thank them all.
