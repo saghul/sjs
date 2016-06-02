@@ -74,7 +74,7 @@ void mt_init_by_array(mt_t* mtt, uint32_t init_key[], unsigned int key_length);
 uint32_t mt_genrand_int32(mt_t* mtt);
 
 /* generates a random number on [0,0x7fffffff]-interval */
-long mt_genrand_int31(mt_t* mtt);
+uint32_t mt_genrand_int31(mt_t* mtt);
 
 /* These real versions are due to Isaku Wada, 2002/01/09 added */
 /* generates a random number on [0,1]-real-interval */

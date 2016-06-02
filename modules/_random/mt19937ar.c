@@ -138,9 +138,9 @@ uint32_t mt_genrand_int32(mt_t* mtt)
 }
 
 /* generates a random number on [0,0x7fffffff]-interval */
-long mt_genrand_int31(mt_t* mtt)
+uint32_t mt_genrand_int31(mt_t* mtt)
 {
-    return (long)(mt_genrand_int32(mtt) >> 1);
+    return (mt_genrand_int32(mtt) >> 1);
 }
 
 /* generates a random number on [0,1]-real-interval */
