@@ -140,7 +140,7 @@ endif()
 #
 add_executable(sjs_cli
     src/cli/linenoise.c
-    src/cli/main.c
+    src/cli/cli.c
 )
 
 set_target_properties(sjs_cli PROPERTIES
