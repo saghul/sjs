@@ -53,6 +53,17 @@ Functions
     .. seealso::
         :man:`dup2(2)`
 
+.. js:function:: os.execv(filename, [args])
+
+    Executes the program pointed to by `filename`.
+
+    :param filename: Program to be executed.
+    :param args: Arguments for the program. If an ``Array`` is passed, the first element should be the
+        program filename.
+
+    .. seealso::
+        :man:`execv(2)`
+
 .. js:function:: os.execve(filename, [args], [envp])
 
     Executes the program pointed to by `filename`.

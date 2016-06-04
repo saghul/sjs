@@ -142,6 +142,17 @@ function S_ISSOCK(mode) {
 }
 
 
+function execv(filename, argv) {
+    // normalize argv
+    if (argv == null) {
+        argv = [filename];
+    } else if (!Array.isArray(argv)) {
+        throw new Error('"argv" must be null, undefined or an Array');
+    }
+    _os.execv(filename, argv);
+}
+
+
 function execve(filename, argv, envp) {
     // normalize argv
     if (argv == null) {
@@ -255,6 +266,7 @@ exports.S_ISLNK  = S_ISLNK;
 exports.S_ISSOCK = S_ISSOCK;
 
 exports.fork         = _os.fork;
+exports.execv        = execv;
 exports.execve       = execve;
 exports.waitpid      = waitpid;
 exports.WIFEXITED    = _os.WIFEXITED;

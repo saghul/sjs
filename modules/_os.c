@@ -489,6 +489,33 @@ static duk_ret_t os_fork(duk_context* ctx) {
 }
 
 
+static duk_ret_t os_execv(duk_context* ctx) {
+    const char* filename;
+    size_t nargs;
+    int r;
+
+    filename = duk_require_string(ctx, 0);
+    assert(duk_is_array(ctx, 1));
+    nargs = duk_get_length(ctx, 1);
+
+    char* args[nargs+1];
+    for (size_t i = 0; i < nargs; i++) {
+        duk_get_prop_index(ctx, 1, i);
+        args[i] = (char*) duk_require_string(ctx, -1);
+        duk_pop(ctx);
+    }
+    args[nargs] = NULL;
+
+    r = execv(filename, args);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    }
+
+    return -42;    /* control never returns here */
+}
+
+
 static duk_ret_t os_execve(duk_context* ctx) {
     const char* filename;
     size_t nargs, nenv;
@@ -817,6 +844,7 @@ static const duk_function_list_entry module_funcs[] = {
     { "unlink",                 os_unlink,          1 },
     { "urandom",                os_urandom,         1 },
     { "fork",                   os_fork,            0 },
+    { "execv",                  os_execv,           2 },
     { "execve",                 os_execve,          3 },
     { "waitpid",                os_waitpid,         2 },
     { "WIFEXITED",              os_WIFEXITED,       1 },
