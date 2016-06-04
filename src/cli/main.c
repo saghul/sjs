@@ -100,7 +100,7 @@ static int handle_interactive(sjs_vm_t* vm) {
         }
 
         sjs_vm_eval_code(vm, "input", line, strlen(line), stdout, stdout, use_strict);
-        free(line);
+        linenoiseFree(line);
     }
 
     if (use_history) {
