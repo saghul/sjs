@@ -55,7 +55,7 @@ Functions
 
 .. js:function:: os.execv(filename, [args])
 
-    Executes the program pointed to by `filename`.
+    Replace the current process image with a new process image.
 
     :param filename: Program to be executed.
     :param args: Arguments for the program. If an ``Array`` is passed, the first element should be the
@@ -66,7 +66,7 @@ Functions
 
 .. js:function:: os.execve(filename, [args], [envp])
 
-    Executes the program pointed to by `filename`.
+    Replace the current process image with a new process image.
 
     :param filename: Program to be executed.
     :param args: Arguments for the program. If an ``Array`` is passed, the first element should be the
