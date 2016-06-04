@@ -135,7 +135,6 @@ const stderr = new File('<stderr>', _io.stderr(), 'w');
 
 // exports
 
-exports.File   = File;
 exports.open   = open;
 exports.fdopen = fdopen;
 exports.stdin  = stdin;

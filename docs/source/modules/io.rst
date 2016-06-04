@@ -12,9 +12,9 @@ File object
 
 .. js:class:: io.File
 
-    Class representing a file stream. This class created through :js:func:`io.open` or :js:func:`io.fdopen`.
-    The :ref:`modio` module also makes use of this class for wrapping
-    `stdio <https://en.wikipedia.org/wiki/C_file_input/output>`_ streams.
+    Class representing a `stdio <https://en.wikipedia.org/wiki/C_file_input/output>`_ stream.
+
+    This class created through :js:func:`io.open` or :js:func:`io.fdopen`, never directly.
 
 .. js:attribute:: io.File.path
 
