@@ -1,4 +1,5 @@
 
+#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
@@ -233,6 +234,40 @@ static duk_ret_t io_fileno(duk_context* ctx) {
 }
 
 
+/*
+ * Set buffering type for file object. Args:
+ * - 0: FILE
+ * - 1: mode (0 is unbuffered, 1 is line buffered)
+ */
+static duk_ret_t io_setvbuf(duk_context* ctx) {
+    FILE* f;
+    int mode;
+    size_t size;
+
+    f = duk_require_pointer(ctx, 0);
+    mode = duk_require_int(ctx, 1);
+
+    if (mode == 0) {
+        printf("unbuffered!\n");
+        mode = _IONBF;
+        size = 0;
+    } else if (mode == 1) {
+        mode = _IOLBF;
+        size = BUFSIZ;
+    } else {
+        assert(0);
+    }
+
+    /*
+     * Ignore erros. According to the man page: "It may set errno on failure.". Sigh.
+     */
+    (void) setvbuf(f, NULL, mode, size);
+
+    duk_push_undefined(ctx);
+    return 1;
+}
+
+
 static duk_ret_t io_stdin(duk_context* ctx) {
     duk_push_pointer(ctx, (void*) stdin);
     return 1;
@@ -268,6 +303,7 @@ static const duk_function_list_entry module_funcs[] = {
     { "fclose", io_fclose, 1 },
     { "fflush", io_fflush, 1 },
     { "fileno", io_fileno, 1 },
+    { "setvbuf", io_setvbuf, 2 },
     { "stdin", io_stdin, 0 },
     { "stdout", io_stdout, 0 },
     { "stderr", io_stderr, 0 },

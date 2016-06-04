@@ -5,10 +5,26 @@ const _io = require('_io');
 const outil = require('objectutil');
 
 
-function File(path, f, mode) {
+function File(path, f, mode, buffering) {
     this._path = path;
     this._f = f;
     this._mode = mode;
+
+    if (buffering !== undefined) {
+        switch (buffering) {
+            case -1:
+                // default, do nothing
+                break;
+            case 0:
+            case 1:
+                // 0 is unbuffered, 1 is line-buffered
+                _io.setvbuf(this._f, buffering);
+                break;
+            default:
+                this.close();
+                throw new RangeError('invalid value for "buffering": ' + buffering);
+        }
+    }
 
     outil.finalizer(this, fileDealloc);
 
@@ -82,15 +98,15 @@ File.prototype.close = function() {
 }
 
 
-function open(path, mode) {
+function open(path, mode, buffering) {
     var f = _io.fopen(path, mode);
-    return new File(path, f, mode);
+    return new File(path, f, mode, buffering);
 }
 
 
-function fdopen(fd, mode, path) {
+function fdopen(fd, mode, path, buffering) {
     var f = _io.fdopen(fd, mode);
-    return new File(path, f, mode);
+    return new File(path, f, mode, buffering);
 }
 
 

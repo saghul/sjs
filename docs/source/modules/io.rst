@@ -76,15 +76,21 @@ File object
 Functions / attributes
 ----------------------
 
-.. js:function:: io.open(path, mode)
+.. js:function:: io.open(path, mode, [buffering])
 
     Opens the file at the given `path` in the given mode. Check :man:`fopen(3)` for the `mode` details.
     It returns a :js:class:`io.File` object.
 
-.. js:function:: io.fdopen(fd, mode, [path])
+    If `buffering` is specified, it must be ``-1`` (for default buffering), ``0`` (for unbuffeered) or ``1`` for
+    line buffering). See :man:`setvbuf(3)`.
+
+.. js:function:: io.fdopen(fd, mode, [path], [buffering])
 
     Opens the fiven file descriptor in `fd` as a :js:class:`io.File` object. The given `mode` must be compatible with
     how the file descriptor was opened. `path` is purely informational.
+
+    If `buffering` is specified, it must be ``-1`` (for default buffering), ``0`` (for unbuffeered) or ``1`` for
+    line buffering). See :man:`setvbuf(3)`.
 
     .. seealso::
         :man:`fdopen(3)`
