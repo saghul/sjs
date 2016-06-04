@@ -490,11 +490,11 @@ static duk_ret_t os_fork(duk_context* ctx) {
 
 
 static duk_ret_t os_execv(duk_context* ctx) {
-    const char* filename;
+    const char* path;
     size_t nargs;
     int r;
 
-    filename = duk_require_string(ctx, 0);
+    path = duk_require_string(ctx, 0);
     assert(duk_is_array(ctx, 1));
     nargs = duk_get_length(ctx, 1);
 
@@ -506,7 +506,7 @@ static duk_ret_t os_execv(duk_context* ctx) {
     }
     args[nargs] = NULL;
 
-    r = execv(filename, args);
+    r = execv(path, args);
     if (r < 0) {
         SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
@@ -517,11 +517,11 @@ static duk_ret_t os_execv(duk_context* ctx) {
 
 
 static duk_ret_t os_execve(duk_context* ctx) {
-    const char* filename;
+    const char* path;
     size_t nargs, nenv;
     int r;
 
-    filename = duk_require_string(ctx, 0);
+    path = duk_require_string(ctx, 0);
     assert(duk_is_array(ctx, 1));
     assert(duk_is_array(ctx, 2));
     nargs = duk_get_length(ctx, 1);
@@ -543,7 +543,71 @@ static duk_ret_t os_execve(duk_context* ctx) {
     }
     env[nenv] = NULL;
 
-    r = execve(filename, args, env);
+    r = execve(path, args, env);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    }
+
+    return -42;    /* control never returns here */
+}
+
+
+static duk_ret_t os_execvp(duk_context* ctx) {
+    const char* file;
+    size_t nargs;
+    int r;
+
+    file = duk_require_string(ctx, 0);
+    assert(duk_is_array(ctx, 1));
+    nargs = duk_get_length(ctx, 1);
+
+    char* args[nargs+1];
+    for (size_t i = 0; i < nargs; i++) {
+        duk_get_prop_index(ctx, 1, i);
+        args[i] = (char*) duk_require_string(ctx, -1);
+        duk_pop(ctx);
+    }
+    args[nargs] = NULL;
+
+    r = execvp(file, args);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    }
+
+    return -42;    /* control never returns here */
+}
+
+
+static duk_ret_t os_execvpe(duk_context* ctx) {
+    const char* file;
+    size_t nargs, nenv;
+    int r;
+
+    file = duk_require_string(ctx, 0);
+    assert(duk_is_array(ctx, 1));
+    assert(duk_is_array(ctx, 2));
+    nargs = duk_get_length(ctx, 1);
+    nenv = duk_get_length(ctx, 2);
+
+    char* args[nargs+1];
+    for (size_t i = 0; i < nargs; i++) {
+        duk_get_prop_index(ctx, 1, i);
+        args[i] = (char*) duk_require_string(ctx, -1);
+        duk_pop(ctx);
+    }
+    args[nargs] = NULL;
+
+    char* env[nenv+1];
+    for (size_t i = 0; i < nenv; i++) {
+        duk_get_prop_index(ctx, 2, i);
+        env[i] = (char*) duk_require_string(ctx, -1);
+        duk_pop(ctx);
+    }
+    env[nenv] = NULL;
+
+    r = execvpe(file, args, env);
     if (r < 0) {
         SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
@@ -846,6 +910,8 @@ static const duk_function_list_entry module_funcs[] = {
     { "fork",                   os_fork,            0 },
     { "execv",                  os_execv,           2 },
     { "execve",                 os_execve,          3 },
+    { "execvp",                 os_execvp,          2 },
+    { "execvpe",                os_execvpe,         3 },
     { "waitpid",                os_waitpid,         2 },
     { "WIFEXITED",              os_WIFEXITED,       1 },
     { "WEXITSTATUS",            os_WEXITSTATUS,     1 },

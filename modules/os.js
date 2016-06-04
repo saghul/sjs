@@ -143,7 +143,6 @@ function S_ISSOCK(mode) {
 
 
 function execv(filename, argv) {
-    // normalize argv
     if (argv == null) {
         argv = [filename];
     } else if (!Array.isArray(argv)) {
@@ -154,22 +153,34 @@ function execv(filename, argv) {
 
 
 function execve(filename, argv, envp) {
-    // normalize argv
     if (argv == null) {
         argv = [filename];
     } else if (!Array.isArray(argv)) {
         throw new Error('"argv" must be null, undefined or an Array');
     }
-    if (envp == null) {
-        envp = [];
-    } else {
-        var envArray = [];
-        for (var prop in envp) {
-            envArray.push(prop + '=' + envp[prop]);
-        }
-        envp = envArray;
-    }
+    envp = normalizeEnvp(envp);
     _os.execve(filename, argv, envp);
+}
+
+
+function execvp(path, argv) {
+    if (argv == null) {
+        argv = [path];
+    } else if (!Array.isArray(argv)) {
+        throw new Error('"argv" must be null, undefined or an Array');
+    }
+    _os.execvp(path, argv);
+}
+
+
+function execvpe(path, argv, envp) {
+    if (argv == null) {
+        argv = [path];
+    } else if (!Array.isArray(argv)) {
+        throw new Error('"argv" must be null, undefined or an Array');
+    }
+    envp = normalizeEnvp(envp);
+    _os.execvpe(path, argv, envp);
 }
 
 
@@ -235,6 +246,19 @@ function modeNum(m, def) {
 }
 
 
+function normalizeEnvp(envp) {
+    if (envp == null) {
+        return [];
+    } else {
+        var envArray = [];
+        for (var prop in envp) {
+            envArray.push(prop + '=' + envp[prop]);
+        }
+        return envArray;
+    }
+}
+
+
 exports.abort    = _os.abort;
 exports.open     = open;
 exports.read     = read;
@@ -268,6 +292,8 @@ exports.S_ISSOCK = S_ISSOCK;
 exports.fork         = _os.fork;
 exports.execv        = execv;
 exports.execve       = execve;
+exports.execvp       = execvp;
+exports.execvpe      = execvpe;
 exports.waitpid      = waitpid;
 exports.WIFEXITED    = _os.WIFEXITED;
 exports.WEXITSTATUS  = _os.WEXITSTATUS;

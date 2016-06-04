@@ -53,28 +53,23 @@ Functions
     .. seealso::
         :man:`dup2(2)`
 
-.. js:function:: os.execv(filename, [args])
+.. js:function:: os.execv(path, [args])
+.. js:function:: os.execvp(file, [args])
+.. js:function:: os.execve(path, [args], [envp])
+.. js:function:: os.execvpe(file, [args], [envp])
 
-    Replace the current process image with a new process image.
+    The ``exec*`` family of functions replace the current process image with a new process image.
 
-    :param filename: Program to be executed.
+    :param file: `file` or `path` indicate file to be used for the new process image. The functions which contain
+        a ``p`` in their name will search for the file in the ``PATH`` environment variable, or in the current
+        directory in its absence.
     :param args: Arguments for the program. If an ``Array`` is passed, the first element should be the
         program filename.
+    :param envp: Object containing the environment for the new program. The functions which do not take ab environment
+        object will inherit it from their parent process.
 
     .. seealso::
-        :man:`execv(2)`
-
-.. js:function:: os.execve(filename, [args], [envp])
-
-    Replace the current process image with a new process image.
-
-    :param filename: Program to be executed.
-    :param args: Arguments for the program. If an ``Array`` is passed, the first element should be the
-        program filename.
-    :param envp: Object containing the environment for the new program.
-
-    .. seealso::
-        :man:`execve(2)`
+        :man:`execve(3)`
 
 .. js:function:: os.exit([status])
 
