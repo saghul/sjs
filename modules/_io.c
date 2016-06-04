@@ -248,7 +248,6 @@ static duk_ret_t io_setvbuf(duk_context* ctx) {
     mode = duk_require_int(ctx, 1);
 
     if (mode == 0) {
-        printf("unbuffered!\n");
         mode = _IONBF;
         size = 0;
     } else if (mode == 1) {

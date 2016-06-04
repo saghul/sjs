@@ -10,6 +10,11 @@
 #include <stdlib.h>
 #include <unistd.h>
 
+#if defined(__APPLE__)
+# include <crt_externs.h>
+# define environ (*_NSGetEnviron())
+#endif
+
 #include "../src/platform-inl.h"
 #include <sjs/sjs.h>
 
@@ -607,7 +612,12 @@ static duk_ret_t os_execvpe(duk_context* ctx) {
     }
     env[nenv] = NULL;
 
+#if defined(__APPLE__)
+    environ = env;
+    r = execvp(file, args);
+#else
     r = execvpe(file, args, env);
+#endif
     if (r < 0) {
         SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
