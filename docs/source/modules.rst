@@ -26,6 +26,7 @@ Standard library
     modules/os
     modules/path
     modules/process
+    modules/pwd
     modules/random
     modules/system
     modules/time

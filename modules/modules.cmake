@@ -140,6 +140,24 @@ install(TARGETS _path
 )
 
 
+# pwd
+#
+
+add_library(_pwd MODULE
+    modules/_pwd.c
+)
+target_link_libraries(_pwd
+    sjs
+)
+set_target_properties(_pwd PROPERTIES
+    PREFIX ""
+    SUFFIX ".jsdll"
+)
+install(TARGETS _pwd
+        DESTINATION lib/sjs/modules
+)
+
+
 # random
 #
 
