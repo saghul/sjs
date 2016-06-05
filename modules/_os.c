@@ -855,6 +855,38 @@ static duk_ret_t os_setsid(duk_context* ctx) {
 }
 
 
+static duk_ret_t os_getuid(duk_context* ctx) {
+    uid_t uid;
+    uid = getuid();
+    duk_push_int(ctx, uid);
+    return 1;
+}
+
+
+static duk_ret_t os_geteuid(duk_context* ctx) {
+    uid_t euid;
+    euid = geteuid();
+    duk_push_int(ctx, euid);
+    return 1;
+}
+
+
+static duk_ret_t os_getgid(duk_context* ctx) {
+    gid_t gid;
+    gid = getgid();
+    duk_push_int(ctx, gid);
+    return 1;
+}
+
+
+static duk_ret_t os_getegid(duk_context* ctx) {
+    uid_t egid;
+    egid = getegid();
+    duk_push_int(ctx, egid);
+    return 1;
+}
+
+
 #define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
     /* flags for open */
@@ -940,6 +972,10 @@ static const duk_function_list_entry module_funcs[] = {
     { "exit",                   os_exit,            1 },
     { "_exit",                  os__exit,           1 },
     { "setsid",                 os_setsid,          0 },
+    { "getuid",                 os_getuid,          0 },
+    { "geteuid",                os_geteuid,         0 },
+    { "getgid",                 os_getgid,          0 },
+    { "getegid",                os_getegid,        0 },
     { NULL, NULL, 0 }
 };
 

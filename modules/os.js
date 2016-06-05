@@ -279,6 +279,10 @@ exports.chdir    = _os.chdir;
 exports.exit     = exit;
 exports._exit    = _os._exit;
 exports.setsid   = _os.setsid;
+exports.getuid   = _os.getuid;
+exports.geteuid  = _os.geteuid;
+exports.getgid   = _os.getgid;
+exports.getegid  = _os.getegid;
 
 exports.S_IMODE  = S_IMODE;
 exports.S_ISDIR  = S_ISDIR;

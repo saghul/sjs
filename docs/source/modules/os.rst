@@ -96,6 +96,27 @@ Functions
     .. seealso::
         :man:`fork(2)`
 
+.. js:function:: os.getegid
+
+    Returns the effective group ID of the calling process.
+
+    .. seealso::
+        :man:`getegid(2)`
+
+.. js:function:: os.geteuid
+
+    Returns the effective user ID of the calling process.
+
+    .. seealso::
+        :man:`geteuid(2)`
+
+.. js:function:: os.getgid
+
+    Returns the real group ID of the calling process.
+
+    .. seealso::
+        :man:`getgid(2)`
+
 .. js:function:: os:getpid
 
     Returns the process id of the calling process.
@@ -109,6 +130,13 @@ Functions
 
     .. seealso::
         :man:`getppid(2)`
+
+.. js:function:: os.getuid
+
+    Returns the real user ID of the calling process.
+
+    .. seealso::
+        :man:`getuid(2)`
 
 .. js:function:: os.isatty(fd)
 
