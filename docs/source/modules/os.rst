@@ -209,6 +209,20 @@ Functions
     .. seealso::
         :man:`scandir(3)`
 
+.. js:function:: os.setgid(gid)
+
+    Sets the effective group ID of the calling process.
+
+    .. seealso::
+        :man:`setgid(2)`
+
+.. js:function:: os.setuid(uid)
+
+    Sets the effective user ID of the calling process.
+
+    .. seealso::
+        :man:`setuid(2)`
+
 .. js:function:: os.setsid
 
     Create a new session if the calling process is not a process group leader.

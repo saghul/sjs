@@ -887,6 +887,38 @@ static duk_ret_t os_getegid(duk_context* ctx) {
 }
 
 
+static duk_ret_t os_setuid(duk_context* ctx) {
+    uid_t uid;
+    int r;
+
+    uid = duk_require_int(ctx, 0);
+    r = setuid(uid);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    }
+
+    duk_push_undefined(ctx);
+    return 1;
+}
+
+
+static duk_ret_t os_setgid(duk_context* ctx) {
+    gid_t gid;
+    int r;
+
+    gid = duk_require_int(ctx, 0);
+    r = setgid(gid);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    }
+
+    duk_push_undefined(ctx);
+    return 1;
+}
+
+
 #define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
     /* flags for open */
@@ -975,7 +1007,9 @@ static const duk_function_list_entry module_funcs[] = {
     { "getuid",                 os_getuid,          0 },
     { "geteuid",                os_geteuid,         0 },
     { "getgid",                 os_getgid,          0 },
-    { "getegid",                os_getegid,        0 },
+    { "getegid",                os_getegid,         0 },
+    { "setuid",                 os_setuid,          1 },
+    { "setgid",                 os_setgid,          1 },
     { NULL, NULL, 0 }
 };
 

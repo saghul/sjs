@@ -169,6 +169,14 @@ Process.prototype.spawn = function() {
 
             os.setsid();
 
+            if (options.gid !== null) {
+                os.setgid(options.gid);
+            }
+
+            if (options.uid !== null) {
+                os.setuid(options.uid);
+            }
+
             if (options.env !== null) {
                 os.execvpe(options.executable, options.args, options.env);
             } else {
@@ -283,7 +291,6 @@ function spawn(cmd, options) {
         procOptions.cwd = options.cwd;
     }
 
-    // TODO: implement this
     procOptions.uid = options.uid || null;
     procOptions.gid = options.gid || null;
 

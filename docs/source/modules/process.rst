@@ -67,3 +67,5 @@ Functions
     * `env`: object containing the environment for the new process. The calling process' environment will be
       used in case ``null`` is provided.
     * `shell`: if ``true`` a shell will be used to spawn the command, thus running ``/bin/sh -c cmd``.
+    * `uid`: the effective user ID for the new process.
+    * `gid`: the effective group ID for the new process.

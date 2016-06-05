@@ -283,6 +283,8 @@ exports.getuid   = _os.getuid;
 exports.geteuid  = _os.geteuid;
 exports.getgid   = _os.getgid;
 exports.getegid  = _os.getegid;
+exports.setuid   = _os.setuid;
+exports.setgid   = _os.setgid;
 
 exports.S_IMODE  = S_IMODE;
 exports.S_ISDIR  = S_ISDIR;
