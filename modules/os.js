@@ -203,6 +203,16 @@ function exit(status) {
 }
 
 
+function setgroups(groups) {
+    if (groups == null) {
+        groups = [];
+    } else if (!Array.isArray(groups)) {
+        throw new TypeError('must specify an Array or null / undefined');
+    }
+    _os.setgroups(groups);
+}
+
+
 // internal helpers
 
 function stringToFlags(flag) {
@@ -285,6 +295,8 @@ exports.getgid   = _os.getgid;
 exports.getegid  = _os.getegid;
 exports.setuid   = _os.setuid;
 exports.setgid   = _os.setgid;
+exports.getgroups = _os.getgroups;
+exports.setgroups = setgroups;
 
 exports.S_IMODE  = S_IMODE;
 exports.S_ISDIR  = S_ISDIR;

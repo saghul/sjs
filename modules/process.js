@@ -169,6 +169,16 @@ Process.prototype.spawn = function() {
 
             os.setsid();
 
+            if (options.uid !== null || options.gid !== null) {
+                // Drop all supplementary groups. When dropping privileges from root some extra groups
+                // may allow the process to act as root. Discard errors since this can fail if we are
+                // not root.
+                try {
+                    os.setgroups([]);
+                } catch (e) {
+                }
+            }
+
             if (options.gid !== null) {
                 os.setgid(options.gid);
             }

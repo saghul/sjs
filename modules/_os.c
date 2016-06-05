@@ -3,6 +3,7 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <grp.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/syscall.h>
@@ -919,6 +920,59 @@ static duk_ret_t os_setgid(duk_context* ctx) {
 }
 
 
+static duk_ret_t os_getgroups(duk_context* ctx) {
+    long ngroups_max;
+    int r;
+
+    ngroups_max = sysconf(_SC_NGROUPS_MAX);
+    if (ngroups_max <= 0) {
+        ngroups_max = 1024;
+    }
+
+    gid_t groups[ngroups_max];
+    r = getgroups((size_t) ngroups_max, groups);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    } else {
+        duk_idx_t idx = duk_push_array(ctx);
+        for (int i = 0; i < r; i++) {
+            duk_push_int(ctx, groups[i]);
+            duk_put_prop_index(ctx, idx, i);
+        }
+        return 1;
+    }
+}
+
+
+static duk_ret_t os_setgroups(duk_context* ctx) {
+    size_t len;
+    int r;
+
+    assert(duk_is_array(ctx, 0));
+    len = duk_get_length(ctx, 0);
+    if (len == 0) {
+        r = setgroups(0, NULL);
+    } else {
+        gid_t groups[len];
+        for (size_t i = 0; i < len; i++) {
+            duk_get_prop_index(ctx, 0, i);
+            groups[i] = duk_require_int(ctx, -1);
+            duk_pop(ctx);
+        }
+        r = setgroups(len, groups);
+    }
+
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    }
+
+    duk_push_undefined(ctx);
+    return 1;
+}
+
+
 #define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
     /* flags for open */
@@ -1010,6 +1064,8 @@ static const duk_function_list_entry module_funcs[] = {
     { "getegid",                os_getegid,         0 },
     { "setuid",                 os_setuid,          1 },
     { "setgid",                 os_setgid,          1 },
+    { "getgroups",              os_getgroups,       0 },
+    { "setgroups",              os_setgroups,       1 },
     { NULL, NULL, 0 }
 };
 

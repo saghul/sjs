@@ -117,6 +117,13 @@ Functions
     .. seealso::
         :man:`getgid(2)`
 
+.. js:function:: os.getgroups
+
+    Returns the supplementary group IDs of the calling process.
+
+    .. seealso::
+        :man:`getgroups(2)`
+
 .. js:function:: os:getpid
 
     Returns the process id of the calling process.
@@ -215,6 +222,13 @@ Functions
 
     .. seealso::
         :man:`setgid(2)`
+
+.. js:function:: os.setgroups(groups)
+
+    Sets the supplementary group IDs for the calling process.
+
+    .. seealso::
+        :man:`setgroups(2)`
 
 .. js:function:: os.setuid(uid)
 
