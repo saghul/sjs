@@ -1015,6 +1015,10 @@ static const duk_number_list_entry module_consts[] = {
     X(WCONTINUED),
     X(WNOHANG),
     X(WUNTRACED),
+    /* stdio constants */
+    X(STDIN_FILENO),
+    X(STDOUT_FILENO),
+    X(STDERR_FILENO),
     { NULL, 0.0 }
 };
 #undef X

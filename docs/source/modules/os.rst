@@ -375,3 +375,7 @@ Constants
 .. js:attribute:: os.W*
 
     Flags used in the options field on :js:func:`os.waitpid`.
+
+.. js:attribute:: os.STD{IN,OUT,ERR}_FILENO
+
+    Constants represendint default file descriptors for stdio.

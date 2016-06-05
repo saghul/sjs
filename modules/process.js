@@ -26,7 +26,7 @@ function daemonize() {
     os.dup2(devNull, 0, false);
     os.dup2(devNull, 1, false);
     os.dup2(devNull, 2, false);
-    if (devNull > 2) {
+    if (devNull > os.STDERR_FILENO) {
         os.close(devNull);
     }
 
@@ -142,7 +142,7 @@ Process.prototype.spawn = function() {
     } catch(e) {
         var fds = [].concat(errorPipe, stdinPipe, stdoutPipe, stderrPipe, devNull);
         fds.forEach(function(fd) {
-            if (fd > 2) {
+            if (fd > os.STDERR_FILENO) {
                 silentClose(fd);
             }
         });
@@ -217,7 +217,7 @@ Process.prototype.spawn = function() {
         // close fds
         var fds = [devNull, errorPipe[0], stdinPipe[0], stdoutPipe[1], stderrPipe[1]];
         fds.forEach(function(fd) {
-            if (fd > 2) {
+            if (fd > os.STDERR_FILENO) {
                 silentClose(fd);
             }
         });
