@@ -14,6 +14,8 @@
 #if defined(__APPLE__)
 # include <crt_externs.h>
 # define environ (*_NSGetEnviron())
+#else
+extern char** environ;
 #endif
 
 #include "../src/platform-inl.h"
@@ -613,7 +615,7 @@ static duk_ret_t os_execvpe(duk_context* ctx) {
     }
     env[nenv] = NULL;
 
-#if defined(__APPLE__)
+#if !defined(execvpe)
     environ = env;
     r = execvp(file, args);
 #else
