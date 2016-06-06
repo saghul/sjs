@@ -20,9 +20,7 @@ function popen(filename) {
         os.dup2(stdin[0], 0, false);
         os.dup2(stdout[1], 1, false);
         os.dup2(stderr[1], 2, false);
-        os.execve(system.executable,
-                  [system.executable, filename],
-                  {SJS_PATH: system.env.SJS_PATH});
+        os.execv(system.executable, [system.executable, filename]);
         assert(false);
     } else {
         // parent
@@ -46,6 +44,10 @@ data = os.read(r.stdout_fd);
 assert.equal(data, TEXT);
 data = os.read(r.stderr_fd);
 assert.equal(data, TEXT);
+
+os.close(r.stdin_fd);
+os.close(r.stdout_fd);
+os.close(r.stderr_fd);
 
 var res = os.waitpid(r.pid);
 assert.equal(r.pid, res.pid);

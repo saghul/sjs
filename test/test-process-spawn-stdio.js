@@ -16,6 +16,9 @@ p = proc.spawn([sys.executable, 'test/helper3.js'],
 p.stdin.write(TEXT);
 assert.equal(p.stdout.readline(), TEXT);
 assert.equal(p.stderr.readline(), TEXT);
+p.stdin.close();
+p.stdout.close();
+p.stderr.close();
 r = p.wait();
 assert.equal(r.exit_status, 0);
 assert.equal(r.term_signal, 0);
@@ -24,6 +27,9 @@ assert.equal(r.term_signal, 0);
 p = proc.spawn([sys.executable, 'test/helper6.js'].concat(TEST_ARGS),
                {stdin: 'pipe', stdout: 'pipe', stderr: 'pipe'});
 assert.deepEqual(JSON.parse(p.stdout.readline()), TEST_ARGS);
+p.stdin.close();
+p.stdout.close();
+p.stderr.close();
 r = p.wait();
 assert.equal(r.exit_status, 0);
 assert.equal(r.term_signal, 0);
