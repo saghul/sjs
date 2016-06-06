@@ -69,3 +69,31 @@ Functions
     * `shell`: if ``true`` a shell will be used to spawn the command, thus running ``/bin/sh -c cmd``.
     * `uid`: the effective user ID for the new process.
     * `gid`: the effective group ID for the new process.
+
+    Example:
+
+    ::
+
+		sjs> const proc = require('process');
+		= undefined
+		sjs> var p = proc.spawn(['ls', '-l'], {stdin: null, stdout: 'pipe', stderr: null});
+		= undefined
+		sjs> print(p.stdout.read());
+		total 56
+		-rw-r--r-- 1 saghul saghul  117 May  7 23:40 AUTHORS
+		drwxr-xr-x 3 saghul saghul 4096 Jun  6 09:17 build
+		-rw-r--r-- 1 saghul saghul 3021 May 17 01:22 CHANGELOG.md
+		-rw-r--r-- 1 saghul saghul 3938 Jun  4 18:16 CMakeLists.txt
+		-rw-r--r-- 1 saghul saghul  619 May  2 11:02 CONTRIBUTING.md
+		drwxr-xr-x 4 saghul saghul 4096 Jun  2 23:44 docs
+		drwxr-xr-x 3 saghul saghul 4096 Mar 18 12:50 include
+		-rw-r--r-- 1 saghul saghul 1080 May  1 23:30 LICENSE
+		-rw-r--r-- 1 saghul saghul  667 May  6 01:38 Makefile
+		drwxr-xr-x 4 saghul saghul 4096 Jun  6 02:41 modules
+		-rw-r--r-- 1 saghul saghul 2829 Jun  3 00:52 README.md
+		drwxr-xr-x 4 saghul saghul 4096 Jun  2 23:42 src
+		drwxr-xr-x 3 saghul saghul 4096 Jun  6 09:14 test
+		drwxr-xr-x 2 saghul saghul 4096 Apr 22 02:16 tools
+
+		= undefined
+		sjs>
