@@ -30,6 +30,7 @@ Standard library
     modules/random
     modules/system
     modules/time
+    modules/uuid
 
 
 Builtins
