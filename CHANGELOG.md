@@ -1,4 +1,71 @@
 
+# 0.3.0 (06-06-2016)
+
+* de023d7 vm: print error if opening file failed
+* 2bb7372 os: add os.urandom
+* 67b330d vm: don't support mod/index.jsdll construct
+* bd4384a vm: fix require if directory and js file exist but dir is not usable
+* a1eca61 objectutil: remove _extend
+* e149381 net: remove unneeded value conversion
+* 49e1a35 misc: simplified statements
+* 3210a41 misc: use Object.assign to avoid modifying given parameters
+* 0252f29 net: improved parameter validation
+* e20a6af os: remove old comment
+* 1cc8971 os: use arc4random_buf on OSX for os.urandom
+* c08c965 build: add CFLAGS to CMAKE_C_FLAGS
+* d889fe3 modules: add random module
+* 916cb9c os: validate fd when opening /dev/urandom
+* 5e77925 core: open all file descriptors with O_CLOEXEC
+* 2d1612d os: fix spacing
+* a261cb8 os: add os.fork, os.execve and related functions
+* db28c76 net: use os.nonblock
+* 0a75845 net: fix storing the non-blocking flag on the instance
+* 78fedc1 doc: mention that O_CLOEXEC is now the default
+* d912f97 os: add os.getpid and os.getppid
+* d2e3d2a io: add missing io.fdopen
+* d45e7ec vm: fix freeing memory on file read error
+* ce710cb vm: error early if trying to read a directory
+* ff53204 io: add readline function
+* 7374519 os: add os.dup and os.dup2
+* 489f2ff doc: fix typos
+* 05cbc66 doc: add some section titles
+* 009a4c2 os: add os.chdir
+* 020f2c5 misc: add documentation and build status to README
+* 01b392e io: fix typo
+* b460709 os: refactor os.close
+* dbf713b os: add os._exit
+* b492288 os,system: move exit() to os module
+* ebd634b modules: make system a non-builtin module
+* a17b345 os: add os.setsid
+* bb01c1d modules: add process module
+* 7d12970 misc: new logo
+* 015df52 random: remove unneeded cast
+* 567f56c build,cli: fix compilation iwarning on ARM
+* 1b75cb7 cli: update linenoise
+* 201926f cli: use lineoise allocator function to free result
+* e19211d cli: rename file
+* 375f9a0 cli: remove duplicated includes
+* a22fe9a test: add another execve test
+* a7e8aef os: add os.execv
+* d2176d2 doc: improve docs on os.execv/e
+* 175dd08 io: add support for unbuffered stdio
+* 3d8007c io: don't expose File objects, factory functions must be used
+* 14e74a0 os: add execvp/e
+* 1e949fe process: add process.spawn
+* 4405aa8 os: add os.get{u,eu,g,eg}id
+* 5a53aaf modules: add pwd module
+* b1f5e08 os: add os.setuid and os.setgid
+* 3ec5c09 os: add os.{get,set}groups
+* e3d82e8 os: simplify exporting functions
+* 83a2dd0 os: add STD{IN,OUT,ERR}_FILENO constants
+* 02d6eb0 modules: add uuid module
+* bc19d76 cli: use EXIT_SUCCESS and EXIT_FAILURE when exiting
+* 1bc6cbe test: properly cleanup resources
+* 8351eee doc: add process.spawn example
+* 96dac7e doc: small fixups to README and documentation
+* 482e2ff core: set version to 0.3.0
+
+
 # 0.2.0 (17-05-2016)
 
 * d0636b9 vm: make module search function non-writable
