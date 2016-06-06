@@ -25,6 +25,14 @@ matrix:
     - os: linux
       dist: trusty
       sudo: required
+      addons:
+        apt:
+          packages:
+            - musl-tools
+      env: BUILDTYPE=Debug MY_CC=musl-gcc MY_LINK=musl-gcc
+    - os: linux
+      dist: trusty
+      sudo: required
       compiler: gcc
       env: BUILDTYPE=Debug
     - os: linux
@@ -42,5 +50,6 @@ before_install:
   - umask 022
   - test -n $MY_CC  && export CC=$MY_CC
   - test -n $MY_CXX  && export CXX=$MY_CXX
+  - test -n $MY_LINK  && export LINK=$MY_LINK
 install: true
 script: make && make test
