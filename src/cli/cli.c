@@ -129,7 +129,7 @@ int main(int argc, char *argv[]) {
     char* eval_code = NULL;
     int interactive = 0;
     int run_stdin = 0;
-    int retval = 0;
+    int retval = EXIT_SUCCESS;
 
     /* Parse options */
     for (int i = 1; i < argc; i++) {
@@ -143,13 +143,13 @@ int main(int argc, char *argv[]) {
             goto usage;
         } else if (strcmp(arg, "-e") == 0) {
             if (i == argc - 1) {
-                retval = 1;
+                retval = EXIT_FAILURE;
                 goto usage;
             }
             eval_code = argv[i + 1];
             break;
         } else if (strlen(arg) > 1 && arg[0] == '-') {
-            retval = 1;
+            retval = EXIT_FAILURE;
             goto usage;
         } else if (strcmp(arg, "-") == 0) {
             run_stdin = 1;
@@ -171,17 +171,17 @@ int main(int argc, char *argv[]) {
     /* run */
     if (run_file) {
         if (sjs_vm_eval_file(vm, run_file, NULL, stderr, use_strict) != 0) {
-            retval = 1;
+            retval = EXIT_FAILURE;
             goto cleanup;
         }
     } else if (run_stdin) {
         if (handle_stdin(vm) != 0) {
-            retval = 1;
+            retval = EXIT_FAILURE;
             goto cleanup;
         }
     } else if (eval_code) {
         if (sjs_vm_eval_code(vm, "eval", eval_code, strlen(eval_code), NULL, stderr, use_strict) != 0) {
-            retval = 1;
+            retval = EXIT_FAILURE;
             goto cleanup;
         }
     }
@@ -189,7 +189,7 @@ int main(int argc, char *argv[]) {
     if (!isatty(STDIN_FILENO)) {
         interactive = 0;
         if (handle_stdin(vm) != 0) {
-            retval = 1;
+            retval = EXIT_FAILURE;
             goto cleanup;
         }
     }
@@ -201,7 +201,7 @@ int main(int argc, char *argv[]) {
         signal(SIGINT, handle_sigint);
 
         if (handle_interactive(vm) != 0) {
-            retval = 1;
+            retval = EXIT_FAILURE;
             goto cleanup;
         }
     }
@@ -209,7 +209,7 @@ int main(int argc, char *argv[]) {
 cleanup:
     sjs_vm_destroy(vm);
     vm = NULL;
-    return retval;
+    exit(retval);
 
 usage:
     fprintf(stderr, "Usage: sjs [options] [ <code> | <file> | - ]\n"
