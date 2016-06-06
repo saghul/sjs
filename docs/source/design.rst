@@ -5,7 +5,7 @@ Design
 ======
 
 Skookum JS is build by abstracting the undelying platform as little as possible and giving the developer full control
-of the low level API.
+of low level POSIX APIs.
 
 The VM is modeled after other runtimes such as Ruby's or Python's.
 

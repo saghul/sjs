@@ -21,7 +21,7 @@ Q: Does it work on <insert your OS of choice>?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **A**: At the moment sjs works only on GNU/Linux and OSX. Adding support for other Unix platforms should be
-easy enough, and Windows support is planned for later, since it's a bigger undertaking.
+easy enough and contributions are more than welcome. Windows support is not currently planned in the short term.
 
 
 Q: Do Nodejs modules work with Skookum JS?

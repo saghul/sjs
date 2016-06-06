@@ -3,8 +3,8 @@
 
 # Overview
 
-Skookum JS, or *sjs* for short, is a JavaScript runtime focused on giving
-unobtrusive and straight abstractions to low level platform facilities.
+Skookum JS, or *sjs* for short, is a JavaScript runtime focused on providing
+comprehensive POSIX APIs.
 
 The motivation for this project comes from answering the question "how would a
 JavaScript runtime look like if there were no browsers?".
@@ -22,6 +22,7 @@ JavaScript runtime look like if there were no browsers?".
 * Combined reference counting and mark-and-sweep garbage collection with finalization
 * CommonJS-based module loading system
 * Support for native modules written in C
+* Rich standard library
 * Binary name 25% shorter than Node
 
 # Hello, world
