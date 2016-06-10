@@ -307,6 +307,10 @@ DUK_EXTERNAL duk_context* sjs_vm_get_duk_ctx(sjs_vm_t* vm) {
 }
 
 
+DUK_EXTERNAL int sjs_path_expanduser(const char* path, char* normalized_path, size_t normalized_path_len) {
+    return sjs__path_expanduser(path, normalized_path, normalized_path_len);
+}
+
 DUK_EXTERNAL int sjs_path_normalize(const char* path, char* normalized_path, size_t normalized_path_len) {
     return sjs__path_normalize(path, normalized_path, normalized_path_len);
 }

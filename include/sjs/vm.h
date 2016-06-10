@@ -28,6 +28,7 @@ DUK_EXTERNAL_DECL int sjs_vm_eval_file(const sjs_vm_t* vm,
                                        FILE* ferror,
                                        bool use_strict);
 
+DUK_EXTERNAL_DECL int sjs_path_expanduser(const char* path, char* normalized_path, size_t normalized_path_len);
 DUK_EXTERNAL_DECL int sjs_path_normalize(const char* path, char* normalized_path, size_t normalized_path_len);
 DUK_EXTERNAL_DECL uint64_t sjs_time_hrtime(void);
 

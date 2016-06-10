@@ -121,6 +121,10 @@ API
     :param normalized_path_len: Size of `normalized_path`.
     :returns: 0 on success, or < 0 on failure. The returned code is the negated `errno`.
 
+.. c:function:: int sjs_path_expanduser(const char* path, char* normalized_path, size_t normalized_path_len)
+
+    Similar to :c:func:`sjs_path_normalize` but in only performs tilde expansion.
+
 .. c:function:: uint64_t sjs_time_hrtime(void)
 
     Return the highest possible precission monotonic timer the system is able to provde.

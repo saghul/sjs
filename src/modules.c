@@ -62,7 +62,10 @@ static void path_join(char* path, size_t size, const char* p) {
 }
 
 
-int sjs__path_normalize(const char* path, char* normalized_path, size_t normalized_path_len) {
+static inline int sjs__path_normalize_impl(const char* path,
+                                           char* normalized_path,
+                                           size_t normalized_path_len,
+                                           int use_realpath) {
     assert(path && normalized_path && normalized_path_len);
 
     const char* ptr;
@@ -116,11 +119,25 @@ int sjs__path_normalize(const char* path, char* normalized_path, size_t normaliz
         ptr = path;
     }
 
-    if (realpath(ptr, normalized_path) == NULL) {
-        return -errno;
+    if (use_realpath) {
+        if (realpath(ptr, normalized_path) == NULL) {
+            return -errno;
+        }
+    } else {
+        sjs__strlcpy(normalized_path, ptr, normalized_path_len);
     }
 
     return 0;
+}
+
+
+int sjs__path_normalize(const char* path, char* normalized_path, size_t normalized_path_len) {
+    return sjs__path_normalize_impl(path, normalized_path, normalized_path_len, 1);
+}
+
+
+int sjs__path_expanduser(const char* path, char* normalized_path, size_t normalized_path_len) {
+    return sjs__path_normalize_impl(path, normalized_path, normalized_path_len, 0);
 }
 
 
