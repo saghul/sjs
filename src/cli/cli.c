@@ -11,10 +11,25 @@
 
 #define SJS_CLI_STDIN_BUF_SIZE    65536
 
-/* exit if user presses Ctrl-C twice */
-static int got_sigint = 0;
+typedef enum {
+    SJS_CLI_REPL = 0,
+    SJS_CLI_FILE,
+    SJS_CLI_EVAL,
+    SJS_CLI_STDIN
+} cli_mode_t;
 
-static int use_strict = 0;
+typedef struct {
+    sjs_vm_t* vm;
+    struct {
+        int use_strict;
+        char* data;
+        int interactive;
+        cli_mode_t mode;
+    } options;
+    int got_sigint;
+} cli_t;
+
+static cli_t cli;
 
 
 static int handle_stdin(sjs_vm_t* vm) {
@@ -53,7 +68,7 @@ static int handle_stdin(sjs_vm_t* vm) {
         bufoff += got;
     }
 
-    r = sjs_vm_eval_code(vm, "stdin", buf, bufoff, NULL, stderr, use_strict);
+    r = sjs_vm_eval_code(vm, "stdin", buf, bufoff, NULL, stderr, cli.options.use_strict);
 
     free(buf);
     buf = NULL;
@@ -93,13 +108,13 @@ static int handle_interactive(sjs_vm_t* vm) {
 
     while((line = linenoise(prompt)) != NULL) {
         /* reset sigint signal state */
-        got_sigint = 0;
+        cli.got_sigint = 0;
 
         if (line[0] != '\0') {
             linenoiseHistoryAdd(line);
         }
 
-        sjs_vm_eval_code(vm, "input", line, strlen(line), stdout, stdout, use_strict);
+        sjs_vm_eval_code(vm, "input", line, strlen(line), stdout, stdout, cli.options.use_strict);
         linenoiseFree(line);
     }
 
@@ -113,10 +128,10 @@ static int handle_interactive(sjs_vm_t* vm) {
 
 static void handle_sigint(int sig) {
     assert(sig == SIGINT);
-    if (got_sigint == 1) {
-        exit(0);
+    if (cli.got_sigint == 1) {
+        exit(EXIT_SUCCESS);
     } else {
-        got_sigint = 1;
+        cli.got_sigint = 1;
         fprintf(stdout, "\r\n(^C again to exit)\r\n");
         fflush(stdout);
     }
@@ -124,21 +139,18 @@ static void handle_sigint(int sig) {
 
 
 int main(int argc, char *argv[]) {
-    sjs_vm_t* vm = NULL;
-    char* run_file = NULL;
-    char* eval_code = NULL;
-    int interactive = 0;
-    int run_stdin = 0;
     int retval = EXIT_SUCCESS;
+
+    memset(&cli, 0, sizeof(cli));
 
     /* Parse options */
     for (int i = 1; i < argc; i++) {
         char *arg = argv[i];
         assert(arg);
         if (strcmp(arg, "--use_strict") == 0) {
-            use_strict = 1;
+            cli.options.use_strict = 1;
         } else if (strcmp(arg, "-i") == 0) {
-            interactive = 1;
+            cli.options.interactive = 1;
         } else if (strcmp(arg, "-h") == 0) {
             goto usage;
         } else if (strcmp(arg, "-e") == 0) {
@@ -146,69 +158,76 @@ int main(int argc, char *argv[]) {
                 retval = EXIT_FAILURE;
                 goto usage;
             }
-            eval_code = argv[i + 1];
+            cli.options.mode = SJS_CLI_EVAL;
+            cli.options.data = argv[i + 1];
             break;
         } else if (strlen(arg) > 1 && arg[0] == '-') {
             retval = EXIT_FAILURE;
             goto usage;
         } else if (strcmp(arg, "-") == 0) {
-            run_stdin = 1;
+            cli.options.mode = SJS_CLI_STDIN;
             break;
         } else {
-            run_file = arg;
+            cli.options.mode = SJS_CLI_FILE;
+            cli.options.data = arg;
             break;
         }
     }
 
-    if (!run_file && !eval_code && !run_stdin) {
-        interactive = 1;
+    if (cli.options.mode == SJS_CLI_REPL) {
+        cli.options.interactive = 1;
     }
 
     /* Create VM */
-    vm = sjs_vm_create();
-    sjs_vm_setup_args(vm, argc, argv);
+    cli.vm = sjs_vm_create();
+    sjs_vm_setup_args(cli.vm, argc, argv);
 
     /* run */
-    if (run_file) {
-        if (sjs_vm_eval_file(vm, run_file, NULL, stderr, use_strict) != 0) {
-            retval = EXIT_FAILURE;
-            goto cleanup;
-        }
-    } else if (run_stdin) {
-        if (handle_stdin(vm) != 0) {
-            retval = EXIT_FAILURE;
-            goto cleanup;
-        }
-    } else if (eval_code) {
-        if (sjs_vm_eval_code(vm, "eval", eval_code, strlen(eval_code), NULL, stderr, use_strict) != 0) {
-            retval = EXIT_FAILURE;
-            goto cleanup;
-        }
+    switch (cli.options.mode) {
+        case SJS_CLI_FILE:
+            if (sjs_vm_eval_file(cli.vm, cli.options.data, NULL, stderr, cli.options.use_strict) != 0) {
+                retval = EXIT_FAILURE;
+                goto cleanup;
+            }
+            break;
+        case SJS_CLI_STDIN:
+            if (handle_stdin(cli.vm) != 0) {
+                retval = EXIT_FAILURE;
+                goto cleanup;
+            }
+            break;
+        case SJS_CLI_EVAL:
+            if (sjs_vm_eval_code(cli.vm, "eval", cli.options.data, strlen(cli.options.data), NULL, stderr, cli.options.use_strict) != 0) {
+                retval = EXIT_FAILURE;
+                goto cleanup;
+            }
+            break;
+        default:
+            break;
     }
 
     if (!isatty(STDIN_FILENO)) {
-        interactive = 0;
-        if (handle_stdin(vm) != 0) {
+        cli.options.interactive = 0;
+        if (handle_stdin(cli.vm) != 0) {
             retval = EXIT_FAILURE;
             goto cleanup;
         }
     }
 
     /* Enter interactive mode */
-    if (interactive) {
+    if (cli.options.interactive) {
         /* setup signal handling */
         signal(SIGPIPE, SIG_IGN);
         signal(SIGINT, handle_sigint);
 
-        if (handle_interactive(vm) != 0) {
+        if (handle_interactive(cli.vm) != 0) {
             retval = EXIT_FAILURE;
             goto cleanup;
         }
     }
 
 cleanup:
-    sjs_vm_destroy(vm);
-    vm = NULL;
+    sjs_vm_destroy(cli.vm);
     exit(retval);
 
 usage:
