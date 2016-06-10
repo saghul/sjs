@@ -217,7 +217,7 @@ static void linenoise_completion(const char *buf, linenoiseCompletions *lc) {
 }
 
 
-static int handle_stdin(sjs_vm_t* vm) {
+static int handle_stdin(void) {
     char *buf;
     size_t bufsz;
     size_t bufoff;
@@ -253,7 +253,7 @@ static int handle_stdin(sjs_vm_t* vm) {
         bufoff += got;
     }
 
-    r = sjs_vm_eval_code(vm, "stdin", buf, bufoff, NULL, stderr, cli.options.use_strict);
+    r = sjs_vm_eval_code(cli.vm, "stdin", buf, bufoff, NULL, stderr, cli.options.use_strict);
 
     free(buf);
     buf = NULL;
@@ -269,14 +269,14 @@ error:
 }
 
 
-static int handle_interactive(sjs_vm_t* vm) {
+static int handle_interactive(void) {
     const char *prompt = "sjs> ";
     duk_context* ctx;
     char* line;
     char history_file[4096];
     int use_history;
 
-    ctx = sjs_vm_get_duk_ctx(vm);
+    ctx = sjs_vm_get_duk_ctx(cli.vm);
     duk_eval_string_noresult(ctx, SJS__CLI_GREET_CODE);
 
     /* setup history file
@@ -301,7 +301,7 @@ static int handle_interactive(sjs_vm_t* vm) {
             linenoiseHistoryAdd(line);
         }
 
-        sjs_vm_eval_code(vm, "input", line, strlen(line), stdout, stdout, cli.options.use_strict);
+        sjs_vm_eval_code(cli.vm, "input", line, strlen(line), stdout, stdout, cli.options.use_strict);
         linenoiseFree(line);
     }
 
@@ -373,20 +373,17 @@ int main(int argc, char *argv[]) {
     switch (cli.options.mode) {
         case SJS_CLI_FILE:
             if (sjs_vm_eval_file(cli.vm, cli.options.data, NULL, stderr, cli.options.use_strict) != 0) {
-                retval = EXIT_FAILURE;
-                goto cleanup;
+                goto error;
             }
             break;
         case SJS_CLI_STDIN:
-            if (handle_stdin(cli.vm) != 0) {
-                retval = EXIT_FAILURE;
-                goto cleanup;
+            if (handle_stdin() != 0) {
+                goto error;
             }
             break;
         case SJS_CLI_EVAL:
             if (sjs_vm_eval_code(cli.vm, "eval", cli.options.data, strlen(cli.options.data), NULL, stderr, cli.options.use_strict) != 0) {
-                retval = EXIT_FAILURE;
-                goto cleanup;
+                goto error;
             }
             break;
         default:
@@ -395,9 +392,8 @@ int main(int argc, char *argv[]) {
 
     if (!isatty(STDIN_FILENO)) {
         cli.options.interactive = 0;
-        if (handle_stdin(cli.vm) != 0) {
-            retval = EXIT_FAILURE;
-            goto cleanup;
+        if (handle_stdin() != 0) {
+            goto error;
         }
     }
 
@@ -407,11 +403,15 @@ int main(int argc, char *argv[]) {
         signal(SIGPIPE, SIG_IGN);
         signal(SIGINT, handle_sigint);
 
-        if (handle_interactive(cli.vm) != 0) {
-            retval = EXIT_FAILURE;
-            goto cleanup;
+        if (handle_interactive() != 0) {
+            goto error;
         }
     }
+
+    goto cleanup;
+
+error:
+    retval = EXIT_FAILURE;
 
 cleanup:
     sjs_vm_destroy(cli.vm);
