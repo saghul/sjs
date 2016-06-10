@@ -114,7 +114,7 @@ API
 
 .. c:function:: int sjs_path_normalize(const char* path, char* normalized_path, size_t normalized_path_len)
 
-    Normalize the given `path` into the given buffer. Mormalizing a path includes tilde expansions and ``realpath(3)``.
+    Normalize the given `path` into the given buffer. Mormalizing a path includes tilde expansions and :man:`realpath(3)`.
 
     :param path: The path which needs to be normalized.
     :param normalized_path: Buffer to store the normalized path.
