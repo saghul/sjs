@@ -113,7 +113,7 @@ static inline int sjs__path_normalize_impl(const char* path,
             }
             home = pw.pw_dir;
         }
-        snprintf(tmp, sizeof(tmp), "%s/%s", home, path+pos);
+        snprintf(tmp, sizeof(tmp), "%s%s", home, path+pos);
         ptr = tmp;
     } else {
         ptr = path;
