@@ -272,14 +272,12 @@ error:
 static int handle_interactive(void) {
     const char *prompt = "sjs> ";
     const char* default_history_file = "~/.sjs_history";
-    duk_context* ctx;
     char* line;
     char* tmp;
     char history_file[4096];
     int use_history;
 
-    ctx = sjs_vm_get_duk_ctx(cli.vm);
-    duk_eval_string_noresult(ctx, SJS__CLI_GREET_CODE);
+    sjs_vm_eval_code(cli.vm, "input", SJS__CLI_GREET_CODE, sizeof(SJS__CLI_GREET_CODE), stdout, stdout, 0);
 
     /* setup history file */
     tmp = getenv("SJS_HISTORY_FILE");
