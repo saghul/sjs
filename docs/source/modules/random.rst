@@ -9,6 +9,9 @@ The current random number generator is implemented as a
 `Mersenne Twister <https://en.wikipedia.org/wiki/Mersenne_Twister>`_ PRNG which is
 automatically seeded on startup with data from :js:func:`os.urandom`.
 
+This module should be preferred to using ``Math.random`` since it uses a more roubust implementation.
+The implementation used my ``Math.random`` can be found `here <http://www.woodmann.com/forum/archive/index.php/t-3100.html>`_.
+
 .. note::
     This module could use some peer review. If you are competent to do so, please get in touch.
 
