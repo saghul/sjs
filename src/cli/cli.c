@@ -391,15 +391,15 @@ int main(int argc, char *argv[]) {
             break;
     }
 
-    if (!isatty(STDIN_FILENO)) {
-        cli.options.interactive = 0;
-        if (handle_stdin() != 0) {
-            goto error;
-        }
-    }
-
     /* Enter interactive mode */
     if (cli.options.interactive) {
+        if (!isatty(STDIN_FILENO)) {
+            if (handle_stdin() != 0) {
+                goto error;
+            }
+            goto cleanup;
+        }
+
         /* setup signal handling */
         signal(SIGPIPE, SIG_IGN);
         signal(SIGINT, handle_sigint);
