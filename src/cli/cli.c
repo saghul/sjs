@@ -277,7 +277,7 @@ static int handle_interactive(void) {
     char history_file[4096];
     int use_history;
 
-    sjs_vm_eval_code(cli.vm, "input", SJS__CLI_GREET_CODE, sizeof(SJS__CLI_GREET_CODE), stdout, stdout, 0);
+    sjs_vm_eval_code(cli.vm, "input", SJS__CLI_GREET_CODE, strlen(SJS__CLI_GREET_CODE), NULL, NULL, 0);
 
     /* setup history file */
     tmp = getenv("SJS_HISTORY_FILE");
