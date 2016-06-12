@@ -59,11 +59,10 @@ static int sjs__compile_execute(duk_context *ctx) {
     bool use_strict;
     int flags;
 
-    /* [ ... use_strict code len filename ] */
+    /* [ ... use_strict code filename ] */
 
-    use_strict = duk_require_boolean(ctx, -4);
-    code = duk_require_pointer(ctx, -3);
-    len = duk_require_uint(ctx, -2);
+    use_strict = duk_require_boolean(ctx, -3);
+    code = duk_require_lstring(ctx, -2, &len);
     filename = duk_require_string(ctx, -1);
 
     flags = 0;
@@ -78,7 +77,7 @@ static int sjs__compile_execute(duk_context *ctx) {
 
     duk_compile_lstring_filename(ctx, flags, code, len);
 
-    /* [ ... use_strict code len function ] */
+    /* [ ... use_strict code function ] */
 
     duk_push_global_object(ctx);  /* 'this' binding */
     duk_push_string(ctx, filename);
@@ -230,11 +229,10 @@ DUK_EXTERNAL int sjs_vm_eval_code(const sjs_vm_t* vm,
     duk_context* ctx = vm->ctx;
 
     duk_push_boolean(ctx, use_strict);
-    duk_push_pointer(ctx, (void *) code);
-    duk_push_uint(ctx, len);
+    duk_push_lstring(ctx, code, len);
     duk_push_string(ctx, filename);
 
-    r = duk_safe_call(ctx, sjs__compile_execute, 4 /*nargs*/, 1 /*nret*/);
+    r = duk_safe_call(ctx, sjs__compile_execute, 3 /*nargs*/, 1 /*nret*/);
     if (r != DUK_EXEC_SUCCESS) {
         if (ferror) {
             duk_safe_call(ctx, sjs__get_error_stack, 1 /*nargs*/, 1 /*nrets*/);
