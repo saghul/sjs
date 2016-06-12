@@ -2,6 +2,7 @@
 #include <assert.h>
 #include <dlfcn.h>
 #include <errno.h>
+#include <libgen.h>
 #include <pwd.h>
 #include <stdlib.h>
 #include <sys/types.h>
@@ -10,9 +11,12 @@
 
 #include "internal.h"
 #include "duktape.h"
+#include "duk_module_node.h"
 
 
 typedef duk_ret_t (*sjs_mod_init_f)(duk_context*);
+
+//#define SJS_DEBUG_MODULE_LOADER 1
 
 
 /*
@@ -37,28 +41,6 @@ static int load_jsdll(duk_context* ctx, const char* path) {
     } else {
         return -1;
     }
-}
-
-
-static void path_join(char* path, size_t size, const char* p) {
-    char sep;
-    size_t pathlen;
-
-    assert(path && p);
-
-    pathlen = strlen(path);
-    sep = '\0';
-    if (path[pathlen-1] != '/') {
-        if (p[0] != '/') {
-            sep = '/';
-        }
-    } else {
-        if (p[0] == '/') {
-            p++;
-        }
-    }
-
-    snprintf(path+pathlen, size-pathlen, "%c%s", sep, p);
 }
 
 
@@ -148,135 +130,146 @@ static int str_endswith(const char* str, const char* suffix) {
 }
 
 
-duk_ret_t sjs__modsearch(duk_context* ctx) {
-    /* nargs is 4:
-     * 0: id
-     * 1: require
-     * 2: exports
-     * 3: module
-     */
+/* Resolve a module's ID
+ *
+ * Entry stack: [ requested_id parent_id ]
+ */
+static inline duk_ret_t resolve_module_helper(duk_context* ctx,
+                                       const char* base_path,
+                                       const char* requested_id) {
+    static const char* filenames[] = {
+        "%s/%s",
+        "%s/%s.js",
+        "%s/%s.jsdll",
+        "%s/%s/index.js",
+    };
 
-    /*
-     * - search the module in the following paths
-     *   .
-     *   ./modules
-     *  /usr/lib/sjs/modules
-     *  /usr/local/lib/lodules
-     *  ~/.local/sjs/modules
-     *
-     *  - if there is an extension, try to load the file straight
-     *  - else: append js and try
-     *  - else: stat and if it's a dir try to add /index.js
-     */
-
-    ssize_t len;
-    char* data;
-    const char* id;
+    char resolved_id[8192];
     char tmp[8192];
-    int found_js;
-    int found_jsdll;
+    struct stat st;
 
-    found_js = 0;
-    found_jsdll = 0;
-    data = NULL;
-    len = -1;
-    id = duk_get_string(ctx, 0);
-
-    /* iterate over system.path */
-    duk_get_global_string(ctx, "_system");
-    duk_get_prop_string(ctx, -1, "path");
-    duk_remove(ctx, -2);
-    duk_enum(ctx, -1, DUK_ENUM_ARRAY_INDICES_ONLY | DUK_ENUM_SORT_ARRAY_INDICES);
-    /* [ ... path enum ] */
-
-    while (duk_next(ctx, -1, 1)) {
-        struct stat st;
-        const char* path = duk_get_string(ctx, -1);
-        duk_pop_2(ctx);    /* pop key and value off the stack */
-
-        if (sjs__path_normalize(path, tmp, sizeof(tmp)) < 0) {
-            continue;
-        }
-
-        path_join(tmp, sizeof(tmp), id);
-
-        if (stat(tmp, &st) == 0) {
-            /* path exists, check if file or directory */
-            if (S_ISREG(st.st_mode)) {
-                /* file, check if .js or .jsdll */
-                if (str_endswith(tmp, ".js")) {
-                    len = sjs__file_read(tmp, &data);
-                    if (len < 0) {
-                        continue;
-                    }
-                    found_js = 1;
-                    break;
-                } else if (str_endswith(tmp, ".jsdll")) {
-                    if (load_jsdll(ctx, tmp) == 0) {
-                        found_jsdll = 1;
-                        break;
-                    }
-                } else {
-                    continue;
-                }
-            } else if (S_ISDIR(st.st_mode)) {
-                /* directory, check for index.js */
-                path_join(tmp, sizeof(tmp), "index.js");
-                len = sjs__file_read(tmp, &data);
-                if (len >= 0) {
-                    /* fix require.id */
-                    char tmpid[1024];
-                    snprintf(tmpid, sizeof(tmpid), "%s/index", id);
-                    duk_push_string(ctx, "id");
-                    duk_push_string(ctx, tmpid);
-                    duk_def_prop(ctx, 1 /* index of 'require' */, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_FORCE);
-                    found_js = 1;
-                    break;
-                } else {
-                    /* no index file found, fallback to checking if a file with the directory file exists */
-                    char* ptr = strrchr(tmp, '/');
-                    assert(ptr != NULL);
-                    *ptr = '\0';
-                }
-            }
-        }
-
-        /* path doesn't exist or is not a directory nor a file, try to add .js or .jsdll */
-        sjs__strlcat(tmp, ".js", sizeof(tmp));
-        len = sjs__file_read(tmp, &data);
-        if (len < 0) {
-            /* no index.js, try index.jsdll */
-            sjs__strlcat(tmp, "dll", sizeof(tmp));
-            if (load_jsdll(ctx, tmp) == 0) {
-                found_jsdll = 1;
-                break;
-            }
-        } else {
-            found_js = 1;
-            break;
+    for (size_t i = 0; i < ARRAY_SIZE(filenames); ++i) {
+        snprintf(tmp, sizeof(tmp), filenames[i], base_path, requested_id);
+#ifdef SJS_DEBUG_MODULE_LOADER
+        printf("Trying to resolve ID: %s\n", tmp);
+#endif
+        if (sjs__path_normalize(tmp, resolved_id, sizeof(resolved_id)) == 0 &&
+                stat(resolved_id, &st) == 0 && S_ISREG(st.st_mode)) {
+#ifdef SJS_DEBUG_MODULE_LOADER
+            printf("Resolved ID: %s\n", resolved_id);
+#endif
+            duk_push_string(ctx, resolved_id);
+            return 0;
         }
     }
 
-    if (found_js) {
-        /* remove shebang if present */
+    return -1;
+}
+
+
+static duk_ret_t cb_resolve_module(duk_context *ctx) {
+    const char *requested_id = duk_get_string(ctx, 0);
+    const char *parent_id = duk_get_string(ctx, 1);  /* calling module */
+
+#ifdef SJS_DEBUG_MODULE_LOADER
+    printf("Requested ID: %s Parent ID: %s\n", requested_id, parent_id);
+#endif
+
+    if (strncmp(requested_id, "./", 2) == 0 || strncmp(requested_id, "../", 3) == 0) {
+        /* path is relative to parent path */
+        char tmp[8192];
+        if (strlen(parent_id) == 0) {
+            sjs__strlcpy(tmp, "./", sizeof(tmp));
+        } else if (str_endswith(parent_id, ".js")) {
+            sjs__strlcpy(tmp, dirname((char*) parent_id), sizeof(tmp));
+        } else {
+            sjs__strlcpy(tmp, parent_id, sizeof(tmp));
+        }
+        if (resolve_module_helper(ctx, tmp, requested_id) == 0) {
+            /* the resolved module ID is at the top of the stack */
+            return 1;
+        }
+    } else {
+        /* path needs to be looked up in system.path */
+        const char* path;
+        size_t n;
+        int found;
+        duk_get_global_string(ctx, "_system");
+        duk_get_prop_string(ctx, -1, "path");
+        duk_remove(ctx, -2);
+        n = duk_get_length(ctx, -1);
+        found = 0;
+        for (size_t i = 0; i < n; ++i) {
+            duk_get_prop_index(ctx, -1, i);
+            path = duk_require_string(ctx, -1);
+#ifdef SJS_DEBUG_MODULE_LOADER
+            printf("System path: %s\n", path);
+#endif
+            duk_pop(ctx);
+            if (resolve_module_helper(ctx, path, requested_id) == 0) {
+                found = 1;
+                break;
+            }
+        }
+        if (found) {
+            /* the resolved module ID is at the top of the stack */
+            duk_remove(ctx, -2);
+            return 1;
+        }
+        duk_pop(ctx);
+    }
+
+    duk_error(ctx, DUK_ERR_ERROR, "Module not found");
+    /* duk_error doesn't return */
+    return -42;
+}
+
+
+/* Load a module given it's ID
+ *
+ * Entry stack: [ resolved_id exports module ]
+ */
+static duk_ret_t cb_load_module(duk_context *ctx) {
+    const char* resolved_id = duk_require_string(ctx, 0);
+
+#ifdef SJS_DEBUG_MODULE_LOADER
+    printf("Loading module with ID: %s\n", resolved_id);
+#endif
+
+    if (str_endswith(resolved_id, ".js")) {
+        char* data;
+        int len;
+        len = sjs__file_read(resolved_id, &data);
+        if (len < 0) {
+            goto error;
+        }
         if (strncmp(data, "#!", 2) == 0) {
             memcpy((void*) data, "//", 2);
         }
-        duk_pop_2(ctx);    /* pop the enum and path off the stack */
-        duk_push_sprintf(ctx, "var __file__ = \"%s\";", tmp);
         duk_push_lstring(ctx, data, len);
-        duk_concat(ctx, 2);
         free(data);
         return 1;
-    } else if (found_jsdll) {
+    } else if (str_endswith(resolved_id, ".jsdll")) {
+        if (load_jsdll(ctx, resolved_id) < 0) {
+            goto error;
+        }
         /* the top of the stack has the exports object */
-        duk_put_prop_string(ctx, 3 /*idx of 'module'*/, "exports");
-        duk_pop_2(ctx);    /* pop the enum and path off the stack */
+        duk_put_prop_string(ctx, 2 /*idx of 'module'*/, "exports");
         return 0;
-    } else {
-        duk_pop_2(ctx);    /* pop the enum and path off the stack */
-        duk_error(ctx, DUK_ERR_ERROR, "Module '%s' not found", id);
-        /* duk_error doesn't return */
-        return -42;
     }
+
+error:
+    duk_error(ctx, DUK_ERR_ERROR, "Module could not be loaded");
+    /* duk_error doesn't return */
+    return -42;
+}
+
+
+void sjs__setup_commonjs(duk_context* ctx) {
+    duk_push_object(ctx);
+    duk_push_c_function(ctx, cb_resolve_module, DUK_VARARGS);
+    duk_put_prop_string(ctx, -2, "resolve");
+    duk_push_c_function(ctx, cb_load_module, DUK_VARARGS);
+    duk_put_prop_string(ctx, -2, "load");
+    duk_module_node_init(ctx);
 }

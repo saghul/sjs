@@ -38,7 +38,7 @@ function popen(filename) {
 }
 
 var data;
-var r = popen(path.join(path.dirname(__file__), 'helper3.js'));
+var r = popen(path.join(path.dirname(__filename), 'helper3.js'));
 os.write(r.stdin_fd, TEXT);
 data = os.read(r.stdout_fd);
 assert.equal(data, TEXT);

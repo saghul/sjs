@@ -7,6 +7,8 @@ Modules
 `sjs` includes a builtin `Common JS <http://wiki.commonjs.org/wiki/Modules/1.1>`_ module loading system.
 There is also a :ref:`stdlib` whith many modules. The goal is to provide a `kitchen-sink` collection of modules.
 
+Starting with version 0.4.0, `sjs` includes a module system more similar to Node.
+
 
 .. _stdlib:
 
@@ -54,8 +56,13 @@ These functions / objects are accessible globally.
 
     Utility function to write `data` to stdout.
 
-.. js:data:: __file__
+.. js:data:: __filename
 
     A sort of global attribute containing the absolute path to the file. In the global scope it constains the filename
-    which is currently being executed, ``input`` if running the REPL or ``eval`` if evaluating code straight from
-    the CLI. Inside a module, it contains the absolute path to the module file.
+    which is currently being executed, ``<repl>`` if running in the REPL, ``<stdin>`` if code is being read from `stdin`,
+    or ``<eval>`` if evaluating code straight from the CLI. Inside a module, it contains the absolute path to the
+    module file.
+
+.. js:data:: __dirname
+
+    The directory of the file being evaluated, obtained by applying :man:`dirname(3)` over ``__filename``.

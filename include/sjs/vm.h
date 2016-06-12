@@ -15,6 +15,13 @@ DUK_EXTERNAL_DECL sjs_vm_t* sjs_vm_create(void);
 DUK_EXTERNAL_DECL void sjs_vm_destroy(sjs_vm_t* vm);
 DUK_EXTERNAL_DECL void sjs_vm_setup_args(sjs_vm_t* vm, int argc, char* argv[]);
 DUK_EXTERNAL_DECL duk_context* sjs_vm_get_duk_ctx(sjs_vm_t* vm);
+DUK_EXTERNAL_DECL int sjs_vm_eval_code_global(const sjs_vm_t* vm,
+                                              const char* filename,
+                                              const char* code,
+                                              size_t len,
+                                              FILE* foutput,
+                                              FILE* ferror,
+                                              bool use_strict);
 DUK_EXTERNAL_DECL int sjs_vm_eval_code(const sjs_vm_t* vm,
                                        const char* filename,
                                        const char* code,

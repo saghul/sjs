@@ -99,6 +99,7 @@ set_target_properties(duktape
 # libsjs
 #
 set(SOURCES
+    src/duk_module_node.c
     src/modules.c
     src/system.c
     src/util.c

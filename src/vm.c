@@ -6,6 +6,7 @@
 #include <sys/stat.h>
 
 #include "duktape.h"
+#include "duk_module_node.h"
 #include "vm.h"
 #include "internal.h"
 #include "es6shim.h"
@@ -30,20 +31,6 @@ static void sjs__duk_fatal_handler(duk_context *ctx, duk_errcode_t code, const c
 }
 
 
-static void sjs__setup_modsearch(sjs_vm_t* vm) {
-    duk_context* ctx = vm->ctx;
-
-    duk_get_global_string(ctx, "Duktape");
-    duk_push_string(ctx, "modSearch");
-    duk_push_c_function(ctx, sjs__modsearch, 4 /* nargs */);
-    duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE |
-                          DUK_DEFPROP_CLEAR_WRITABLE |
-                          DUK_DEFPROP_CLEAR_ENUMERABLE |
-                          DUK_DEFPROP_CLEAR_CONFIGURABLE);
-    duk_pop(ctx);
-}
-
-
 static void sjs__setup_global_module(sjs_vm_t* vm) {
     duk_context* ctx = vm->ctx;
 
@@ -54,7 +41,6 @@ static void sjs__setup_global_module(sjs_vm_t* vm) {
 
 static int sjs__compile_execute(duk_context *ctx) {
     const char *code;
-    const char* filename;
     duk_size_t len;
     bool use_strict;
     int flags;
@@ -63,16 +49,10 @@ static int sjs__compile_execute(duk_context *ctx) {
 
     use_strict = duk_require_boolean(ctx, -3);
     code = duk_require_lstring(ctx, -2, &len);
-    filename = duk_require_string(ctx, -1);
 
     flags = 0;
     if (use_strict) {
         flags |= DUK_COMPILE_STRICT;
-    }
-
-    /* remove shebang if present */
-    if (strncmp(code, "#!", 2) == 0) {
-        memcpy((void*) code, "//", 2);
     }
 
     duk_compile_lstring_filename(ctx, flags, code, len);
@@ -80,8 +60,6 @@ static int sjs__compile_execute(duk_context *ctx) {
     /* [ ... use_strict code function ] */
 
     duk_push_global_object(ctx);  /* 'this' binding */
-    duk_push_string(ctx, filename);
-    duk_put_prop_string(ctx, -2, "__file__");
     duk_call_method(ctx, 0);
 
     return 1;    /* either the result or error are on the stack top */
@@ -105,6 +83,36 @@ static int sjs__get_error_stack(duk_context *ctx) {
     duk_get_prop_string(ctx, -1, "stack");  /* caller coerces */
     duk_remove(ctx, -2);
     return 1;
+}
+
+
+static void sjs__dump_result(duk_context* ctx, int r, FILE* foutput, FILE* ferror) {
+    if (r != DUK_EXEC_SUCCESS) {
+        if (ferror) {
+            duk_safe_call(ctx, sjs__get_error_stack, 1 /*nargs*/, 1 /*nrets*/);
+            fprintf(ferror, "%s\n", duk_safe_to_string(ctx, -1));
+            fflush(ferror);
+        }
+    } else {
+        if (foutput) {
+            /* TODO: make this optional with a parameter? */
+            /* beautify output */
+            duk_eval_string(ctx, "(function (v) {\n"
+                                 "    try {\n"
+                                 "        return Duktape.enc('jx', v, null, 4);\n"
+                                 "    } catch (e) {\n"
+                                 "        return String(v);\n"
+                                 "    }\n"
+                                 "})");
+            duk_insert(ctx, -2);
+            duk_call(ctx, 1);
+
+            fprintf(foutput, "= %s\n", duk_safe_to_string(ctx, -1));
+            fflush(foutput);
+        }
+    }
+
+    duk_pop(ctx);
 }
 
 
@@ -149,6 +157,11 @@ ssize_t sjs__file_read(const char* path, char** data) {
         return -EIO;
     }
 
+    /* remove shebang if present */
+    if (strncmp(*data, "#!", 2) == 0) {
+        memcpy((void*) *data, "//", 2);
+    }
+
     fclose(f);
     return fsize;
 }
@@ -170,7 +183,7 @@ DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
     /* setup builtin modules */
     sjs__setup_system_module(vm->ctx);
     sjs__setup_global_module(vm);
-    sjs__setup_modsearch(vm);
+    sjs__setup_commonjs(vm->ctx);
 
     /* setup es6 shim */
     duk_eval_string_noresult(vm->ctx, sjs__es6shim_src);
@@ -216,6 +229,29 @@ DUK_EXTERNAL void sjs_vm_setup_args(sjs_vm_t* vm, int argc, char* argv[]) {
 }
 
 
+DUK_EXTERNAL int sjs_vm_eval_code_global(const sjs_vm_t* vm,
+                                         const char* filename,
+                                         const char* code,
+                                         size_t len,
+                                         FILE* foutput,
+                                         FILE* ferror,
+                                         bool use_strict) {
+    int r;
+
+    assert(vm);
+    duk_context* ctx = vm->ctx;
+
+    duk_push_boolean(ctx, use_strict);
+    duk_push_lstring(ctx, code, len);
+    duk_push_string(ctx, filename);
+    r = duk_safe_call(ctx, sjs__compile_execute, 3 /*nargs*/, 1 /*nret*/);
+
+    sjs__dump_result(ctx, r, foutput, ferror);
+
+    return r;
+}
+
+
 DUK_EXTERNAL int sjs_vm_eval_code(const sjs_vm_t* vm,
                                   const char* filename,
                                   const char* code,
@@ -227,38 +263,13 @@ DUK_EXTERNAL int sjs_vm_eval_code(const sjs_vm_t* vm,
 
     assert(vm);
     duk_context* ctx = vm->ctx;
+    (void) use_strict;
 
-    duk_push_boolean(ctx, use_strict);
     duk_push_lstring(ctx, code, len);
-    duk_push_string(ctx, filename);
+    r = duk_module_node_eval_code(ctx, filename);
 
-    r = duk_safe_call(ctx, sjs__compile_execute, 3 /*nargs*/, 1 /*nret*/);
-    if (r != DUK_EXEC_SUCCESS) {
-        if (ferror) {
-            duk_safe_call(ctx, sjs__get_error_stack, 1 /*nargs*/, 1 /*nrets*/);
-            fprintf(ferror, "%s\n", duk_safe_to_string(ctx, -1));
-            fflush(ferror);
-        }
-    } else {
-        if (foutput) {
-            /* TODO: make this optional with a parameter? */
-            /* beautify output */
-            duk_eval_string(ctx, "(function (v) {\n"
-                                 "    try {\n"
-                                 "        return Duktape.enc('jx', v, null, 4);\n"
-                                 "    } catch (e) {\n"
-                                 "        return String(v);\n"
-                                 "    }\n"
-                                 "})");
-            duk_insert(ctx, -2);
-            duk_call(ctx, 1);
+    sjs__dump_result(ctx, r, foutput, ferror);
 
-            fprintf(foutput, "= %s\n", duk_safe_to_string(ctx, -1));
-            fflush(foutput);
-        }
-    }
-
-    duk_pop(ctx);
     return r;
 }
 
@@ -292,8 +303,14 @@ DUK_EXTERNAL int sjs_vm_eval_file(const sjs_vm_t* vm,
         free(data);
         return r;
     } else {
-        r = sjs_vm_eval_code(vm, path, data, r, foutput, ferror, use_strict);
+        duk_context* ctx;
+        ctx = vm->ctx;
+        duk_push_lstring(ctx, data, r);
         free(data);
+        (void) use_strict;
+        /* TODO: use strict */
+        r = duk_module_node_eval_code(ctx, path);
+        sjs__dump_result(ctx, r, foutput, ferror);
         return r;
     }
 }
@@ -309,9 +326,11 @@ DUK_EXTERNAL int sjs_path_expanduser(const char* path, char* normalized_path, si
     return sjs__path_expanduser(path, normalized_path, normalized_path_len);
 }
 
+
 DUK_EXTERNAL int sjs_path_normalize(const char* path, char* normalized_path, size_t normalized_path_len) {
     return sjs__path_normalize(path, normalized_path, normalized_path_len);
 }
+
 
 DUK_EXTERNAL uint64_t sjs_time_hrtime(void) {
     return sjs__hrtime();

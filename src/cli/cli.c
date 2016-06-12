@@ -253,7 +253,7 @@ static int handle_stdin(void) {
         bufoff += got;
     }
 
-    r = sjs_vm_eval_code(cli.vm, "stdin", buf, bufoff, NULL, stderr, cli.options.use_strict);
+    r = sjs_vm_eval_code(cli.vm, "<stdin>", buf, bufoff, NULL, stderr, cli.options.use_strict);
 
     free(buf);
     buf = NULL;
@@ -277,7 +277,7 @@ static int handle_interactive(void) {
     char history_file[4096];
     int use_history;
 
-    sjs_vm_eval_code(cli.vm, "input", SJS__CLI_GREET_CODE, strlen(SJS__CLI_GREET_CODE), NULL, NULL, 0);
+    sjs_vm_eval_code_global(cli.vm, "<repl>", SJS__CLI_GREET_CODE, strlen(SJS__CLI_GREET_CODE), NULL, NULL, 0);
 
     /* setup history file */
     tmp = getenv("SJS_HISTORY_FILE");
@@ -302,7 +302,7 @@ static int handle_interactive(void) {
             linenoiseHistoryAdd(line);
         }
 
-        sjs_vm_eval_code(cli.vm, "input", line, strlen(line), stdout, stdout, cli.options.use_strict);
+        sjs_vm_eval_code_global(cli.vm, "<repl>", line, strlen(line), stdout, stdout, cli.options.use_strict);
         linenoiseFree(line);
     }
 
@@ -383,7 +383,7 @@ int main(int argc, char *argv[]) {
             }
             break;
         case SJS_CLI_EVAL:
-            if (sjs_vm_eval_code(cli.vm, "eval", cli.options.data, strlen(cli.options.data), NULL, stderr, cli.options.use_strict) != 0) {
+            if (sjs_vm_eval_code(cli.vm, "<eval>", cli.options.data, strlen(cli.options.data), NULL, stderr, cli.options.use_strict) != 0) {
                 goto error;
             }
             break;

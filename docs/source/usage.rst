@@ -88,7 +88,7 @@ API
 
 .. c:function:: int sjs_vm_eval_code(const sjs_vm_t* vm, const char* filename, const char* code, size_t len, FILE* foutput, FILE* ferror, bool use_strict)
 
-    Evaluate the given JavaScript `code`.
+    Evaluate the given JavaScript `code`. The code is wrapped in a CommonJS module function and executed.
 
     :param vm: The VM reference.
     :param filename: Indicates the filename that is being executed. It will be printed in tracebacks and such.
@@ -99,9 +99,14 @@ API
     :param use_strict: Indicates if the code should be evaluated in strict mode or not.
     :returns: 0 if the code was evaluated without errors, != 0 otherwise.
 
+.. c:function:: int sjs_vm_eval_code_global(const sjs_vm_t* vm, const char* filename, const char* code, size_t len, FILE* foutput, FILE* ferror, bool use_strict)
+
+    Similar to :c:func:`sjs_vm_eval_code` but it evaluates the code in the global scope instead of creating a new
+    CommonJS style context.
+
 .. c:function:: int sjs_vm_eval_file(const sjs_vm_t* vm, const char* filename, FILE* foutput, FILE* ferror, bool use_strict)
 
-    Evaluate the given file as JavaScript code.
+    Evaluate the given file as JavaScript code. The code is wrapped in a CommonJS module function and executed.
 
     :param vm: The VM reference.
     :param filename: The file to be evaluated.
