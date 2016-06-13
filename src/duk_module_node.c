@@ -11,7 +11,7 @@
 
 
 static duk_int_t duk__eval_module_source(duk_context *ctx);
-static void duk__push_module_object(duk_context *ctx, const char *id);
+static void duk__push_module_object(duk_context *ctx, const char *id, int main);
 
 static duk_bool_t duk__get_cached_module(duk_context *ctx, const char *id) {
 	duk_push_global_stash(ctx);
@@ -90,7 +90,7 @@ static duk_ret_t duk__handle_require(duk_context *ctx) {
 		goto have_module;  /* use the cached module */
 	}
 
-	duk__push_module_object(ctx, id);
+	duk__push_module_object(ctx, id, 0  /* main*/);
 	duk__put_cached_module(ctx);  /* module remains on stack */
 
 	/*
@@ -155,7 +155,7 @@ static void duk__push_require_function(duk_context *ctx, const char *id) {
 	duk_pop(ctx);
 }
 
-static void duk__push_module_object(duk_context *ctx, const char *id) {
+static void duk__push_module_object(duk_context *ctx, const char *id, int main) {
 	duk_push_object(ctx);
 
 	/* Node.js uses the canonicalized filename of a module for both module.id
@@ -177,6 +177,12 @@ static void duk__push_module_object(duk_context *ctx, const char *id) {
 
 	/* module.require */
 	duk__push_require_function(ctx, id);
+	if (main) {
+	    duk_dup(ctx, -2);
+    } else {
+        duk_push_undefined(ctx);
+    }
+	duk_put_prop_string(ctx, -2, "main");
 	duk_put_prop_string(ctx, -2, "require");
 }
 
@@ -235,7 +241,7 @@ duk_ret_t duk_module_node_eval_code(duk_context *ctx, const char* filename) {
 	 *  Stack: [ ... source ]
 	 */
 
-	duk__push_module_object(ctx, filename);
+	duk__push_module_object(ctx, filename, 1  /* main */);
 	/* [ ... source module ] */
 
     duk_dup(ctx, 0);
