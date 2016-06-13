@@ -21,7 +21,6 @@ typedef enum {
 typedef struct {
     sjs_vm_t* vm;
     struct {
-        int use_strict;
         char* data;
         int interactive;
         cli_mode_t mode;
@@ -253,7 +252,7 @@ static int handle_stdin(void) {
         bufoff += got;
     }
 
-    r = sjs_vm_eval_code(cli.vm, "<stdin>", buf, bufoff, NULL, stderr, cli.options.use_strict);
+    r = sjs_vm_eval_code(cli.vm, "<stdin>", buf, bufoff, NULL, stderr);
 
     free(buf);
     buf = NULL;
@@ -277,7 +276,7 @@ static int handle_interactive(void) {
     char history_file[4096];
     int use_history;
 
-    sjs_vm_eval_code_global(cli.vm, "<repl>", SJS__CLI_GREET_CODE, strlen(SJS__CLI_GREET_CODE), NULL, NULL, 0);
+    sjs_vm_eval_code_global(cli.vm, "<repl>", SJS__CLI_GREET_CODE, strlen(SJS__CLI_GREET_CODE), NULL, NULL);
 
     /* setup history file */
     tmp = getenv("SJS_HISTORY_FILE");
@@ -302,7 +301,7 @@ static int handle_interactive(void) {
             linenoiseHistoryAdd(line);
         }
 
-        sjs_vm_eval_code_global(cli.vm, "<repl>", line, strlen(line), stdout, stdout, cli.options.use_strict);
+        sjs_vm_eval_code_global(cli.vm, "<repl>", line, strlen(line), stdout, stdout);
         linenoiseFree(line);
     }
 
@@ -335,9 +334,7 @@ int main(int argc, char *argv[]) {
     for (int i = 1; i < argc; i++) {
         char *arg = argv[i];
         assert(arg);
-        if (strcmp(arg, "--use_strict") == 0) {
-            cli.options.use_strict = 1;
-        } else if (strcmp(arg, "-i") == 0) {
+        if (strcmp(arg, "-i") == 0) {
             cli.options.interactive = 1;
         } else if (strcmp(arg, "-h") == 0) {
             goto usage;
@@ -373,7 +370,7 @@ int main(int argc, char *argv[]) {
     /* run */
     switch (cli.options.mode) {
         case SJS_CLI_FILE:
-            if (sjs_vm_eval_file(cli.vm, cli.options.data, NULL, stderr, cli.options.use_strict) != 0) {
+            if (sjs_vm_eval_file(cli.vm, cli.options.data, NULL, stderr) != 0) {
                 goto error;
             }
             break;
@@ -383,7 +380,7 @@ int main(int argc, char *argv[]) {
             }
             break;
         case SJS_CLI_EVAL:
-            if (sjs_vm_eval_code(cli.vm, "<eval>", cli.options.data, strlen(cli.options.data), NULL, stderr, cli.options.use_strict) != 0) {
+            if (sjs_vm_eval_code(cli.vm, "<eval>", cli.options.data, strlen(cli.options.data), NULL, stderr) != 0) {
                 goto error;
             }
             break;
@@ -424,8 +421,6 @@ usage:
                     "   -h         show help text\n"
                     "   -i         enter interactive mode after executing argument file(s) / eval code\n"
                     "   -e CODE    evaluate code\n"
-                    "\n"
-                    "   --use_strict    evaluate the code in strict mode\n"
                     "\n"
                     "If <file> is omitted, interactive mode is started automatically.\n");
     fflush(stderr);

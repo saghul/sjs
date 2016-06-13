@@ -42,22 +42,13 @@ static void sjs__setup_global_module(sjs_vm_t* vm) {
 static int sjs__compile_execute(duk_context *ctx) {
     const char *code;
     duk_size_t len;
-    bool use_strict;
-    int flags;
 
-    /* [ ... use_strict code filename ] */
+    /* [ ... code filename ] */
 
-    use_strict = duk_require_boolean(ctx, -3);
     code = duk_require_lstring(ctx, -2, &len);
+    duk_compile_lstring_filename(ctx, 0, code, len);
 
-    flags = 0;
-    if (use_strict) {
-        flags |= DUK_COMPILE_STRICT;
-    }
-
-    duk_compile_lstring_filename(ctx, flags, code, len);
-
-    /* [ ... use_strict code function ] */
+    /* [ ... code function ] */
 
     duk_push_global_object(ctx);  /* 'this' binding */
     duk_call_method(ctx, 0);
@@ -234,17 +225,15 @@ DUK_EXTERNAL int sjs_vm_eval_code_global(const sjs_vm_t* vm,
                                          const char* code,
                                          size_t len,
                                          FILE* foutput,
-                                         FILE* ferror,
-                                         bool use_strict) {
+                                         FILE* ferror) {
     int r;
 
     assert(vm);
     duk_context* ctx = vm->ctx;
 
-    duk_push_boolean(ctx, use_strict);
     duk_push_lstring(ctx, code, len);
     duk_push_string(ctx, filename);
-    r = duk_safe_call(ctx, sjs__compile_execute, 3 /*nargs*/, 1 /*nret*/);
+    r = duk_safe_call(ctx, sjs__compile_execute, 2 /*nargs*/, 1 /*nret*/);
 
     sjs__dump_result(ctx, r, foutput, ferror);
 
@@ -257,13 +246,11 @@ DUK_EXTERNAL int sjs_vm_eval_code(const sjs_vm_t* vm,
                                   const char* code,
                                   size_t len,
                                   FILE* foutput,
-                                  FILE* ferror,
-                                  bool use_strict) {
+                                  FILE* ferror) {
     int r;
 
     assert(vm);
     duk_context* ctx = vm->ctx;
-    (void) use_strict;
 
     duk_push_lstring(ctx, code, len);
     r = duk_module_node_eval_code(ctx, filename);
@@ -277,8 +264,7 @@ DUK_EXTERNAL int sjs_vm_eval_code(const sjs_vm_t* vm,
 DUK_EXTERNAL int sjs_vm_eval_file(const sjs_vm_t* vm,
                                   const char* filename,
                                   FILE* foutput,
-                                  FILE* ferror,
-                                  bool use_strict) {
+                                  FILE* ferror) {
     int r;
     char* data;
     char path[8192];
@@ -307,8 +293,6 @@ DUK_EXTERNAL int sjs_vm_eval_file(const sjs_vm_t* vm,
         ctx = vm->ctx;
         duk_push_lstring(ctx, data, r);
         free(data);
-        (void) use_strict;
-        /* TODO: use strict */
         r = duk_module_node_eval_code(ctx, path);
         sjs__dump_result(ctx, r, foutput, ferror);
         return r;

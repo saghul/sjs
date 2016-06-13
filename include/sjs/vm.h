@@ -3,7 +3,6 @@
 #define SJS_VM_H
 
 #include <errno.h>
-#include <stdbool.h>
 
 #include "duktape.h"
 
@@ -20,20 +19,17 @@ DUK_EXTERNAL_DECL int sjs_vm_eval_code_global(const sjs_vm_t* vm,
                                               const char* code,
                                               size_t len,
                                               FILE* foutput,
-                                              FILE* ferror,
-                                              bool use_strict);
+                                              FILE* ferror);
 DUK_EXTERNAL_DECL int sjs_vm_eval_code(const sjs_vm_t* vm,
                                        const char* filename,
                                        const char* code,
                                        size_t len,
                                        FILE* foutput,
-                                       FILE* ferror,
-                                       bool use_strict);
+                                       FILE* ferror);
 DUK_EXTERNAL_DECL int sjs_vm_eval_file(const sjs_vm_t* vm,
                                        const char* filename,
                                        FILE* foutput,
-                                       FILE* ferror,
-                                       bool use_strict);
+                                       FILE* ferror);
 
 DUK_EXTERNAL_DECL int sjs_path_expanduser(const char* path, char* normalized_path, size_t normalized_path_len);
 DUK_EXTERNAL_DECL int sjs_path_normalize(const char* path, char* normalized_path, size_t normalized_path_len);
