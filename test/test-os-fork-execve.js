@@ -15,7 +15,7 @@ var pid = os.fork();
 if (pid == 0) {
     // child
     os.execve(system.executable,
-              [system.executable, path.join(path.dirname(__filename), 'helper1.js')],
+              [system.executable, path.join(__dirname, 'helper1.js')],
               {PARENT_FD: wfd, SJS_PATH: system.env.SJS_PATH});
     assert(false);
 } else {

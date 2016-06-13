@@ -17,7 +17,7 @@ if (pid == 0) {
     // child
     os.dup2(wfd, 1, false);
     os.execv(system.executable,
-              [system.executable, path.join(path.dirname(__filename), 'helper5.js')]);
+              [system.executable, path.join(__dirname, 'helper5.js')]);
     assert(false);
 } else {
     // parent
