@@ -236,12 +236,12 @@ static duk_int_t duk__eval_module_source(duk_context *ctx) {
 	return 1;
 }
 
-duk_ret_t duk_module_node_eval_code(duk_context *ctx, const char* filename) {
+duk_ret_t duk_module_node_peval_file(duk_context *ctx, const char* filename, int main) {
 	/*
 	 *  Stack: [ ... source ]
 	 */
 
-	duk__push_module_object(ctx, filename, 1  /* main */);
+	duk__push_module_object(ctx, filename, main);
 	/* [ ... source module ] */
 
     duk_dup(ctx, 0);

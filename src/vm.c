@@ -253,7 +253,7 @@ DUK_EXTERNAL int sjs_vm_eval_code(const sjs_vm_t* vm,
     duk_context* ctx = vm->ctx;
 
     duk_push_lstring(ctx, code, len);
-    r = duk_module_node_eval_code(ctx, filename);
+    r = duk_module_node_peval_file(ctx, filename, 0);
 
     sjs__dump_result(ctx, r, foutput, ferror);
 
@@ -293,7 +293,7 @@ DUK_EXTERNAL int sjs_vm_eval_file(const sjs_vm_t* vm,
         ctx = vm->ctx;
         duk_push_lstring(ctx, data, r);
         free(data);
-        r = duk_module_node_eval_code(ctx, path);
+        r = duk_module_node_peval_file(ctx, path, 1);
         sjs__dump_result(ctx, r, foutput, ferror);
         return r;
     }
