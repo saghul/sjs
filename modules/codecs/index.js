@@ -1,16 +1,21 @@
 'use strict';
 
+const utf8 = require('./utf8');
+
+
 var encoders = {
     'base64': Duktape.enc.bind(Duktape, 'base64'),
     'hex': Duktape.enc.bind(Duktape, 'hex'),
-    'json': JSON.stringify
+    'json': JSON.stringify,
+    'utf8': utf8.encode
 };
 
 
 var decoders = {
     'base64': Duktape.dec.bind(Duktape, 'base64'),
     'hex': Duktape.dec.bind(Duktape, 'hex'),
-    'json': JSON.parse
+    'json': JSON.parse,
+    'utf8': utf8.decode
 };
 
 

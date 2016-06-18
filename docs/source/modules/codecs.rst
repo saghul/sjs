@@ -4,9 +4,13 @@
 codecs
 ======
 
-The `codecs` module provides a consistent API for encoding (or objects) into different representations.
+The `codecs` module provides a consistent API for encoding strings (or objects) into different representations.
+The following encodeings are supported:
 
-Currently ``json``, ``hex`` and ``base64`` are the supported encodings.
+- ``json``
+- ``hex``
+- ``base64``
+- ``utf8``
 
 
 .. js:function:: encode(encoding, data)
