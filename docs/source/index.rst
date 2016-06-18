@@ -27,6 +27,7 @@ Documentation
     features
     design
     usage
+    module_system
     modules
     faq
 
