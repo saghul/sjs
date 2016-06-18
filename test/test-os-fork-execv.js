@@ -17,7 +17,7 @@ if (pid == 0) {
     // child
     os.dup2(wfd, 1, false);
     os.execv(system.executable,
-              [system.executable, path.join(__dirname, 'helper5.js')]);
+              [system.executable, path.join(__dirname, 'helper8.js')]);
     assert(false);
 } else {
     // parent
@@ -31,7 +31,7 @@ if (pid == 0) {
             break;
         }
     }
-    assert.deepEqual(JSON.parse(data), system.env);
+    assert.equal(data, 'HELLO SJS\n');
     var r = os.waitpid(pid);
     assert.equal(r.pid, pid);
     assert(os.WIFEXITED(r.status));

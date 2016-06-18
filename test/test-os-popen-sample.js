@@ -20,7 +20,9 @@ function popen(filename) {
         os.dup2(stdin[0], 0, false);
         os.dup2(stdout[1], 1, false);
         os.dup2(stderr[1], 2, false);
-        os.execv(system.executable, [system.executable, filename]);
+        os.execve(system.executable,
+                  [system.executable, filename],
+                  {SJS_PATH: system.env.SJS_PATH});
         assert(false);
     } else {
         // parent
@@ -28,10 +30,10 @@ function popen(filename) {
         os.close(stdout[1]);
         os.close(stderr[1]);
         var r = {
-                    pid: pid,
-                    stdin_fd: stdin[1],
-                    stdout_fd: stdout[0],
-                    stderr_fd: stderr[0]
+            pid: pid,
+            stdin_fd: stdin[1],
+            stdout_fd: stdout[0],
+            stderr_fd: stderr[0]
         };
         return r;
     }

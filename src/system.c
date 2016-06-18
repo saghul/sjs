@@ -13,8 +13,6 @@ extern char** environ;
 
 
 static const char* default_search_paths[] = {
-    ".",
-    "./modules",
     "/usr/lib/sjs/modules",
     "/usr/local/lib/sjs/modules",
     "~/.local/sjs/modules",

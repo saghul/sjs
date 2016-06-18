@@ -29,9 +29,9 @@ distclean:
 	@rm -rf build
 
 run: build
-	SJS_PATH=build ./build/sjs
+	SJS_PATH=build:modules ./build/sjs
 
 test: build
-	$(PYTHON) tools/test.py test/
+	env SJS_PATH=build:modules $(PYTHON) tools/test.py test/
 
 .PHONY: all build install clean distclean run
