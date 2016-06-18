@@ -7,9 +7,10 @@ codecs
 The `codecs` module provides a consistent API for encoding strings (or objects) into different representations.
 The following encodeings are supported:
 
-- ``json``
-- ``hex``
 - ``base64``
+- ``hex``
+- ``json``
+- ``punycode``
 - ``utf8``
 
 
