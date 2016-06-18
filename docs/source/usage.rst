@@ -84,6 +84,13 @@ API
     :param vm: The VM reference.
     :returns: The Duktape context.
 
+.. c:function:: sjs_vm_t* sjs_vm_get_vm(duk_context* ctx)
+
+    Get the reference to the `sjs` VM associated with the given Duktape context.
+
+    :param ctx: The Duktape context.
+    :returns: The `sjs` VM instance.
+
 .. c:function:: int sjs_vm_eval_code(const sjs_vm_t* vm, const char* filename, const char* code, size_t len, FILE* foutput, FILE* ferror)
 
     Evaluate the given JavaScript `code`. The code is wrapped in a CommonJS module function and executed.

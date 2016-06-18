@@ -166,10 +166,11 @@ DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
     vm->ctx = duk_create_heap(NULL,                     /* alloc function */
                               NULL,                     /* realloc function */
                               NULL,                     /* free function */
-                              NULL,                     /* user data */
+                              (void*) vm,               /* user data */
                               sjs__duk_fatal_handler    /* fatal error handler */
                              );
     assert(vm->ctx != NULL);
+    assert(sjs_vm_get_vm(vm->ctx) == vm);
 
     /* setup builtin modules */
     sjs__setup_system_module(vm->ctx);
@@ -303,6 +304,14 @@ DUK_EXTERNAL int sjs_vm_eval_file(const sjs_vm_t* vm,
 DUK_EXTERNAL duk_context* sjs_vm_get_duk_ctx(sjs_vm_t* vm) {
     assert(vm);
     return vm->ctx;
+}
+
+
+DUK_EXTERNAL sjs_vm_t* sjs_vm_get_vm(duk_context* ctx) {
+    duk_memory_functions funcs;
+    assert(ctx);
+    duk_get_memory_functions(ctx, &funcs);
+    return funcs.udata;
 }
 
 
