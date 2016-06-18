@@ -10,7 +10,7 @@ to minimize abstractions and give the developer as much control as possible over
 Quickstart
 ----------
 
-::
+.. code-block:: shell
 
     git clone https://github.com/saghul/sjs && cd sjs
     make && make run
@@ -41,26 +41,26 @@ Compile
 
 For Debug builds (the default):
 
-::
+.. code-block:: shell
 
     make
 
 For Release builds:
 
-::
+.. code-block:: shell
 
     make BUILDTYPE=Release
 
 The installation prefix can be specified by setting ``PREFIX``, it defaults to ``/usr/local``.
 
-::
+.. code-block:: shell
 
     make PREFIX=/usr
 
 Install
 ^^^^^^^
 
-::
+.. code-block:: shell
 
     make install
 
@@ -74,20 +74,20 @@ following structure:
 The destination of the files can be further altered by setting ``DESTDIR``. This will be prepended to ``PREFIX``.
 Confusing, I know.
 
-::
+.. code-block:: shell
 
     make DESTDIR=/tmp/testsjs install
 
 Run the test suite
 ^^^^^^^^^^^^^^^^^^
 
-::
+.. code-block:: shell
 
     make test
 
 Run the CLI without installing
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-::
+.. code-block:: shell
 
     make run
