@@ -1,17 +1,23 @@
 
-.. _modobjectutil:
+.. _modutils:
 
-objectutil
-==========
+utils
+=====
 
-This module contains several utilities for working with objects. It oritinates from
+This package contains several modules grouping utility functions.
+
+
+utils/object
+------------
+
+This submodule contains several utilities for working with objects. It oritinates from
 `this module <https://github.com/defunctzombie/node-util>`_.
 
 
 Functions
----------
+^^^^^^^^^
 
-.. js:function:: objectutil.format(format, [...])
+.. js:function:: utils/object.format(format, [...])
 
     Returns a formatted string using the first argument as a ``printf``-like format.
 
@@ -32,24 +38,24 @@ Functions
 
     ::
 
-        objectutil.format('%s:%s', 'foo'); // 'foo:%s'
+        utils/object.format('%s:%s', 'foo'); // 'foo:%s'
 
     If there are more arguments than placeholders, the extra arguments are coerced to strings
-    (for objects and symbols, :js:func:`objectutil.inspect` is used) and then concatenated, delimited by a space.
+    (for objects and symbols, :js:func:`utils/object.inspect` is used) and then concatenated, delimited by a space.
 
     ::
 
-        objectutil.format('%s:%s', 'foo', 'bar', 'baz'); // 'foo:bar baz'
+        utils/object.format('%s:%s', 'foo', 'bar', 'baz'); // 'foo:bar baz'
 
     If the first argument is not a format string then this function returns a string that is the
     concatenation of all its arguments separated by spaces. Each argument is converted to a string with
-    :js:func:`objectutil.inspect`.
+    :js:func:`utils/object.inspect`.
 
     ::
 
-        objectutil.format(1, 2, 3); // '1 2 3'
+        utils/object.format(1, 2, 3); // '1 2 3'
 
-.. js:function:: objectutil.inspect(object, [options])
+.. js:function:: utils/object.inspect(object, [options])
 
     Return a string representation of `object`, which is useful for debugging.
 
@@ -72,16 +78,16 @@ Functions
 
     ::
 
-        const outil = require('objectutil');
+        const outil = require('utils/object');
         print(outil.inspect(outil, { showHidden: true, depth: null }));
 
     Values may supply their own custom ``inspect(depth, opts)`` functions, when called they receive the current
     depth in the recursive inspection, as well as the options object passed to this function.
 
-    Color output (if enabled) of this function is customizable globally via ``objectutil.inspect.styles`` and
-    ``objectutil.inspect.colors`` objects.
+    Color output (if enabled) of this function is customizable globally via ``utils/object.inspect.styles`` and
+    ``utils/object.inspect.colors`` objects.
 
-    ``objectutil.inspect.styles`` is a map assigning each style a color from ``objectutil.inspect.colors``.
+    ``utils/object.inspect.styles`` is a map assigning each style a color from ``utils/object.inspect.colors``.
     Highlighted styles and their default values are: number (yellow) boolean (yellow) string (green) date (magenta)
     regexp (red) null (bold) undefined (grey) special - only function at this time (cyan) * name (intentionally no styling)
 
@@ -93,7 +99,7 @@ Functions
 
     ::
 
-        const outil = require('objectutil');
+        const outil = require('utils/object');
 
         var obj = { name: 'nate' };
         obj.inspect = function(depth) {
@@ -116,14 +122,14 @@ Functions
         outil.inspect(obj);
         // "{ bar: 'baz' }"
 
-.. js:function:: objectutil.inherits(constructor, superConstructor)
+.. js:function:: utils/object.inherits(constructor, superConstructor)
 
     Inherit the prototype methods from one constructor into another. The prototype of `constructor` will be set to a
     new object created from `superConstructor`.
 
     As an additional convenience, `superConstructor` will be accessible through the ``constructor.super_`` property.
 
-.. js:function:: objectutil.finalizer(object, funalizerFunc)
+.. js:function:: utils/object.finalizer(object, funalizerFunc)
 
     Set or get the finalizer for the given `object`.
 

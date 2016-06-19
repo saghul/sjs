@@ -2,7 +2,7 @@
 
 const errno = require('errno');
 const _io = require('_io');
-const outil = require('objectutil');
+const outil = require('utils/object');
 
 
 function File(path, f, mode, buffering) {

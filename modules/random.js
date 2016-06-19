@@ -3,7 +3,7 @@
 const _random = require('_random');
 const codecs = require('codecs');
 const os = require('os');
-const outil = require('objectutil');
+const outil = require('utils/object');
 
 
 function Random() {

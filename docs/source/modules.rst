@@ -24,7 +24,6 @@ Standard library
     modules/io
     modules/log
     modules/net
-    modules/objectutil
     modules/os
     modules/path
     modules/process
@@ -32,6 +31,7 @@ Standard library
     modules/random
     modules/system
     modules/time
+    modules/utils
     modules/uuid
 
 

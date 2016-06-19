@@ -4,7 +4,7 @@ const errno = require('errno');
 const _gai = require('_gai');
 const _socket = require('_socket');
 const os = require('os');
-const outil = require('objectutil');
+const outil = require('utils/object');
 
 
 function Socket(domain, type, options) {
