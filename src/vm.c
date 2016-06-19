@@ -92,7 +92,7 @@ static void sjs__dump_result(duk_context* ctx, int r, FILE* foutput, FILE* ferro
                                  "    try {\n"
                                  "        return Duktape.enc('jx', v, null, 4);\n"
                                  "    } catch (e) {\n"
-                                 "        return String(v);\n"
+                                 "        return ''+v;\n"
                                  "    }\n"
                                  "})");
             duk_insert(ctx, -2);
