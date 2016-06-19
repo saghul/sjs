@@ -139,3 +139,21 @@ Functions
 
     .. seealso::
         `Duktape documentation on finalizers <http://duktape.org/guide.html#finalization>`_.
+
+
+utils/unicode
+-------------
+
+This submodule provides unicode related utilities.
+
+
+Functions
+^^^^^^^^^
+
+.. js:function:: utils/unicode.format(form, string)
+
+    Normalize the given `string` to the requested unicode `form`. It uses the `unorm <https://github.com/walling/unorm>`_ module.
+
+    :param form: Type of normalizatio to be applied. One of ``NFC``, ``NFD``, ``NFKC`` or ``NFKD``.
+    :param string: Unicode string to be normalized.
+    :returns: The normalized unicode string.
