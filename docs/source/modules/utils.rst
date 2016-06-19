@@ -38,14 +38,14 @@ Functions
 
     ::
 
-        utils/object.format('%s:%s', 'foo'); // 'foo:%s'
+        outils.format('%s:%s', 'foo'); // 'foo:%s'
 
     If there are more arguments than placeholders, the extra arguments are coerced to strings
     (for objects and symbols, :js:func:`utils/object.inspect` is used) and then concatenated, delimited by a space.
 
     ::
 
-        utils/object.format('%s:%s', 'foo', 'bar', 'baz'); // 'foo:bar baz'
+        outils.format('%s:%s', 'foo', 'bar', 'baz'); // 'foo:bar baz'
 
     If the first argument is not a format string then this function returns a string that is the
     concatenation of all its arguments separated by spaces. Each argument is converted to a string with
@@ -53,7 +53,7 @@ Functions
 
     ::
 
-        utils/object.format(1, 2, 3); // '1 2 3'
+        outils.format(1, 2, 3); // '1 2 3'
 
 .. js:function:: utils/object.inspect(object, [options])
 
@@ -78,8 +78,8 @@ Functions
 
     ::
 
-        const outil = require('utils/object');
-        print(outil.inspect(outil, { showHidden: true, depth: null }));
+        const outils = require('utils/object');
+        print(outils.inspect(outil, { showHidden: true, depth: null }));
 
     Values may supply their own custom ``inspect(depth, opts)`` functions, when called they receive the current
     depth in the recursive inspection, as well as the options object passed to this function.
@@ -99,14 +99,14 @@ Functions
 
     ::
 
-        const outil = require('utils/object');
+        const outils = require('utils/object');
 
         var obj = { name: 'nate' };
         obj.inspect = function(depth) {
             return '{' + this.name + '}';
         };
 
-        outil.inspect(obj);
+        outils.inspect(obj);
         // "{nate}"
 
     You may also return another Object entirely, and the returned String will be formatted according to the returned
@@ -119,7 +119,7 @@ Functions
             return { bar: 'baz' };
         };
 
-        outil.inspect(obj);
+        outils.inspect(obj);
         // "{ bar: 'baz' }"
 
 .. js:function:: utils/object.inherits(constructor, superConstructor)
