@@ -1,4 +1,48 @@
 
+# 0.4.0 (22-06-2016)
+
+* 5dbd8d2 misc: updated changelog
+* bcd7c1d ci: add musl libc to the test matrix
+* 89b8b89 build: improve support for systems lacking execvpe
+* 7832459 cli: group CLI related options in a global structure
+* e43885e cli: add minimal line completion to the CLI
+* 8cbd0b6 cli: simplified code
+* ffef60d vm: add sjs_path_expanduser
+* 20d7ea1 doc: man-up link
+* afb6465 cli: make history file configurable
+* f67a069 vm: fix adding extraneous / in sjs_path_expanduser
+* b749995 doc: indicate the implementation used in Math.random
+* 3cedadb cli: use sjs_vm_eval_code for running greeting code
+* d34132e cli: fix running greeting code
+* e3ad035 vm: simplified code
+* 16ca862 test: simplify test
+* 2569f12 core, vm: refactor module system
+* 82d04e4 cli: fix running stdin code after executing a file or eval-ing code
+* 66c8503 test: simplified test
+* 5710d3e test: use new `__dirname` pseudo-global
+* 2400909 modules: set require.main to the module when executing a file directly
+* 16859d7 modules: use an anonymous function as the CommonJS wrapper
+* dd8cf29 cli,vm: remove --use_strict flag
+* 23c58a3 test: add test for require.main property
+* 1c379f5 vm: fix require.main when eval-ing code from the CLI
+* dbc6688 ci: test on Travis using GCC 6
+* 9e8bf5e core: toggle some compile time Duktape options
+* 528966d examples: add hello <name> example
+* 67bc269 doc: fix highlightinh in index
+* 7f72602 vm: don't add '.' and 'modules' to the default path
+* 87b6cf0 test: add execve + read env in JSON test
+* f066232 doc: add documentation about the module system
+* 099da1d vm: add ability to get the VM reference from a Duktape context
+* a4f1b3b codecs: add utf8 encoder / decoder
+* bb82173 doc: move some definitions to the module system section
+* 71f4b23 codecs: add punycode encoder / decoder
+* 49c32a2 modules: move objectutils to utils/object
+* a6e0871 assert: remove comment which no longer applies
+* 11ba005 utils: add unicode submodule
+* 60ea60f doc: improved utils/object docs
+* d09deff vm: simplify pretty-printing objects
+
+
 # 0.3.0 (06-06-2016)
 
 * de023d7 vm: print error if opening file failed
