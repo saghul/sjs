@@ -21,6 +21,7 @@ Standard library
     modules/assert
     modules/codecs
     modules/errno
+    modules/hash
     modules/io
     modules/log
     modules/net

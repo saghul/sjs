@@ -23,6 +23,27 @@ install(TARGETS _errno
 )
 
 
+# hash
+#
+
+add_library(_hash MODULE
+    modules/_hash/hash.c
+    modules/_hash/md5.c
+    modules/_hash/sha1.c
+    modules/_hash/sha2.c
+)
+target_link_libraries(_hash
+    sjs
+)
+set_target_properties(_hash PROPERTIES
+    PREFIX ""
+    SUFFIX ".jsdll"
+)
+install(TARGETS _hash
+        DESTINATION lib/sjs/modules
+)
+
+
 # io
 #
 
