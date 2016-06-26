@@ -1,2 +1,1 @@
-(function() {
-})();
+const console = require('console');
