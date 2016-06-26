@@ -183,7 +183,7 @@ DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
     duk_eval_string_noresult(vm->ctx, sjs__es6shim_src);
 
     /* run bootstrap code */
-    duk_eval_string_noresult(vm->ctx, SJS__BOOTSTRAP_CODE);
+    duk_peval_string_noresult(vm->ctx, SJS__BOOTSTRAP_CODE);
 
     return vm;
 }
