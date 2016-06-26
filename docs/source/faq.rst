@@ -27,8 +27,8 @@ easy enough and contributions are more than welcome. Windows support is not curr
 Q: Do Nodejs modules work with Skookum JS?
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**A**: Most likely not. Some of them might, but if a module uses any Node or browser specifics (such as ``console``
-or ``process``) it won't. In addition, sjs does not read ``package.json`` files nor search for modules in
+**A**: Most likely not. Some of them might, but if a module uses any Node or browser specifics (such as ``process``)
+it won't. In addition, sjs does not read ``package.json`` files nor search for modules in
 ``node_mules`` directories. This is by design.
 
 
