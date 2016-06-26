@@ -20,6 +20,7 @@ Standard library
 
     modules/assert
     modules/codecs
+    modules/console
     modules/errno
     modules/hash
     modules/io
