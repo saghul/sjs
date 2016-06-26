@@ -1,6 +1,7 @@
 build/
 original/
 *.swp
+*.swo
 *.pyc
 include/sjs/build.h
 include/sjs/version.h
