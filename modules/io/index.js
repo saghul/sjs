@@ -2,6 +2,7 @@
 
 const errno = require('errno');
 const _io = require('_io');
+const os = require('os');
 const outil = require('utils/object');
 
 
@@ -134,15 +135,10 @@ function checkFile() {
 }
 
 
-const stdin = new File('<stdin>', _io.stdin(), 'r');
-const stdout = new File('<stdout>', _io.stdout(), 'w');
-const stderr = new File('<stderr>', _io.stderr(), 'w');
-
-
 // exports
 
 exports.open   = open;
 exports.fdopen = fdopen;
-exports.stdin  = stdin;
-exports.stdout = stdout;
-exports.stderr = stderr;
+exports.stdin  = fdopen(os.STDIN_FILENO, 'r', '<stdin>');
+exports.stdout = fdopen(os.STDOUT_FILENO, 'w', '<stdout>');
+exports.stderr = fdopen(os.STDERR_FILENO, 'w', '<stderr>');

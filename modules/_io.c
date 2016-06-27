@@ -267,24 +267,6 @@ static duk_ret_t io_setvbuf(duk_context* ctx) {
 }
 
 
-static duk_ret_t io_stdin(duk_context* ctx) {
-    duk_push_pointer(ctx, (void*) stdin);
-    return 1;
-}
-
-
-static duk_ret_t io_stdout(duk_context* ctx) {
-    duk_push_pointer(ctx, (void*) stdout);
-    return 1;
-}
-
-
-static duk_ret_t io_stderr(duk_context* ctx) {
-    duk_push_pointer(ctx, (void*) stderr);
-    return 1;
-}
-
-
 #define X(name) {#name, name}
 static const duk_number_list_entry module_consts[] = {
     { NULL, 0.0 }
@@ -303,9 +285,6 @@ static const duk_function_list_entry module_funcs[] = {
     { "fflush", io_fflush, 1 },
     { "fileno", io_fileno, 1 },
     { "setvbuf", io_setvbuf, 2 },
-    { "stdin", io_stdin, 0 },
-    { "stdout", io_stdout, 0 },
-    { "stderr", io_stderr, 0 },
     { NULL, NULL, 0 }
 };
 
