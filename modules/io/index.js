@@ -68,7 +68,7 @@ File.prototype.read = function(nread) {
 }
 
 
-File.prototype.readline = function(nread) {
+File.prototype.readLine = function(nread) {
     checkFile.call(this);
     if (nread === undefined || typeof nread === 'number') {
         nread = (nread >>> 0) || 4096;
@@ -81,6 +81,12 @@ File.prototype.readline = function(nread) {
 File.prototype.write = function(data) {
     checkFile.call(this);
     return _io.fwrite(this._f, data);
+}
+
+
+File.prototype.writeLine = function(data) {
+    checkFile.call(this);
+    return _io.fwrite(this._f, data) + _io.fwrite(this._f, '\n');
 }
 
 

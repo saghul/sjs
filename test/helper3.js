@@ -3,7 +3,7 @@
 const io = require('io');
 
 
-var data = io.stdin.readline();
+var data = io.stdin.readLine();
 io.stdout.write(data);
 io.stdout.flush();
 io.stderr.write(data);
