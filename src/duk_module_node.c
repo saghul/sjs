@@ -153,10 +153,24 @@ static void duk__push_require_function(duk_context *ctx, const char *id) {
 	(void) duk_get_prop_string(ctx, -1, "\xff" "requireCache");
 	duk_put_prop_string(ctx, -3, "cache");
 	duk_pop(ctx);
+
+	/* require.main */
+	duk_push_global_stash(ctx);
+	(void) duk_get_prop_string(ctx, -1, "\xff" "mainModule");
+	duk_put_prop_string(ctx, -3, "main");
+	duk_pop(ctx);
 }
 
 static void duk__push_module_object(duk_context *ctx, const char *id, int main) {
 	duk_push_object(ctx);
+
+    /* Set this as the main module, if requested */
+    if (main) {
+        duk_push_global_stash(ctx);
+        duk_dup(ctx, -2);
+	    duk_put_prop_string(ctx, -2, "\xff" "mainModule");
+	    duk_pop(ctx);
+	}
 
 	/* Node.js uses the canonicalized filename of a module for both module.id
 	 * and module.filename.  We have no concept of a file system here, so just
@@ -177,12 +191,6 @@ static void duk__push_module_object(duk_context *ctx, const char *id, int main) 
 
 	/* module.require */
 	duk__push_require_function(ctx, id);
-	if (main) {
-	    duk_dup(ctx, -2);
-    } else {
-        duk_push_undefined(ctx);
-    }
-	duk_put_prop_string(ctx, -2, "main");
 	duk_put_prop_string(ctx, -2, "require");
 }
 
@@ -276,6 +284,12 @@ void duk_module_node_init(duk_context *ctx) {
 	duk_get_prop_string(ctx, options_idx, "load");
 	duk_require_function(ctx, -1);
 	duk_put_prop_string(ctx, -2, "\xff" "modLoad");
+	duk_pop(ctx);
+
+    /* Stash main module */
+	duk_push_global_stash(ctx);
+	duk_push_undefined(ctx);
+	duk_put_prop_string(ctx, -2, "\xff" "mainModule");
 	duk_pop(ctx);
 
 	/* register `require` as a global function */
