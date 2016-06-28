@@ -53,6 +53,15 @@ Object.defineProperty(exports, 'argv', {
 });
 
 
+Object.defineProperty(exports, 'args', {
+    configurable: false,
+    enumerable: true,
+    get: function() {
+        return (exports.argv || []).slice(1);
+    }
+});
+
+
 exports.stdin  = io.fdopen(os.STDIN_FILENO, 'r', '<stdin>');
 exports.stdout = io.fdopen(os.STDOUT_FILENO, 'w', '<stdout>');
 exports.stderr = io.fdopen(os.STDERR_FILENO, 'w', '<stderr>');

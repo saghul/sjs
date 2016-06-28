@@ -52,6 +52,21 @@ Attributes
 
     Set of command line arguments that were given to the process.
 
+    ::
+
+        ./build/sjs t.js -i -o --verbose
+        // [ './build/sjs', 't.js', '-i', '-o', '--verbose' ]
+
+.. js:data:: system.args
+
+    Similar to ``argv``, except that the interpreter binary is not listed. This is to conform with
+    `CommonJS System/1.0 <http://wiki.commonjs.org/wiki/System/1.0>`_.
+
+    ::
+
+        ./build/sjs t.js -i -o --verbose
+        // [ 't.js', '-i', '-o', '--verbose' ]
+
 .. js:data:: system.build
 
     Object providing various information about the build and the system where it was produced:
