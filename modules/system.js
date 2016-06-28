@@ -16,7 +16,7 @@ for (var i = 0; i < staticProps.length; i++) {
 }
 
 
-const frozenProps = ['argv', 'build', 'env', 'versions'];
+const frozenProps = ['build', 'env', 'versions'];
 
 for (var i = 0; i < frozenProps.length; i++) {
     var prop = frozenProps[i];
@@ -34,5 +34,18 @@ Object.defineProperty(exports, 'path', {
     enumerable: true,
     get: function() {
         return _system.path;
+    }
+});
+
+
+var _argv = null;
+Object.defineProperty(exports, 'argv', {
+    configurable: false,
+    enumerable: true,
+    get: function() {
+        if (_argv === null) {
+            _argv = Object.freeze(_system.argv);
+        }
+        return _argv;
     }
 });
