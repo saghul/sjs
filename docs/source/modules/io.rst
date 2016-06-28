@@ -77,8 +77,8 @@ File object
     Close the file.
 
 
-Functions / attributes
-----------------------
+Functions
+---------
 
 .. js:function:: io.open(path, mode, [buffering])
 
@@ -98,18 +98,6 @@ Functions / attributes
 
     .. seealso::
         :man:`fdopen(3)`
-
-.. js:data:: io.stdin
-
-    Object of type :js:class:`io.File` representing the standard input.
-
-.. js:data:: io.stdout
-
-    Object of type :js:class:`io.File` representing the standard output.
-
-.. js:data:: io.stderr
-
-    Object of type :js:class:`io.File` representing the standard error.
 
 
 io/select

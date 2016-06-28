@@ -1,5 +1,7 @@
 'use strict';
 
+const io = require('io');
+const os = require('os');
 // _system is a builtin
 
 
@@ -49,3 +51,8 @@ Object.defineProperty(exports, 'argv', {
         return _argv;
     }
 });
+
+
+exports.stdin  = io.fdopen(os.STDIN_FILENO, 'r', '<stdin>');
+exports.stdout = io.fdopen(os.STDOUT_FILENO, 'w', '<stdout>');
+exports.stderr = io.fdopen(os.STDERR_FILENO, 'w', '<stderr>');

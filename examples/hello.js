@@ -1,8 +1,8 @@
 'use strict';
 
-const io = require('io');
+const sys = require('system');
 
 
-io.stdout.write('What is your name? ');
-var name = io.stdin.readLine();
-io.stdout.writeLine('Hello ' + name.trim() + ', nice to meet you!');
+sys.stdout.write('What is your name? ');
+var name = sys.stdin.readLine();
+sys.stdout.writeLine('Hello ' + name.trim() + ', nice to meet you!');

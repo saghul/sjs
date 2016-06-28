@@ -5,7 +5,7 @@ system
 ======
 
 This module provides information about the system where `sjs` is running as well as the
-environment.
+environment. It implements `CommonJS System/1.0 <http://wiki.commonjs.org/wiki/System/1.0>`_ with some extras.
 
 
 Attributes
@@ -71,3 +71,15 @@ Attributes
 .. js:data:: system.endianness
 
     Returns ``big`` if the system is Big Engian, or ``little`` if the system is Little Endian. This is determined at runtime.
+
+.. js:data:: system.stdin
+
+    Object of type :js:class:`io.File` representing the standard input.
+
+.. js:data:: system.stdout
+
+    Object of type :js:class:`io.File` representing the standard output.
+
+.. js:data:: system.stderr
+
+    Object of type :js:class:`io.File` representing the standard error.

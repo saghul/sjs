@@ -4,6 +4,7 @@ const assert = require('assert');
 const errno = require('errno');
 const io = require('io');
 const os = require('os');
+const sys = require('system');
 
 
 // usual double forking for Unix daemons
@@ -128,7 +129,7 @@ Process.prototype.spawn = function() {
         if (stdoutPipe[1] !== -1) {
             stderrPipe[1] = stdoutPipe[1];
         } else {
-            stderrPipe[1] = io.stdout.fd;
+            stderrPipe[1] = sys.stdout.fd;
         }
     } else if (typeof options.stderr === 'number') {
         stderrPipe[1] = options.stderr;

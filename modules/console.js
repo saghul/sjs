@@ -1,8 +1,8 @@
 'use strict';
 
 const assert = require('assert');
-const io     = require('io');
 const outil  = require('utils/object');
+const sys    = require('system');
 const time   = require('time');
 
 
@@ -106,5 +106,5 @@ Console.prototype.assert = function(expression) {
 };
 
 
-module.exports = new Console(io.stdout, io.stderr);
+module.exports = new Console(sys.stdout, sys.stderr);
 module.exports.Console = Console;

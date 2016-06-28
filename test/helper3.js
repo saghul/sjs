@@ -1,10 +1,10 @@
 'use strict';
 
-const io = require('io');
+const sys = require('system');
 
 
-var data = io.stdin.readLine();
-io.stdout.write(data);
-io.stdout.flush();
-io.stderr.write(data);
-io.stderr.flush();
+var data = sys.stdin.readLine();
+sys.stdout.write(data);
+sys.stdout.flush();
+sys.stderr.write(data);
+sys.stderr.flush();
