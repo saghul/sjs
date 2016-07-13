@@ -135,8 +135,8 @@ static int str_endswith(const char* str, const char* suffix) {
  * Entry stack: [ requested_id parent_id ]
  */
 static inline duk_ret_t resolve_module_helper(duk_context* ctx,
-                                       const char* base_path,
-                                       const char* requested_id) {
+                                              const char* base_path,
+                                              const char* requested_id) {
     static const char* filenames[] = {
         "%s/%s",
         "%s/%s.js",
