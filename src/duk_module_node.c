@@ -9,9 +9,12 @@
 #include "duktape.h"
 #include "duk_module_node.h"
 
-
+#if DUK_VERSION >= 19999
+static duk_int_t duk__eval_module_source(duk_context *ctx, void *udata);
+#else
 static duk_int_t duk__eval_module_source(duk_context *ctx);
-static void duk__push_module_object(duk_context *ctx, const char *id, int main);
+#endif
+static void duk__push_module_object(duk_context *ctx, const char *id, duk_bool_t main);
 
 static duk_bool_t duk__get_cached_module(duk_context *ctx, const char *id) {
 	duk_push_global_stash(ctx);
@@ -90,7 +93,7 @@ static duk_ret_t duk__handle_require(duk_context *ctx) {
 		goto have_module;  /* use the cached module */
 	}
 
-	duk__push_module_object(ctx, id, 0  /* main*/);
+	duk__push_module_object(ctx, id, 0 /*main*/);
 	duk__put_cached_module(ctx);  /* module remains on stack */
 
 	/*
@@ -119,7 +122,11 @@ static duk_ret_t duk__handle_require(duk_context *ctx) {
 
 		/* [ ... module source ] */
 
+#if DUK_VERSION >= 19999
+		ret = duk_safe_call(ctx, duk__eval_module_source, NULL, 2, 1);
+#else
 		ret = duk_safe_call(ctx, duk__eval_module_source, 2, 1);
+#endif
 		if (ret != DUK_EXEC_SUCCESS) {
 			duk__del_cached_module(ctx, id);
 			duk_throw(ctx);  /* rethrow */
@@ -128,7 +135,7 @@ static duk_ret_t duk__handle_require(duk_context *ctx) {
 		duk_pop(ctx);
 	} else {
 		duk__del_cached_module(ctx, id);
-		duk_error(ctx, DUK_ERR_API_ERROR, "invalid module load callback return value");
+		duk_error(ctx, DUK_ERR_TYPE_ERROR, "invalid module load callback return value");
 	}
 
 	/* fall through */
@@ -161,15 +168,15 @@ static void duk__push_require_function(duk_context *ctx, const char *id) {
 	duk_pop(ctx);
 }
 
-static void duk__push_module_object(duk_context *ctx, const char *id, int main) {
+static void duk__push_module_object(duk_context *ctx, const char *id, duk_bool_t main) {
 	duk_push_object(ctx);
 
-    /* Set this as the main module, if requested */
-    if (main) {
-        duk_push_global_stash(ctx);
-        duk_dup(ctx, -2);
-	    duk_put_prop_string(ctx, -2, "\xff" "mainModule");
-	    duk_pop(ctx);
+	/* Set this as the main module, if requested */
+	if (main) {
+		duk_push_global_stash(ctx);
+		duk_dup(ctx, -2);
+		duk_put_prop_string(ctx, -2, "\xff" "mainModule");
+		duk_pop(ctx);
 	}
 
 	/* Node.js uses the canonicalized filename of a module for both module.id
@@ -194,13 +201,21 @@ static void duk__push_module_object(duk_context *ctx, const char *id, int main) 
 	duk_put_prop_string(ctx, -2, "require");
 }
 
+#if DUK_VERSION >= 19999
+static duk_int_t duk__eval_module_source(duk_context *ctx, void *udata) {
+#else
 static duk_int_t duk__eval_module_source(duk_context *ctx) {
+#endif
 	/*
 	 *  Stack: [ ... module source ]
 	 */
 
-    const char* filename;
-    char tmp[8192];
+	const char* filename;
+	char tmp[8192];
+
+#if DUK_VERSION >= 19999
+	(void) udata;
+#endif
 
 	/* Wrap the module code in a function expression.  This is the simplest
 	 * way to implement CommonJS closure semantics and matches the behavior of
@@ -214,8 +229,8 @@ static duk_int_t duk__eval_module_source(duk_context *ctx) {
 	/* [ ... module source func_src ] */
 
 	(void) duk_get_prop_string(ctx, -3, "filename");
-    filename = duk_get_string(ctx, -1);
-    strcpy(tmp, filename);
+	filename = duk_get_string(ctx, -1);
+	strcpy(tmp, filename);
 	duk_compile(ctx, DUK_COMPILE_EVAL);
 	duk_call(ctx, 0);
 
@@ -231,7 +246,7 @@ static duk_int_t duk__eval_module_source(duk_context *ctx) {
 	(void) duk_get_prop_string(ctx, -4, "require");   /* require */
 	duk_dup(ctx, -5);                                 /* module */
 	(void) duk_get_prop_string(ctx, -6, "filename");  /* __filename */
-    duk_push_string(ctx, dirname(tmp));               /* __dirname */
+	duk_push_string(ctx, dirname(tmp));               /* __dirname */
 	duk_call(ctx, 5);
 
 	/* [ ... module source result(ignore) ] */
@@ -257,10 +272,14 @@ duk_ret_t duk_module_node_peval_file(duk_context *ctx, const char* filename, int
 	duk__push_module_object(ctx, filename, main);
 	/* [ ... source module ] */
 
-    duk_dup(ctx, 0);
+	duk_dup(ctx, 0);
 	/* [ ... source module source ] */
 
+#if DUK_VERSION >= 19999
+	return duk_safe_call(ctx, duk__eval_module_source, NULL, 2, 1);
+#else
 	return duk_safe_call(ctx, duk__eval_module_source, 2, 1);
+#endif
 }
 
 void duk_module_node_init(duk_context *ctx) {
@@ -291,13 +310,13 @@ void duk_module_node_init(duk_context *ctx) {
 	duk_put_prop_string(ctx, -2, "\xff" "modLoad");
 	duk_pop(ctx);
 
-    /* Stash main module */
+	/* Stash main module. */
 	duk_push_global_stash(ctx);
 	duk_push_undefined(ctx);
 	duk_put_prop_string(ctx, -2, "\xff" "mainModule");
 	duk_pop(ctx);
 
-	/* register `require` as a global function */
+	/* register `require` as a global function. */
 	duk_push_global_object(ctx);
 	duk_push_string(ctx, "require");
 	duk__push_require_function(ctx, "");
