@@ -129,7 +129,7 @@ void sjs__setup_system_module(duk_context* ctx) {
 
     /* system.executable */
     {
-        char buf[8192] = {0};
+        char buf[SJS_PATH_MAX] = {0};
         sjs__executable(buf, sizeof(buf));
         duk_push_string(ctx, buf);
         duk_put_prop_string(ctx, -2, "executable");

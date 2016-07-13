@@ -8,6 +8,7 @@
 
 #include "duktape.h"
 #include "duk_module_node.h"
+#include "internal.h"
 
 #if DUK_VERSION >= 19999
 static duk_int_t duk__eval_module_source(duk_context *ctx, void *udata);
@@ -211,7 +212,7 @@ static duk_int_t duk__eval_module_source(duk_context *ctx) {
 	 */
 
 	const char* filename;
-	char tmp[8192];
+	char tmp[SJS_PATH_MAX];
 
 #if DUK_VERSION >= 19999
 	(void) udata;

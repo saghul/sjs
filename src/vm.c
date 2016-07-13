@@ -270,7 +270,7 @@ DUK_EXTERNAL int sjs_vm_eval_file(const sjs_vm_t* vm,
                                   FILE* ferror) {
     int r;
     char* data;
-    char path[8192];
+    char path[SJS_PATH_MAX];
 
     r = sjs__path_normalize(filename, path, sizeof(path));
     if (r < 0) {

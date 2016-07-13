@@ -4,6 +4,7 @@
 
 #include "duktape.h"
 
+#define SJS_PATH_MAX 4096
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
 
 

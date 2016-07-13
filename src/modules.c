@@ -55,7 +55,7 @@ static inline int sjs__path_normalize_impl(const char* path,
     /* expand ~ and ~user */
     if (path[0] == '~') {
         /* relative to home path: ~/foo/bar or ~user/foo/bar */
-        char tmp[8192];
+        char tmp[SJS_PATH_MAX];
         char* home;
         char* sep = strchr(path, '/');
         int pos;
@@ -144,8 +144,8 @@ static inline duk_ret_t resolve_module_helper(duk_context* ctx,
         "%s/%s/index.js",
     };
 
-    char resolved_id[8192];
-    char tmp[8192];
+    char resolved_id[SJS_PATH_MAX];
+    char tmp[SJS_PATH_MAX];
     struct stat st;
 
     for (size_t i = 0; i < ARRAY_SIZE(filenames); ++i) {
@@ -177,7 +177,7 @@ static duk_ret_t cb_resolve_module(duk_context *ctx) {
 
     if (strncmp(requested_id, "./", 2) == 0 || strncmp(requested_id, "../", 3) == 0) {
         /* path is relative to parent path */
-        char tmp[8192];
+        char tmp[SJS_PATH_MAX];
         if (strlen(parent_id) == 0) {
             sjs__strlcpy(tmp, "./", sizeof(tmp));
         } else if (str_endswith(parent_id, ".js")) {
