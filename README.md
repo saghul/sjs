@@ -25,16 +25,9 @@ JavaScript runtime look like if there were no browsers?".
 * Rich standard library
 * Binary name 25% shorter than Node
 
-# Hello, world
+# Demo
 
-    Skookum JS 0.1.0 running on linux x64
-    [Engine: Duktape v1.5.0 (83d5577)]
-    [Build: Debug on 2016-05-08T11:05:16Z]
-    [GCC 5.3.1 on Linux-4.5.0-1-amd64]
-    sjs> print('hello world!');
-    hello world!
-    = undefined
-    sjs>
+[![asciicast](https://asciinema.org/a/dxn9vxjod2kvk2hi5il0tn8zd.png)](https://asciinema.org/a/dxn9vxjod2kvk2hi5il0tn8zd)
 
 # Documentation
 

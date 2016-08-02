@@ -14,8 +14,10 @@ Quickstart
 
     git clone https://github.com/saghul/sjs && cd sjs
     make && make run
-    sjs> print('Hello JavaScript! \u2b22');
-    Hello JavaScript! ⬢
+
+.. raw:: html
+
+    <script type="text/javascript" src="https://asciinema.org/a/dxn9vxjod2kvk2hi5il0tn8zd.js" id="asciicast-dxn9vxjod2kvk2hi5il0tn8zd" async></script>
 
 
 Documentation
