@@ -15,7 +15,7 @@ Modules are loaded using the :js:func:`require` function. Given a *module id*, i
 data.
 
 The module id can be a relative path or a non-relative path, in which case the module is loaded from the system
-search directories. See :ref:`modpath`.
+search directories. See :ref:`modsearchpath`.
 
 
 Module context
@@ -104,7 +104,7 @@ The following construct can be used in order to differentiate if a module was re
     }
 
 
-.. _modpath:
+.. _modsearchpath:
 
 Module search paths
 -------------------
