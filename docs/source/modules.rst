@@ -24,7 +24,6 @@ Standard library
     modules/errno
     modules/hash
     modules/io
-    modules/log
     modules/net
     modules/os
     modules/path
