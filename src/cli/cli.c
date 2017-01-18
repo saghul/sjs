@@ -48,7 +48,9 @@ static int completion_digit(unsigned char c) {
 }
 
 
-static duk_ret_t linenoise_completion_lookup(duk_context *ctx) {
+static duk_ret_t linenoise_completion_lookup(duk_context *ctx, void* udata) {
+    (void) udata;
+
     duk_size_t len;
     const char *orig;
     const unsigned char *p;
@@ -211,7 +213,7 @@ static void linenoise_completion(const char *buf, linenoiseCompletions *lc) {
     duk_push_lstring(ctx, (const char *) p, (duk_size_t) (p_end - p));
     duk_push_pointer(ctx, (void *) lc);
 
-    (void) duk_safe_call(ctx, linenoise_completion_lookup, 3 /*nargs*/, 1 /*nrets*/);
+    (void) duk_safe_call(ctx, linenoise_completion_lookup, NULL, 3 /*nargs*/, 1 /*nrets*/);
     duk_pop(ctx);
 }
 

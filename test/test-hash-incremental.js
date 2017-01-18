@@ -12,4 +12,4 @@ h2.update('aaa');
 h2.digest();
 h2.update('aaa');
 
-assert.equal(h1.digest(), h2.digest());
+assert.equal(h1.digest('hex'), h2.digest('hex'));

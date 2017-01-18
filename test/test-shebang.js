@@ -1,3 +1,3 @@
 #!/bin/env sjs
 
-print('hello');
+console.log('hello');

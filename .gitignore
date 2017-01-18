@@ -1,5 +1,7 @@
 build/
 original/
+tools/build_duktape/duktape/
+tools/build_duktape/out/
 *.swp
 *.swo
 *.pyc

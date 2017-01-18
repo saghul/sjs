@@ -9,7 +9,7 @@ const pwd = require('pwd');
 
 var info = pwd.getpwnam('nobody');
 if (info === null) {
-    print('SKIP: there is no "nobody" user');
+    console.log('SKIP: there is no "nobody" user');
     os.exit(0);
 }
 
@@ -21,7 +21,7 @@ try {
                    {cwd: '/', uid: info.uid, gid: info.gid});
 } catch (e) {
     assert.equal(e.errno, errno.EPERM);
-    print('SKIP: no permission to downgrade to user "nobody"');
+    console.log('SKIP: no permission to downgrade to user "nobody"');
     os.exit(0);
 }
 r = p.wait();

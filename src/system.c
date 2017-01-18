@@ -20,6 +20,39 @@ static const char* default_search_paths[] = {
 };
 
 
+static duk_ret_t duk__print_alert_helper(duk_context *ctx, FILE *fh) {
+    duk_idx_t nargs;
+
+    nargs = duk_get_top(ctx);
+
+    /* If argument count is 1 and first argument is a buffer, write the buffer
+     * as raw data into the file without a newline; this allows exact control
+     * over stdout/stderr without an additional entrypoint (useful for now).
+     * Otherwise current print/alert semantics are to ToString() coerce
+     * arguments, join them with a single space, and append a newline.
+     */
+
+    if (nargs == 1 && duk_is_buffer(ctx, 0)) {
+        duk_size_t sz_buf;
+        const duk_uint8_t* buf = (const duk_uint8_t *) duk_get_buffer(ctx, 0, &sz_buf);
+        fwrite((const void *) buf, 1, (size_t) sz_buf, fh);
+    } else {
+        duk_push_string(ctx, " ");
+        duk_insert(ctx, 0);
+        duk_concat(ctx, nargs);
+        fprintf(fh, "%s\n", duk_require_string(ctx, -1));
+    }
+
+    fflush(fh);
+    return 0;
+}
+
+
+static duk_ret_t duk__print(duk_context *ctx) {
+    return duk__print_alert_helper(ctx, stdout);
+}
+
+
 void sjs__setup_system_module(duk_context* ctx) {
     /* create system module */
     duk_push_object(ctx);
@@ -168,8 +201,13 @@ void sjs__setup_system_module(duk_context* ctx) {
         duk_put_prop_string(ctx, -2, "endianness");
     }
 
+    /* system.print */
+    {
+        duk_push_string(ctx, "print");
+        duk_push_c_function(ctx, duk__print, DUK_VARARGS);
+        duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_SET_WRITABLE | DUK_DEFPROP_SET_CONFIGURABLE);
+    }
+
     duk_pop(ctx);
 }
-
-
 

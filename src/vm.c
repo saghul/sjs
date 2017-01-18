@@ -25,14 +25,6 @@ static const char SJS__BOOTSTRAP_CODE[] = {
 };
 
 
-static void sjs__duk_fatal_handler(duk_context *ctx, duk_errcode_t code, const char *msg) {
-    (void) ctx;
-    fprintf(stderr, "FATAL %ld: %s\n", (long) code, (const char *) (msg ? msg : "null"));
-    fflush(stderr);
-    abort();
-}
-
-
 static void sjs__setup_global_module(sjs_vm_t* vm) {
     duk_context* ctx = vm->ctx;
 
@@ -41,9 +33,11 @@ static void sjs__setup_global_module(sjs_vm_t* vm) {
 }
 
 
-static int sjs__compile_execute(duk_context *ctx) {
+static int sjs__compile_execute(duk_context *ctx, void* udata) {
     const char *code;
     duk_size_t len;
+
+    (void) udata;
 
     /* [ ... code filename ] */
 
@@ -59,7 +53,9 @@ static int sjs__compile_execute(duk_context *ctx) {
 }
 
 
-static int sjs__get_error_stack(duk_context *ctx) {
+static int sjs__get_error_stack(duk_context *ctx, void* udata) {
+    (void) udata;
+
     if (!duk_is_object(ctx, -1)) {
         return 1;
     }
@@ -82,7 +78,7 @@ static int sjs__get_error_stack(duk_context *ctx) {
 static void sjs__dump_result(duk_context* ctx, int r, FILE* foutput, FILE* ferror) {
     if (r != DUK_EXEC_SUCCESS) {
         if (ferror) {
-            duk_safe_call(ctx, sjs__get_error_stack, 1 /*nargs*/, 1 /*nrets*/);
+            duk_safe_call(ctx, sjs__get_error_stack, NULL, 1 /*nargs*/, 1 /*nrets*/);
             fprintf(ferror, "%s\n", duk_safe_to_string(ctx, -1));
             fflush(ferror);
         }
@@ -169,7 +165,7 @@ DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
                               NULL,                     /* realloc function */
                               NULL,                     /* free function */
                               (void*) vm,               /* user data */
-                              sjs__duk_fatal_handler    /* fatal error handler */
+                              NULL                      /* fatal error handler (set in duk_config.h) */
                              );
     assert(vm->ctx != NULL);
     assert(sjs_vm_get_vm(vm->ctx) == vm);
@@ -236,7 +232,7 @@ DUK_EXTERNAL int sjs_vm_eval_code_global(const sjs_vm_t* vm,
 
     duk_push_lstring(ctx, code, len);
     duk_push_string(ctx, filename);
-    r = duk_safe_call(ctx, sjs__compile_execute, 2 /*nargs*/, 1 /*nret*/);
+    r = duk_safe_call(ctx, sjs__compile_execute, NULL, 2 /*nargs*/, 1 /*nret*/);
 
     sjs__dump_result(ctx, r, foutput, ferror);
 

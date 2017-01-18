@@ -10,7 +10,7 @@ message(STATUS "Building in ${CMAKE_BUILD_TYPE} mode")
 message(STATUS "Building with ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION} on ${CMAKE_SYSTEM}")
 
 set(CMAKE_C_FLAGS "$ENV{CFLAGS} -pedantic -std=c99 -Wall -Wextra -fstrict-aliasing -fno-omit-frame-pointer")
-set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -Werror -O0 -g3")
+set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS} -Werror -Wno-unused-value -O0 -g3")
 set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS} -O2 -g")
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
@@ -78,10 +78,6 @@ add_definitions(
     -D_GNU_SOURCE
     -D_LARGEFILE_SOURCE
     -D_FILE_OFFSET_BITS=64
-    -DDUK_OPT_NO_COMMONJS_MODULES
-    -DDUK_OPT_NO_BYTECODE_DUMP_SUPPORT
-    -DDUK_OPT_FASTINT
-    -DDUK_OPT_JSON_STRINGIFY_FASTPATH
 )
 
 
@@ -96,7 +92,7 @@ target_include_directories(duktape
 )
 
 set_target_properties(duktape
-    PROPERTIES COMPILE_FLAGS "-fPIC -Wno-unused-function"
+    PROPERTIES COMPILE_FLAGS "-fPIC -Wno-unused-function -Wno-unused-parameter"
 )
 
 

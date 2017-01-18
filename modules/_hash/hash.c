@@ -34,11 +34,11 @@
     static duk_ret_t hash_##name##_digest(duk_context* ctx) {                                \
         HASH_CTX* hash_ctx;                                                                  \
         HASH_CTX tmp;                                                                        \
-        char digest[HASH_DIGEST_LENGTH];                                                     \
+        char* digest;                                                                        \
         hash_ctx = duk_require_pointer(ctx, 0);                                              \
         memcpy(&tmp, hash_ctx, sizeof(*hash_ctx));                                           \
+        digest = duk_push_fixed_buffer(ctx, HASH_DIGEST_LENGTH);                             \
         HASH_Final((uint8_t*) digest, &tmp);                                                 \
-        duk_push_lstring(ctx, digest, HASH_DIGEST_LENGTH);                                   \
         return 1;                                                                            \
     }                                                                                        \
 
