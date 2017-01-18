@@ -106,5 +106,14 @@ Console.prototype.assert = function(expression) {
 };
 
 
-module.exports = new Console(sys.stdout, sys.stderr);
+var dummy = function() {};
+var defaultConsole = new Console(sys.stdout, sys.stderr);
+var handler = {
+    get: function(target, name) {
+        var value = target[name];
+        return typeof value==='function' ? value : dummy;
+    }
+};
+
+module.exports = new Proxy(defaultConsole, handler);
 module.exports.Console = Console;
