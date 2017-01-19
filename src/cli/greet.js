@@ -1,5 +1,5 @@
 const system = require('system');
-print('Skookum JS ' + system.versions.sjs + ' running on ' + system.platform + ' ' + system.arch);
-print('[Engine: Duktape ' + system.versions.duktape + ' (' + system.versions.duktapeCommit + ')]');
-print('[Build: ' + system.build.type + ' on ' + system.build.timestamp + ']');
-print('[' + system.build.compiler + ' ' + system.build.compilerVersion + ' on ' + system.build.system + ']');
+console.log('Skookum JS ' + system.versions.sjs + ' running on ' + system.platform + ' ' + system.arch);
+console.log('[Engine: Duktape ' + system.versions.duktape + ' (' + system.versions.duktapeCommit + ')]');
+console.log('[Build: ' + system.build.type + ' on ' + system.build.timestamp + ']');
+console.log('[' + system.build.compiler + ' ' + system.build.compilerVersion + ' on ' + system.build.system + ']');
