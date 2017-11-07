@@ -9,7 +9,7 @@
 #include "duk_module_node.h"
 #include "vm.h"
 #include "internal.h"
-#include "es6shim.h"
+#include "polyfill.h"
 
 
 struct sjs_vm_t {
@@ -175,8 +175,8 @@ DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
     sjs__setup_global_module(vm);
     sjs__setup_commonjs(vm->ctx);
 
-    /* setup es6 shim */
-    duk_eval_string_noresult(vm->ctx, sjs__es6shim_src);
+    /* setup polyfill */
+    duk_eval_string_noresult(vm->ctx, (char*) sjs__polyfill_src);
 
     /* run bootstrap code */
     duk_peval_string_noresult(vm->ctx, SJS__BOOTSTRAP_CODE);

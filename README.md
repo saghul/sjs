@@ -12,18 +12,16 @@ JavaScript runtime look like if there were no browsers?".
 # Features
 
 * Small footprint
-* [Ecmascript ES5/ES5.1](http://www.ecma-international.org/ecma-262/5.1/) compliant, some features borrowed
-  from [Ecmascript ES6](http://www.ecma-international.org/ecma-262/6.0/index.html)
-* [TypedArray](https://www.khronos.org/registry/typedarray/specs/latest/) and
-  [Buffer](https://nodejs.org/docs/v0.12.1/api/buffer.html) support
-* Built-in regular expression engine
+* [Ecmascript ES5/ES5.1](http://www.ecma-international.org/ecma-262/5.1/) compliant
+* Some post-ES5 features
 * Built-in Unicode support
 * Tail call support
-* Combined reference counting and mark-and-sweep garbage collection with finalization
 * CommonJS-based module loading system
 * Support for native modules written in C
 * Rich standard library
 * Binary name 25% shorter than Node
+
+See the full list [here](http://sjs.saghul.net/en/latest/features.html).
 
 # Demo
 
