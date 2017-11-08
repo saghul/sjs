@@ -5,7 +5,6 @@ DUK_USE_FATAL_HANDLER:
   verbatim: "#define DUK_USE_FATAL_HANDLER(udata,msg) do { const char *fatal_msg = (msg); fprintf(stderr, \"*** FATAL ERROR: %s\\n\", fatal_msg ? fatal_msg : \"no message\"); fflush(stderr); *((volatile unsigned int *) 0) = (unsigned int) 0xdeadbeefUL; abort(); } while(0)"
 DUK_USE_BYTECODE_DUMP_SUPPORT: false
 DUK_USE_COMMONJS_MODULES: false
-DUK_USE_COMPILER_RECLIMIT: 5000
 DUK_USE_COROUTINE_SUPPORT: false
 DUK_USE_DUKTAPE_BUILTIN: true
 DUK_USE_ENCODING_BUILTINS: true
@@ -17,3 +16,6 @@ DUK_USE_JC: false
 DUK_USE_JX: true
 DUK_USE_SYMBOL_BUILTIN: true
 DUK_USE_UNION_INITIALIZERS: true
+DUK_USE_GET_MONOTONIC_TIME_CLOCK_GETTIME: true
+DUK_USE_BROWSER_LIKE: false
+DUK_USE_GLOBAL_BINDING: true
