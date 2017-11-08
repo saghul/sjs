@@ -25,14 +25,6 @@ static const char SJS__BOOTSTRAP_CODE[] = {
 };
 
 
-static void sjs__setup_global_module(sjs_vm_t* vm) {
-    duk_context* ctx = vm->ctx;
-
-    duk_push_global_object(ctx);
-    duk_put_global_string(ctx, "global");
-}
-
-
 static int sjs__compile_execute(duk_context *ctx, void* udata) {
     const char *code;
     duk_size_t len;
@@ -172,7 +164,6 @@ DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
 
     /* setup builtin modules */
     sjs__setup_system_module(vm->ctx);
-    sjs__setup_global_module(vm);
     sjs__setup_commonjs(vm->ctx);
 
     /* setup polyfill */
