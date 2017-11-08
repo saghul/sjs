@@ -64,3 +64,6 @@ before_install:
   - test -n $MY_LINK  && export LINK=$MY_LINK
 install: true
 script: make && make test
+branches:
+  only:
+    - master
