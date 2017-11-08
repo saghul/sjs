@@ -313,7 +313,3 @@ DUK_EXTERNAL int sjs_path_normalize(const char* path, char* normalized_path, siz
     return sjs__path_normalize(path, normalized_path, normalized_path_len);
 }
 
-
-DUK_EXTERNAL uint64_t sjs_time_hrtime(void) {
-    return sjs__hrtime();
-}

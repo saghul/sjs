@@ -34,7 +34,6 @@ DUK_EXTERNAL_DECL int sjs_vm_eval_file(const sjs_vm_t* vm,
 
 DUK_EXTERNAL_DECL int sjs_path_expanduser(const char* path, char* normalized_path, size_t normalized_path_len);
 DUK_EXTERNAL_DECL int sjs_path_normalize(const char* path, char* normalized_path, size_t normalized_path_len);
-DUK_EXTERNAL_DECL uint64_t sjs_time_hrtime(void);
 
 
 #define SJS_THROW_ERRNO_ERROR2(x)                                                           \

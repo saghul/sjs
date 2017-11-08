@@ -64,7 +64,7 @@ Console.prototype.dir = function(object, options) {
 
 
 Console.prototype.time = function(label) {
-    this._times.set(label, time.hrtime());
+    this._times.set(label, performance.now());
 };
 
 
@@ -73,9 +73,8 @@ Console.prototype.timeEnd = function(label) {
     if (!t) {
         return;
     }
-    const duration = time.hrtime(t);
-    const ms = duration[0] * 1000 + duration[1] / 1e6;
-    this.log('%s: %sms', label, ms.toFixed(3));
+    const duration = performance.now() - t;
+    this.log('%s: %sms', label, duration.toFixed(3));
     this._times.delete(label);
 };
 

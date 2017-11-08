@@ -36,12 +36,3 @@ void sjs__executable(char* buf, size_t size) {
     buf[size] = '\0';
 }
 
-
-uint64_t sjs__hrtime(void) {
-    static mach_timebase_info_data_t info;
-    if (info.denom == 0) {
-        mach_timebase_info(&info);
-    }
-    return mach_absolute_time() * info.numer / info.denom;
-}
-

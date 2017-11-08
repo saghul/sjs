@@ -4,12 +4,11 @@ const assert = require('assert');
 const time = require('time');
 
 
-var t = time.time();
+var t = performance.now();
 assert.ok(t > 0);
 
-var t1 = time.hrtime();
+var t1 = performance.now();
 time.sleep(0.5);
-var diff = time.hrtime(t1);
-assert.equal(diff[0], 0);
-assert.ok(diff[1]/1000000 >= 500);
+var diff = performance.now() - t1;
+assert.ok(diff >= 500);
 

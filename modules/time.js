@@ -1,6 +1,5 @@
 'use strict';
 
-const _time = require('_time');
 const select = require('io/select');
 
 
@@ -10,6 +9,4 @@ function sleep(delay) {
 }
 
 
-exports.time   = _time.time;
-exports.hrtime = _time.hrtime;
 exports.sleep  = sleep;

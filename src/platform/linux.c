@@ -19,12 +19,3 @@ void sjs__executable(char* buf, size_t size) {
     buf[n] = '\0';
 }
 
-
-uint64_t sjs__hrtime(void) {
-    struct timespec t;
-    if (clock_gettime(CLOCK_MONOTONIC, &t)) {
-        return 0;   /* Not really possible. */
-    }
-    return t.tv_sec * (uint64_t) 1e9 + t.tv_nsec;
-}
-

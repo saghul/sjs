@@ -133,9 +133,3 @@ API
 
     Similar to :c:func:`sjs_path_normalize` but in only performs tilde expansion.
 
-.. c:function:: uint64_t sjs_time_hrtime(void)
-
-    Return the highest possible precission monotonic timer the system is able to provde.
-
-    :returns: High precission time in nanoseconds.
-
