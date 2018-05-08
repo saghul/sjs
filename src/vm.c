@@ -9,19 +9,13 @@
 #include "duk_module_node.h"
 #include "vm.h"
 #include "internal.h"
+
+#include "bootstrap.h"
 #include "polyfill.h"
 
 
 struct sjs_vm_t {
     duk_context* ctx;
-};
-
-
-/* generated from src/bootstrap.js */
-static const char SJS__BOOTSTRAP_CODE[] = {
-    99, 111, 110, 115, 116, 32, 99, 111, 110, 115, 111, 108, 101, 32, 61, 32,
-    114, 101, 113, 117, 105, 114, 101, 40, 39, 99, 111, 110, 115, 111, 108, 101,
-    39, 41, 59, 10, 0,
 };
 
 
@@ -167,10 +161,10 @@ DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
     sjs__setup_commonjs(vm->ctx);
 
     /* setup polyfill */
-    duk_eval_string_noresult(vm->ctx, (char*) sjs__polyfill_src);
+    duk_eval_lstring_noresult(vm->ctx, (const char*) sjs__code_polyfill_data, sjs__code_polyfill_size);
 
     /* run bootstrap code */
-    duk_peval_string_noresult(vm->ctx, SJS__BOOTSTRAP_CODE);
+    duk_eval_lstring_noresult(vm->ctx, (const char*) sjs__code_bootstrap_data, sjs__code_bootstrap_size);
 
     return vm;
 }

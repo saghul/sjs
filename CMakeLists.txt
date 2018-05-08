@@ -98,6 +98,16 @@ set_target_properties(duktape
 
 # libsjs
 #
+configure_file(
+        ${CMAKE_SOURCE_DIR}/src/bootstrap.js
+        ${CMAKE_CURRENT_BINARY_DIR}/embed-js/bootstrap.js
+        COPYONLY)
+
+configure_file(
+        ${CMAKE_SOURCE_DIR}/src/polyfill.min.js
+        ${CMAKE_CURRENT_BINARY_DIR}/embed-js/polyfill.min.js
+        COPYONLY)
+
 set(SOURCES
     src/duk_module_node.c
     src/modules.c
@@ -139,6 +149,11 @@ endif()
 
 # sjs
 #
+configure_file(
+        ${CMAKE_SOURCE_DIR}/src/cli/greet.js
+        ${CMAKE_CURRENT_BINARY_DIR}/embed-js/greet.js
+        COPYONLY)
+
 add_executable(sjs_cli
     src/cli/linenoise.c
     src/cli/cli.c
