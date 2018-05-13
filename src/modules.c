@@ -219,9 +219,7 @@ static duk_ret_t cb_resolve_module(duk_context *ctx) {
         duk_pop(ctx);
     }
 
-    duk_error(ctx, DUK_ERR_ERROR, "Module not found");
-    /* duk_error doesn't return */
-    return -42;
+    return duk_error(ctx, DUK_ERR_ERROR, "Module not found: %s", requested_id);
 }
 
 
@@ -259,9 +257,7 @@ static duk_ret_t cb_load_module(duk_context *ctx) {
     }
 
 error:
-    duk_error(ctx, DUK_ERR_ERROR, "Module could not be loaded");
-    /* duk_error doesn't return */
-    return -42;
+    return duk_error(ctx, DUK_ERR_ERROR, "Module could not be loaded: %s", resolved_id);
 }
 
 
