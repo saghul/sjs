@@ -125,7 +125,7 @@ ssize_t sjs__file_read(const char* path, char** data) {
         return -ENOMEM;
     }
 
-    fread(*data, fsize, 1, f);
+    fread(*data, 1, fsize, f);
     if (ferror(f)) {
         fclose(f);
         free(*data);
