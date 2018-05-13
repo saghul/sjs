@@ -96,6 +96,13 @@ Functions
     .. seealso::
         :man:`fork(2)`
 
+.. js:function:: os.fstat(fd)
+
+    Same as :js:func:`os.stat` but for an already opened file descriptor.
+
+    .. seealso::
+        :man:`fstat(2)`
+
 .. js:function:: os.getegid
 
     Returns the effective group ID of the calling process.

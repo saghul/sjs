@@ -311,6 +311,73 @@ static inline double sjs__timespec2ms(const struct timespec ts) {
 #endif
 
 /*
+ * Call the stat / fstat callback.
+ */
+static void os_stat_cb(duk_context* ctx, struct stat st) {
+    /* prepare the call to the given function */
+    duk_dup(ctx, 1);
+    duk_push_object(ctx);
+    /* [... func obj ] */
+
+    duk_push_uint(ctx, st.st_dev);
+    duk_push_uint(ctx, st.st_mode);
+    duk_push_uint(ctx, st.st_nlink);
+    duk_push_uint(ctx, st.st_uid);
+    duk_push_uint(ctx, st.st_gid);
+    duk_push_uint(ctx, st.st_rdev);
+    duk_push_uint(ctx, st.st_ino);
+    duk_push_uint(ctx, st.st_size);
+    duk_push_uint(ctx, st.st_blksize);
+    duk_push_uint(ctx, st.st_blocks);
+#if defined(__APPLE__)
+    duk_push_uint(ctx, st.st_flags);
+    duk_push_uint(ctx, st.st_gen);
+#else
+    duk_push_uint(ctx, 0);    /* st_flags */
+    duk_push_uint(ctx, 0);    /* st_gen */
+#endif
+
+/* times, convert to ms */
+#if defined(__APPLE__)
+    duk_push_number(ctx, sjs__timespec2ms(st.st_atimespec));
+    duk_push_number(ctx, sjs__timespec2ms(st.st_mtimespec));
+    duk_push_number(ctx, sjs__timespec2ms(st.st_ctimespec));
+    duk_push_number(ctx, sjs__timespec2ms(st.st_birthtimespec));
+#else
+    duk_push_number(ctx, st.st_atime * 1000);
+    duk_push_number(ctx, st.st_mtime * 1000);
+    duk_push_number(ctx, st.st_ctime * 1000);
+    duk_push_number(ctx, st.st_ctime * 1000);    /* st_birthtim */
+#endif
+
+    duk_call_method(ctx, 16 /* number of args */);
+}
+
+/*
+ * fstat(2). Args:
+ * - 0: fd
+ * - 1: function to build the stat result
+ */
+static duk_ret_t os_fstat(duk_context* ctx) {
+    int r;
+    int fd;
+    struct stat st;
+
+    fd = duk_require_int(ctx, 0);
+    duk_require_function(ctx, 1);
+
+    r = fstat(fd, &st);
+    if (r < 0) {
+        SJS_THROW_ERRNO_ERROR();
+        return -42;    /* control never returns here */
+    } else {
+        os_stat_cb(ctx, st);
+        return 1;
+    }
+}
+
+
+/*
  * stat(2). Args:
  * - 0: path
  * - 1: function to build the stat result
@@ -328,43 +395,7 @@ static duk_ret_t os_stat(duk_context* ctx) {
         SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
     } else {
-        /* prepare the call to the given function */
-        duk_dup(ctx, 1);
-        duk_push_object(ctx);
-        /* [... func obj ] */
-
-        duk_push_uint(ctx, st.st_dev);
-        duk_push_uint(ctx, st.st_mode);
-        duk_push_uint(ctx, st.st_nlink);
-        duk_push_uint(ctx, st.st_uid);
-        duk_push_uint(ctx, st.st_gid);
-        duk_push_uint(ctx, st.st_rdev);
-        duk_push_uint(ctx, st.st_ino);
-        duk_push_uint(ctx, st.st_size);
-        duk_push_uint(ctx, st.st_blksize);
-        duk_push_uint(ctx, st.st_blocks);
-#if defined(__APPLE__)
-        duk_push_uint(ctx, st.st_flags);
-        duk_push_uint(ctx, st.st_gen);
-#else
-        duk_push_uint(ctx, 0);    /* st_flags */
-        duk_push_uint(ctx, 0);    /* st_gen */
-#endif
-
-    /* times, convert to ms */
-#if defined(__APPLE__)
-        duk_push_number(ctx, sjs__timespec2ms(st.st_atimespec));
-        duk_push_number(ctx, sjs__timespec2ms(st.st_mtimespec));
-        duk_push_number(ctx, sjs__timespec2ms(st.st_ctimespec));
-        duk_push_number(ctx, sjs__timespec2ms(st.st_birthtimespec));
-#else
-        duk_push_number(ctx, st.st_atime * 1000);
-        duk_push_number(ctx, st.st_mtime * 1000);
-        duk_push_number(ctx, st.st_ctime * 1000);
-        duk_push_number(ctx, st.st_ctime * 1000);    /* st_birthtim */
-#endif
-
-        duk_call_method(ctx, 16 /* number of args */);
+        os_stat_cb(ctx, st);
         return 1;
     }
 }
@@ -1039,6 +1070,7 @@ static const duk_function_list_entry module_funcs[] = {
     { "getcwd",                 os_getcwd,          0 },
     { "scandir",                os_scandir,         1 },
     { "stat",                   os_stat,            2 },
+    { "fstat",                  os_fstat,           2 },
     { "unlink",                 os_unlink,          1 },
     { "urandom",                os_urandom,         1 },
     { "fork",                   os_fork,            0 },

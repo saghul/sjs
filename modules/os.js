@@ -98,6 +98,10 @@ function stat(path) {
     return _os.stat(path, buildStat);
 }
 
+function fstat(fd) {
+    return _os.fstat(fd, buildStat);
+}
+
 // stat things
 
 function S_IMODE(mode) {
@@ -280,6 +284,7 @@ exports.open      = open;
 exports.read      = read;
 exports.setgroups = setgroups;
 exports.stat      = stat;
+exports.fstat     = fstat;
 exports.urandom   = urandom;
 exports.waitpid   = waitpid;
 exports.S_IMODE   = S_IMODE;
