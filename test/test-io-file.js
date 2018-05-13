@@ -28,6 +28,9 @@ f.read(databuf);
 f.close();
 assert.equal(databuf.slice(0, TEST_DATA.length).toString(), TEST_DATA);
 
+var data = io.readFile(TEST_FILE);
+assert.equal(data, TEST_DATA);
+
 safeUnlink(TEST_FILE);
 
 function safeUnlink(path) {

@@ -99,6 +99,10 @@ Functions
     .. seealso::
         :man:`fdopen(3)`
 
+.. js:function:: io.readFile(path)
+
+    Returns the contents of the file at the given `path`.
+
 
 io/select
 ---------

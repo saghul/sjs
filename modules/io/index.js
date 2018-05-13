@@ -2,6 +2,7 @@
 
 const errno = require('errno');
 const _io = require('_io');
+const os = require('os');
 const outil = require('utils/object');
 
 
@@ -116,6 +117,16 @@ function fdopen(fd, mode, path, buffering) {
 }
 
 
+function readFile(path) {
+    const f = open(path, 'rb');
+    const st = os.fstat(f.fd);
+    const data = f.read(st.size);
+
+    f.close();
+
+    return data;
+}
+
 // internal helpers
 
 function fileDealloc(f) {
@@ -136,5 +147,6 @@ function checkFile() {
 
 // exports
 
-exports.open   = open;
-exports.fdopen = fdopen;
+exports.open     = open;
+exports.fdopen   = fdopen;
+exports.readFile = readFile;
