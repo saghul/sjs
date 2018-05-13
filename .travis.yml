@@ -2,60 +2,38 @@ language: c
 matrix:
   include:
     - os: linux
-      dist: trusty
+      dist: xenial
+      sudo: required
+      compiler: gcc
+      env: BUILDTYPE=Debug
+    - os: linux
+      dist: xenial
+      sudo: required
+      compiler: gcc
+      env: BUILDTYPE=Release
+    - os: linux
+      dist: xenial
       sudo: required
       compiler: clang
       env: BUILDTYPE=Debug
     - os: linux
-      dist: trusty
+      dist: xenial
       sudo: required
       compiler: clang
       env: BUILDTYPE=Release
     - os: linux
-      dist: trusty
-      sudo: required
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - gcc-5
-            - g++-5
-      env: BUILDTYPE=Debug MY_CC=gcc-5 MY_CXX=g++-5
-    - os: linux
-      dist: trusty
-      sudo: required
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - gcc-6
-            - g++-6
-      env: BUILDTYPE=Debug MY_CC=gcc-6 MY_CXX=g++-6
-    - os: linux
-      dist: trusty
+      dist: xenial
       sudo: required
       addons:
         apt:
           packages:
             - musl-tools
       env: BUILDTYPE=Debug MY_CC=musl-gcc MY_LINK=musl-gcc
-    - os: linux
-      dist: trusty
-      sudo: required
-      compiler: gcc
-      env: BUILDTYPE=Debug
-    - os: linux
-      dist: trusty
-      sudo: required
-      compiler: gcc
-      env: BUILDTYPE=Release
     - os: osx
-      osx_image: xcode9.1
+      osx_image: xcode9.3
       env: BUILDTYPE=Debug
     - os: osx
-      osx_image: xcode9.1
+      osx_image: xcode9.3
       env: BUILDTYPE=Release
 before_install:
   - umask 022
