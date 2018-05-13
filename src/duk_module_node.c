@@ -10,11 +10,7 @@
 #include "duk_module_node.h"
 #include "internal.h"
 
-#if DUK_VERSION >= 19999
 static duk_int_t duk__eval_module_source(duk_context *ctx, void *udata);
-#else
-static duk_int_t duk__eval_module_source(duk_context *ctx);
-#endif
 static void duk__push_module_object(duk_context *ctx, const char *id, duk_bool_t main);
 
 static duk_bool_t duk__get_cached_module(duk_context *ctx, const char *id) {
@@ -123,11 +119,7 @@ static duk_ret_t duk__handle_require(duk_context *ctx) {
 
 		/* [ ... module source ] */
 
-#if DUK_VERSION >= 19999
 		ret = duk_safe_call(ctx, duk__eval_module_source, NULL, 2, 1);
-#else
-		ret = duk_safe_call(ctx, duk__eval_module_source, 2, 1);
-#endif
 		if (ret != DUK_EXEC_SUCCESS) {
 			duk__del_cached_module(ctx, id);
 			duk_throw(ctx);  /* rethrow */
@@ -202,11 +194,7 @@ static void duk__push_module_object(duk_context *ctx, const char *id, duk_bool_t
 	duk_put_prop_string(ctx, -2, "require");
 }
 
-#if DUK_VERSION >= 19999
 static duk_int_t duk__eval_module_source(duk_context *ctx, void *udata) {
-#else
-static duk_int_t duk__eval_module_source(duk_context *ctx) {
-#endif
 	/*
 	 *  Stack: [ ... module source ]
 	 */
@@ -214,9 +202,7 @@ static duk_int_t duk__eval_module_source(duk_context *ctx) {
 	const char* filename;
 	char tmp[SJS_PATH_MAX];
 
-#if DUK_VERSION >= 19999
 	(void) udata;
-#endif
 
 	/* Wrap the module code in a function expression.  This is the simplest
 	 * way to implement CommonJS closure semantics and matches the behavior of
@@ -276,11 +262,7 @@ duk_ret_t duk_module_node_peval_file(duk_context *ctx, const char* filename, int
 	duk_dup(ctx, 0);
 	/* [ ... source module source ] */
 
-#if DUK_VERSION >= 19999
 	return duk_safe_call(ctx, duk__eval_module_source, NULL, 2, 1);
-#else
-	return duk_safe_call(ctx, duk__eval_module_source, 2, 1);
-#endif
 }
 
 void duk_module_node_init(duk_context *ctx) {
