@@ -40,7 +40,7 @@ if __name__ == "__main__":
 
     test_dir = sys.argv[1]
     for f in sorted(os.listdir(test_dir)):
-        if f.startswith('test-'):
+        if f.startswith('test-') and f.endswith('.js'):
             run_test(os.path.join(test_dir, f))
 
     sys.stdout.write('\n')
