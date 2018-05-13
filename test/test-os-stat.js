@@ -11,4 +11,6 @@ assert(stat);
 assert.throws(function() { os.stat('/this/does/not/exist'); });
 
 assert(os.S_ISREG(stat.mode));
-assert.equal(os.S_IMODE(stat.mode), 493);  // 0755
+
+const mode = os.S_IMODE(stat.mode);
+assert.ok(mode === 0o0755 || mode === 0o0775);
