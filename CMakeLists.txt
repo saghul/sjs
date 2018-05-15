@@ -109,8 +109,25 @@ configure_file(
         COPYONLY)
 
 set(SOURCES
+    src/binding.c
+    src/bindings/errno.c
+    src/bindings/gai.c
+    src/bindings/hash/hash.c
+    src/bindings/hash/md5.c
+    src/bindings/hash/sha1.c
+    src/bindings/hash/sha2.c
+    src/bindings/io.c
+    src/bindings/os.c
+    src/bindings/path.c
+    src/bindings/poll.c
+    src/bindings/pwd.c
+    src/bindings/random/mt19937ar.c
+    src/bindings/random/random.c
+    src/bindings/select.c
+    src/bindings/socket.c
     src/duk_module_node.c
     src/modules.c
+    src/platform/common.c
     src/system.c
     src/util.c
     src/vm.c
@@ -143,6 +160,9 @@ if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
     target_link_libraries(sjs
         dl
         rt
+    )
+set_target_properties(sjs PROPERTIES
+        COMPILE_DEFINITIONS "_POSIX_C_SOURCE=200112"
     )
 endif()
 
@@ -183,8 +203,3 @@ install(DIRECTORY modules
         PATTERN "*.h" EXCLUDE
         PATTERN "*.swp" EXCLUDE)
 
-
-# modules
-#
-
-include(modules/modules.cmake)

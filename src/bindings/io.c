@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include "../binding.h"
 #include <sjs/sjs.h>
 
 
@@ -267,13 +268,6 @@ static duk_ret_t io_setvbuf(duk_context* ctx) {
 }
 
 
-#define X(name) {#name, name}
-static const duk_number_list_entry module_consts[] = {
-    { NULL, 0.0 }
-};
-#undef X
-
-
 static const duk_function_list_entry module_funcs[] = {
     /* name, function, nargs */
     { "fopen", io_fopen, 2 },
@@ -289,12 +283,7 @@ static const duk_function_list_entry module_funcs[] = {
 };
 
 
-DUK_EXTERNAL duk_ret_t sjs_mod_init(duk_context* ctx) {
-    duk_push_object(ctx);
-    duk_put_function_list(ctx, -1, module_funcs);
-    duk_push_object(ctx);
-    duk_put_number_list(ctx, -1, module_consts);
-    duk_put_prop_string(ctx, -2, "c");
-    return 1;
+void sjs__binding_io_init(duk_context* ctx) {
+    sjs__register_binding(ctx, "io", module_funcs, NULL);
 }
 

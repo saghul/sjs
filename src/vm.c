@@ -8,6 +8,7 @@
 #include "duktape.h"
 #include "duk_module_node.h"
 #include "vm.h"
+#include "binding.h"
 #include "internal.h"
 
 #include "bootstrap.h"
@@ -159,6 +160,7 @@ DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
     /* setup builtin modules */
     sjs__setup_system_module(vm->ctx);
     sjs__setup_commonjs(vm->ctx);
+    sjs__setup_binding(vm->ctx);
 
     /* setup polyfill */
     duk_eval_lstring_noresult(vm->ctx, (const char*) sjs__code_polyfill_data, sjs__code_polyfill_size);

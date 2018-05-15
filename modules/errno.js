@@ -1,6 +1,6 @@
 'use strict';
 
-const _errno = require('_errno');
+const _errno = _system.binding('errno');
 
 
 exports.strerror = _errno.strerror;

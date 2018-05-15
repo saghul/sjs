@@ -1,6 +1,6 @@
 'use strict';
 
-const _poll = require('_poll');
+const _poll = _system.binding('poll');
 
 
 function poll(pfds, timeout) {

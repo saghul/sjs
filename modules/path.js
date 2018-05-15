@@ -1,6 +1,6 @@
 'use strict';
 
-const _path = require('_path');
+const _path = _system.binding('path');
 
 
 function join() {

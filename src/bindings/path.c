@@ -1,6 +1,7 @@
 
 #include <libgen.h>
 
+#include "../binding.h"
 #include <sjs/sjs.h>
 
 
@@ -62,8 +63,7 @@ static const duk_function_list_entry module_funcs[] = {
 };
 
 
-DUK_EXTERNAL duk_ret_t sjs_mod_init(duk_context* ctx) {
-    duk_push_object(ctx);
-    duk_put_function_list(ctx, -1, module_funcs);
-    return 1;
+void sjs__binding_path_init(duk_context* ctx) {
+    sjs__register_binding(ctx, "path", module_funcs, NULL);
 }
+

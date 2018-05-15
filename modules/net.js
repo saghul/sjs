@@ -1,8 +1,9 @@
 'use strict';
 
+const _gai = _system.binding('gai');
+const _socket = _system.binding('socket');
+
 const errno = require('errno');
-const _gai = require('_gai');
-const _socket = require('_socket');
 const os = require('os');
 const outil = require('utils/object');
 

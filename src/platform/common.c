@@ -1,14 +1,11 @@
 
-#ifndef SJS_PLATFORM_H
-#define SJS_PLATFORM_H
-
 #include <errno.h>
 #include <fcntl.h>
+#include <unistd.h>
 #include <sys/ioctl.h>
 
 
- __attribute__((unused))
-static int sjs__cloexec(int fd, int set) {
+int sjs__cloexec(int fd, int set) {
     int r;
 
     do
@@ -22,8 +19,7 @@ static int sjs__cloexec(int fd, int set) {
 }
 
 
- __attribute__((unused))
-static int sjs__nonblock(int fd, int set) {
+int sjs__nonblock(int fd, int set) {
     int r;
 
     do
@@ -37,7 +33,6 @@ static int sjs__nonblock(int fd, int set) {
 }
 
 
- __attribute__((unused))
 int sjs__close(int fd) {
   int saved_errno;
   int r;
@@ -55,4 +50,3 @@ int sjs__close(int fd) {
   return r;
 }
 
-#endif
