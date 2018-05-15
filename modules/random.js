@@ -1,6 +1,7 @@
 'use strict';
 
-const _random = require('_random');
+const _random = _system.binding('random');
+
 const codecs = require('codecs');
 const os = require('os');
 const outil = require('utils/object');

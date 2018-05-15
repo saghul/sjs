@@ -1,7 +1,8 @@
 'use strict';
 
+const _io = _system.binding('io');
+
 const errno = require('errno');
-const _io = require('_io');
 const os = require('os');
 const outil = require('utils/object');
 

@@ -1,6 +1,6 @@
 'use strict';
 
-const _select = require('_select');
+const _select = _system.binding('select');
 
 
 function select(rfds, wfds, xfds, timeout) {

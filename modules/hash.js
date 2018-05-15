@@ -1,6 +1,7 @@
 'use strict';
 
-const _hash  = require('_hash');
+const _hash  = _system.binding('hash');
+
 const codecs = require('codecs');
 const outil  = require('utils/object');
 

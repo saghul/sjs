@@ -1,6 +1,6 @@
 'use strict';
 
-const _os = require('_os');
+const _os = _system.binding('os');
 
 
 const O_APPEND = _os.c.O_APPEND || 0;

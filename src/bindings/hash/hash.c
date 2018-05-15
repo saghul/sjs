@@ -1,4 +1,5 @@
 
+#include "../../binding.h"
 #include <sjs/sjs.h>
 
 #include "md5.h"
@@ -77,8 +78,7 @@ static const duk_function_list_entry module_funcs[] = {
 #undef EXPORT_HASH
 
 
-DUK_EXTERNAL duk_ret_t sjs_mod_init(duk_context* ctx) {
-    duk_push_object(ctx);
-    duk_put_function_list(ctx, -1, module_funcs);
-    return 1;
+void sjs__binding_hash_init(duk_context* ctx) {
+    sjs__register_binding(ctx, "hash", module_funcs, NULL);
 }
+

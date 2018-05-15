@@ -1,6 +1,6 @@
 'use strict';
 
-const _pwd = require('_pwd');
+const _pwd = _system.binding('pwd');
 
 
 exports.getpwnam = _pwd.getpwnam;
