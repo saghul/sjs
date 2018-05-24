@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const outil  = require('utils/object');
+const outil  = require('utils').object;
 const sys    = require('system');
 const time   = require('time');
 

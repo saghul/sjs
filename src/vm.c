@@ -165,6 +165,9 @@ DUK_EXTERNAL sjs_vm_t* sjs_vm_create(void) {
     /* setup polyfill */
     duk_eval_lstring_noresult(vm->ctx, (const char*) sjs__code_polyfill_data, sjs__code_polyfill_size);
 
+    /* register builtin modules */
+    sjs__register_bultins(vm->ctx);
+
     /* run bootstrap code */
     duk_eval_lstring_noresult(vm->ctx, (const char*) sjs__code_bootstrap_data, sjs__code_bootstrap_size);
 

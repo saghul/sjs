@@ -1,6 +1,6 @@
 'use strict';
 
-const unorm = require('./_unorm');
+const unorm = require('_utils_unicode_unorm');
 
 
 function normalize(form, str) {

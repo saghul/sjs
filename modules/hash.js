@@ -3,7 +3,7 @@
 const _hash  = _system.binding('hash');
 
 const codecs = require('codecs');
-const outil  = require('utils/object');
+const outil  = require('utils').object;
 
 
 function HashBase() {

@@ -104,10 +104,10 @@ Functions
     Returns the contents of the file at the given `path`.
 
 
-io/select
+io.select
 ---------
 
-This submodule provides access to :man:`select(2)`.
+This object provides access to :man:`select(2)`.
 
 .. js:function:: select.select(rfds, wfds, xfds, timeout)
 
@@ -125,10 +125,10 @@ This submodule provides access to :man:`select(2)`.
     For more information see :man:`select(2)`.
 
 
-io/poll
+io.poll
 -------
 
-This submodule provides access to :man:`poll(2)`.
+This object provides access to :man:`poll(2)`.
 
 .. js:data:: poll.POLLIN
 .. js:data:: poll.POLLOUT

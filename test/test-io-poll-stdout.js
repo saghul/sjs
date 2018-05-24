@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const poll = require('io/poll');
+const poll = require('io').poll;
 
 
 var res = poll.poll([{fd: 1, events: poll.POLLOUT}], null);

@@ -108,6 +108,8 @@ configure_file(
         ${CMAKE_CURRENT_BINARY_DIR}/embed-js/polyfill.min.js
         COPYONLY)
 
+file(COPY ${CMAKE_SOURCE_DIR}/modules DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
 set(SOURCES
     src/binding.c
     src/bindings/errno.c
@@ -125,6 +127,7 @@ set(SOURCES
     src/bindings/random/random.c
     src/bindings/select.c
     src/bindings/socket.c
+    src/builtins.c
     src/duk_module_node.c
     src/modules.c
     src/platform/common.c

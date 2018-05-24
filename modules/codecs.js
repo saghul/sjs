@@ -1,7 +1,7 @@
 'use strict';
 
-const punycode = require('./punycode');
-const utf8     = require('./utf8');
+const punycode = require('_codecs_punycode');
+const utf8     = require('_codecs_utf8');
 
 
 var encoders = {

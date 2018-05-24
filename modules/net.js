@@ -5,7 +5,7 @@ const _socket = _system.binding('socket');
 
 const errno = require('errno');
 const os = require('os');
-const outil = require('utils/object');
+const outil = require('utils').object;
 
 
 function Socket(domain, type, options) {

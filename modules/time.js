@@ -1,6 +1,6 @@
 'use strict';
 
-const select = require('io/select');
+const select = require('io').select;
 
 
 function sleep(delay) {

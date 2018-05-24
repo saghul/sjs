@@ -7,17 +7,17 @@ utils
 This package contains several modules grouping utility functions.
 
 
-utils/object
+utils.object
 ------------
 
-This submodule contains several utilities for working with objects. It oritinates from
+This object contains several utilities for working with objects. It oritinates from
 `this module <https://github.com/defunctzombie/node-util>`_.
 
 
 Functions
 ^^^^^^^^^
 
-.. js:function:: utils/object.format(format, [...])
+.. js:function:: utils.object.format(format, [...])
 
     Returns a formatted string using the first argument as a ``printf``-like format.
 
@@ -41,7 +41,7 @@ Functions
         outils.format('%s:%s', 'foo'); // 'foo:%s'
 
     If there are more arguments than placeholders, the extra arguments are coerced to strings
-    (for objects and symbols, :js:func:`utils/object.inspect` is used) and then concatenated, delimited by a space.
+    (for objects and symbols, :js:func:`utils.object.inspect` is used) and then concatenated, delimited by a space.
 
     ::
 
@@ -49,13 +49,13 @@ Functions
 
     If the first argument is not a format string then this function returns a string that is the
     concatenation of all its arguments separated by spaces. Each argument is converted to a string with
-    :js:func:`utils/object.inspect`.
+    :js:func:`utils.object.inspect`.
 
     ::
 
         outils.format(1, 2, 3); // '1 2 3'
 
-.. js:function:: utils/object.inspect(object, [options])
+.. js:function:: utils.object.inspect(object, [options])
 
     Return a string representation of `object`, which is useful for debugging.
 
@@ -78,16 +78,16 @@ Functions
 
     ::
 
-        const outils = require('utils/object');
+        const outils = require('utils').object;
         print(outils.inspect(outil, { showHidden: true, depth: null }));
 
     Values may supply their own custom ``inspect(depth, opts)`` functions, when called they receive the current
     depth in the recursive inspection, as well as the options object passed to this function.
 
-    Color output (if enabled) of this function is customizable globally via ``utils/object.inspect.styles`` and
-    ``utils/object.inspect.colors`` objects.
+    Color output (if enabled) of this function is customizable globally via ``utils.object.inspect.styles`` and
+    ``utils.object.inspect.colors`` objects.
 
-    ``utils/object.inspect.styles`` is a map assigning each style a color from ``utils/object.inspect.colors``.
+    ``utils.object.inspect.styles`` is a map assigning each style a color from ``utils.object.inspect.colors``.
     Highlighted styles and their default values are: number (yellow) boolean (yellow) string (green) date (magenta)
     regexp (red) null (bold) undefined (grey) special - only function at this time (cyan) * name (intentionally no styling)
 
@@ -99,7 +99,7 @@ Functions
 
     ::
 
-        const outils = require('utils/object');
+        const outils = require('utils').object;
 
         var obj = { name: 'nate' };
         obj.inspect = function(depth) {
@@ -122,14 +122,14 @@ Functions
         outils.inspect(obj);
         // "{ bar: 'baz' }"
 
-.. js:function:: utils/object.inherits(constructor, superConstructor)
+.. js:function:: utils.object.inherits(constructor, superConstructor)
 
     Inherit the prototype methods from one constructor into another. The prototype of `constructor` will be set to a
     new object created from `superConstructor`.
 
     As an additional convenience, `superConstructor` will be accessible through the ``constructor.super_`` property.
 
-.. js:function:: utils/object.finalizer(object, funalizerFunc)
+.. js:function:: utils.object.finalizer(object, funalizerFunc)
 
     Set or get the finalizer for the given `object`.
 
@@ -141,16 +141,16 @@ Functions
         `Duktape documentation on finalizers <http://duktape.org/guide.html#finalization>`_.
 
 
-utils/unicode
+utils.unicode
 -------------
 
-This submodule provides unicode related utilities.
+This object provides unicode related utilities.
 
 
 Functions
 ^^^^^^^^^
 
-.. js:function:: utils/unicode.format(form, string)
+.. js:function:: utils.unicode.format(form, string)
 
     Normalize the given `string` to the requested unicode `form`. It uses the `unorm <https://github.com/walling/unorm>`_ module.
 

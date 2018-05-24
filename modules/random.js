@@ -4,7 +4,7 @@ const _random = _system.binding('random');
 
 const codecs = require('codecs');
 const os = require('os');
-const outil = require('utils/object');
+const outil = require('utils').object;
 
 
 function Random() {
