@@ -33,7 +33,7 @@ a default instance of this class though more can be created (which is rarely nee
 
     .. js:function:: console.Console.prototype.log
 
-        Outpits the given data to ``stdout`` with a newline. Data is formatted using :js:func:`utils/object.format`.
+        Outpits the given data to ``stdout`` with a newline. Data is formatted using :js:func:`utils.object.format`.
 
         ::
 
@@ -89,7 +89,7 @@ a default instance of this class though more can be created (which is rarely nee
     .. js:function:: console.Console.prototype.trace([message], [...])
 
         Prints a stack trace at the current position to ``stderr``. If an optional message and formatting options are
-        given the message is formatted using :js:func:`utils/object.format`.
+        given the message is formatted using :js:func:`utils.object.format`.
 
         ::
 

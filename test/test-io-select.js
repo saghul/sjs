@@ -1,7 +1,7 @@
 'use strict';
 
 const assert = require('assert');
-const select = require('io/select');
+const select = require('io').select;
 
 
 var res = select.select([], [], [], 0);

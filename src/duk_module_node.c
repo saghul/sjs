@@ -4,6 +4,7 @@
  *  https://nodejs.org/api/modules.html
  */
 
+#include <assert.h>
 #include <libgen.h>
 
 #include "duktape.h"
@@ -12,6 +13,19 @@
 
 static duk_int_t duk__eval_module_source(duk_context *ctx, void *udata);
 static void duk__push_module_object(duk_context *ctx, const char *id, duk_bool_t main);
+
+static duk_bool_t duk__get_builtin_module(duk_context *ctx, const char *id) {
+	duk_push_global_stash(ctx);
+	(void) duk_get_prop_string(ctx, -1, "\xff" "builtinCache");
+	if (duk_get_prop_string(ctx, -1, id)) {
+		duk_remove(ctx, -2);
+		duk_remove(ctx, -2);
+		return 1;
+	} else {
+		duk_pop_3(ctx);
+		return 0;
+	}
+}
 
 static duk_bool_t duk__get_cached_module(duk_context *ctx, const char *id) {
 	duk_push_global_stash(ctx);
@@ -24,6 +38,26 @@ static duk_bool_t duk__get_cached_module(duk_context *ctx, const char *id) {
 		duk_pop_3(ctx);
 		return 0;
 	}
+}
+
+/* Place a `module` object on the top of the value stack into the builtin cache
+ * based on its `.id` property.  As a convenience to the caller, leave the
+ * object on top of the value stack afterwards.
+ */
+static void duk__put_builtin_module(duk_context *ctx) {
+	/* [ ... module ] */
+
+	duk_push_global_stash(ctx);
+	(void) duk_get_prop_string(ctx, -1, "\xff" "builtinCache");
+	duk_dup(ctx, -3);
+
+	/* [ ... module stash req_cache module ] */
+
+	(void) duk_get_prop_string(ctx, -1, "id");
+	duk_dup(ctx, -2);
+	duk_put_prop(ctx, -4);
+
+	duk_pop_3(ctx);  /* [ ... module ] */
 }
 
 /* Place a `module` object on the top of the value stack into the require cache
@@ -76,6 +110,10 @@ static duk_ret_t duk__handle_require(duk_context *ctx) {
 	/* [ id stash require parent_id ] */
 
 	id = duk_require_string(ctx, 0);
+
+	if (duk__get_builtin_module(ctx, id)) {
+		goto have_module;  /* use the cached builtin module */
+	}
 
 	(void) duk_get_prop_string(ctx, stash_idx, "\xff" "modResolve");
 	duk_dup(ctx, 0);   /* module ID */
@@ -147,6 +185,14 @@ static void duk__push_require_function(duk_context *ctx, const char *id) {
 	duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE);
 	duk_push_string(ctx, id);
 	duk_put_prop_string(ctx, -2, "\xff" "moduleId");
+
+#ifdef DEBUG
+	/* require._builtins */
+	duk_push_global_stash(ctx);
+	(void) duk_get_prop_string(ctx, -1, "\xff" "builtinCache");
+	duk_put_prop_string(ctx, -3, "_builtins");
+	duk_pop(ctx);
+#endif
 
 	/* require.cache */
 	duk_push_global_stash(ctx);
@@ -265,6 +311,18 @@ duk_ret_t duk_module_node_peval_file(duk_context *ctx, const char* filename, int
 	return duk_safe_call(ctx, duk__eval_module_source, NULL, 2, 1);
 }
 
+void duk_module_node_register_builtin(duk_context *ctx, const char* id) {
+	/*
+	 *  Stack: [ ... source ]
+	 */
+
+    int r = duk_module_node_peval_file(ctx, id, 0);
+    assert(r == DUK_EXEC_SUCCESS);
+
+    duk__put_builtin_module(ctx);
+    duk_pop_2(ctx);
+}
+
 void duk_module_node_init(duk_context *ctx) {
 	/*
 	 *  Stack: [ ... options ] => [ ... ]
@@ -274,6 +332,12 @@ void duk_module_node_init(duk_context *ctx) {
 
 	duk_require_object_coercible(ctx, -1);  /* error before setting up requireCache */
 	options_idx = duk_require_normalize_index(ctx, -1);
+
+	/* Initialize the builtin cache to a fresh object. */
+	duk_push_global_stash(ctx);
+	duk_push_object(ctx);
+	duk_put_prop_string(ctx, -2, "\xff" "builtinCache");
+	duk_pop(ctx);
 
 	/* Initialize the require cache to a fresh object. */
 	duk_push_global_stash(ctx);

@@ -1,10 +1,12 @@
 'use strict';
 
 const _io = _system.binding('io');
+const _select = require('_io_select');
+const _poll = require('_io_poll');
 
 const errno = require('errno');
 const os = require('os');
-const outil = require('utils/object');
+const outil = require('utils').object;
 
 
 function File(path, f, mode, buffering) {
@@ -151,3 +153,5 @@ function checkFile() {
 exports.open     = open;
 exports.fdopen   = fdopen;
 exports.readFile = readFile;
+exports.select   = _select;
+exports.poll     = _poll;
