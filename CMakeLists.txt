@@ -149,7 +149,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     )
 endif()
 
-add_library(sjs SHARED ${SOURCES})
+add_library(sjs STATIC ${SOURCES})
 
 target_include_directories(sjs
     PRIVATE ${CMAKE_SOURCE_DIR}/include/sjs
@@ -195,14 +195,9 @@ target_link_libraries(sjs_cli
 
 install(TARGETS sjs sjs_cli
         RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib)
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
 
 install(DIRECTORY include/sjs
         DESTINATION include)
-
-install(DIRECTORY modules
-        DESTINATION lib/sjs
-        PATTERN "*.c" EXCLUDE
-        PATTERN "*.h" EXCLUDE
-        PATTERN "*.swp" EXCLUDE)
 

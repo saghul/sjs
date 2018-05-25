@@ -20,9 +20,7 @@ function popen(filename) {
         os.dup2(stdin[0], 0, false);
         os.dup2(stdout[1], 1, false);
         os.dup2(stderr[1], 2, false);
-        os.execve(system.executable,
-                  [system.executable, filename],
-                  {SJS_PATH: system.env.SJS_PATH});
+        os.execv(system.executable, [system.executable, filename]);
         assert(false);
     } else {
         // parent

@@ -12,7 +12,7 @@ var p;
 var r;
 
 p = proc.spawn([sys.executable, 'test/helper3.js'],
-               {stdin: 'pipe', stdout: 'pipe', stderr: 'pipe', env: {SJS_PATH: sys.env.SJS_PATH}});
+               {stdin: 'pipe', stdout: 'pipe', stderr: 'pipe'});
 p.stdin.write(TEXT);
 assert.equal(p.stdout.readLine(), TEXT);
 assert.equal(p.stderr.readLine(), TEXT);
@@ -25,7 +25,7 @@ assert.equal(r.term_signal, 0);
 
 
 p = proc.spawn([sys.executable, 'test/helper6.js'].concat(TEST_ARGS),
-               {stdin: null, stdout: 'pipe', stderr: 'inherit', env: {SJS_PATH: sys.env.SJS_PATH}});
+               {stdin: null, stdout: 'pipe', stderr: 'inherit'});
 var data = p.stdout.readLine();
 assert.deepEqual(JSON.parse(data), TEST_ARGS);
 p.stdout.close();

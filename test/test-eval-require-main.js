@@ -9,7 +9,7 @@ var p;
 var r;
 
 p = proc.spawn([sys.executable, '-e', 'require(\'assert\')(require.main === undefined)'],
-               {stdin: null, stdout: null, stderr: null, env: {SJS_PATH: sys.env.SJS_PATH}});
+               {stdin: null, stdout: null, stderr: null});
 r = p.wait();
 assert.equal(r.exit_status, 0);
 assert.equal(r.term_signal, 0);
