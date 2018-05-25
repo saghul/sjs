@@ -81,6 +81,21 @@ add_definitions(
 )
 
 
+# js files
+#
+configure_file(
+        ${CMAKE_SOURCE_DIR}/src/bootstrap.js
+        ${CMAKE_CURRENT_BINARY_DIR}/embed-js/bootstrap.js
+        COPYONLY)
+
+configure_file(
+        ${CMAKE_SOURCE_DIR}/src/polyfill.min.js
+        ${CMAKE_CURRENT_BINARY_DIR}/embed-js/polyfill.min.js
+        COPYONLY)
+
+file(COPY ${CMAKE_SOURCE_DIR}/modules DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+
 # duktape
 #
 add_library(duktape STATIC
@@ -98,18 +113,6 @@ set_target_properties(duktape
 
 # libsjs
 #
-configure_file(
-        ${CMAKE_SOURCE_DIR}/src/bootstrap.js
-        ${CMAKE_CURRENT_BINARY_DIR}/embed-js/bootstrap.js
-        COPYONLY)
-
-configure_file(
-        ${CMAKE_SOURCE_DIR}/src/polyfill.min.js
-        ${CMAKE_CURRENT_BINARY_DIR}/embed-js/polyfill.min.js
-        COPYONLY)
-
-file(COPY ${CMAKE_SOURCE_DIR}/modules DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-
 set(SOURCES
     src/binding.c
     src/bindings/errno.c
@@ -149,7 +152,27 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     )
 endif()
 
-add_library(sjs STATIC ${SOURCES})
+add_library(sjs_static STATIC ${SOURCES})
+
+target_include_directories(sjs_static
+    PRIVATE ${CMAKE_SOURCE_DIR}/include/sjs
+)
+
+target_link_libraries(sjs_static
+    duktape
+    m
+)
+if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+    target_link_libraries(sjs_static
+        dl
+        rt
+    )
+    set_target_properties(sjs_static PROPERTIES
+        COMPILE_DEFINITIONS "_POSIX_C_SOURCE=200112"
+    )
+endif()
+
+add_library(sjs SHARED ${SOURCES})
 
 target_include_directories(sjs
     PRIVATE ${CMAKE_SOURCE_DIR}/include/sjs
@@ -164,10 +187,11 @@ if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
         dl
         rt
     )
-set_target_properties(sjs PROPERTIES
+    set_target_properties(sjs PROPERTIES
         COMPILE_DEFINITIONS "_POSIX_C_SOURCE=200112"
     )
 endif()
+
 
 
 # sjs
@@ -187,13 +211,13 @@ set_target_properties(sjs_cli PROPERTIES
 )
 
 target_link_libraries(sjs_cli
-    sjs
+    sjs_static
 )
 
 # install target
 #
 
-install(TARGETS sjs sjs_cli
+install(TARGETS sjs sjs_static sjs_cli
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib)
