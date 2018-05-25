@@ -26,6 +26,7 @@ matrix:
       sudo: required
       addons:
         apt:
+          update: true
           packages:
             - musl-tools
       env: BUILDTYPE=Debug MY_CC=musl-gcc MY_LINK=musl-gcc
