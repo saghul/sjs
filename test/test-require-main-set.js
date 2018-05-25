@@ -10,7 +10,7 @@ var p;
 var r;
 
 p = proc.spawn([sys.executable, path.join(__dirname, 'fixtures', 'require_main', 'foo.js')],
-               {stdin: 'inherit', stdout: 'inherit', stderr: 'inherit', env: {SJS_PATH: sys.env.SJS_PATH}});
+               {stdin: 'inherit', stdout: 'inherit', stderr: 'inherit'});
 r = p.wait();
 assert.equal(r.exit_status, 0);
 assert.equal(r.term_signal, 0);

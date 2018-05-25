@@ -28,10 +28,7 @@ clean:
 distclean:
 	@rm -rf build
 
-run: build
-	SJS_PATH=build ./build/sjs
-
 test: build
-	env SJS_PATH=build $(PYTHON) tools/test.py test/
+	$(PYTHON) tools/test.py test/
 
 .PHONY: all build install clean distclean run

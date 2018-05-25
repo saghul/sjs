@@ -5,7 +5,6 @@ import sys
 
 
 cmd = './build/sjs'
-env = {'SJS_PATH': os.getenv('SJS_PATH')}
 
 results = {}
 
@@ -23,7 +22,7 @@ def run_test(f):
     sys.stdout.write('Running {:50}'.format(test_file))
     sys.stdout.flush()
     try:
-        subprocess.check_output('%s %s' % (cmd, f), stderr=subprocess.STDOUT, shell=True, env=env)
+        subprocess.check_output('%s %s' % (cmd, f), stderr=subprocess.STDOUT, shell=True)
     except subprocess.CalledProcessError as e:
         sys.stdout.write(red('ERROR'))
         sys.stdout.write('\n')
