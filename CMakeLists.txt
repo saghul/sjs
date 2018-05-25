@@ -18,8 +18,8 @@ include_directories(${CMAKE_SOURCE_DIR}/include)
 
 # Version
 #
-set(SJS__VERSION_MAJOR 17)
-set(SJS__VERSION_MINOR 0)
+set(SJS__VERSION_MAJOR 18)
+set(SJS__VERSION_MINOR 5)
 set(SJS__VERSION_PATCH 0)
 set(SJS__VERSION_SUFFIX "alpha")
 configure_file (
