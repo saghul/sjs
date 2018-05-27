@@ -106,8 +106,9 @@ target_include_directories(duktape
     PRIVATE ${CMAKE_SOURCE_DIR}/include/sjs
 )
 
-set_target_properties(duktape
-    PROPERTIES COMPILE_FLAGS "-fPIC -Wno-unused-function -Wno-unused-parameter"
+set_target_properties(duktape PROPERTIES
+    COMPILE_FLAGS "-Wno-unused-function -Wno-unused-parameter"
+    POSITION_INDEPENDENT_CODE ON
 )
 
 
@@ -152,46 +153,49 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     )
 endif()
 
-add_library(sjs_static STATIC ${SOURCES})
+add_library(sjs_obj OBJECT ${SOURCES})
 
-target_include_directories(sjs_static
+target_include_directories(sjs_obj
     PRIVATE ${CMAKE_SOURCE_DIR}/include/sjs
 )
+
+set_target_properties(sjs_obj PROPERTIES
+    POSITION_INDEPENDENT_CODE ON
+)
+
+if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
+    set_target_properties(sjs_obj PROPERTIES
+        COMPILE_DEFINITIONS "_POSIX_C_SOURCE=200112"
+    )
+endif()
+
+add_library(sjs_static STATIC $<TARGET_OBJECTS:sjs_obj>)
 
 target_link_libraries(sjs_static
     duktape
     m
 )
+
 if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
     target_link_libraries(sjs_static
         dl
         rt
     )
-    set_target_properties(sjs_static PROPERTIES
-        COMPILE_DEFINITIONS "_POSIX_C_SOURCE=200112"
-    )
 endif()
 
-add_library(sjs SHARED ${SOURCES})
-
-target_include_directories(sjs
-    PRIVATE ${CMAKE_SOURCE_DIR}/include/sjs
-)
+add_library(sjs SHARED $<TARGET_OBJECTS:sjs_obj>)
 
 target_link_libraries(sjs
     duktape
     m
 )
+
 if("${CMAKE_SYSTEM_NAME}" MATCHES "Linux")
     target_link_libraries(sjs
         dl
         rt
     )
-    set_target_properties(sjs PROPERTIES
-        COMPILE_DEFINITIONS "_POSIX_C_SOURCE=200112"
-    )
 endif()
-
 
 
 # sjs
