@@ -316,6 +316,7 @@ static int handle_interactive(void) {
 
 
 static void handle_sigint(int sig) {
+    (void) sig;
     assert(sig == SIGINT);
     if (cli.got_sigint == 1) {
         exit(EXIT_SUCCESS);
