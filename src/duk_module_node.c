@@ -4,8 +4,8 @@
  *  https://nodejs.org/api/modules.html
  */
 
-#include <assert.h>
 #include <libgen.h>
+#include <stdlib.h>
 
 #include "duktape.h"
 #include "duk_module_node.h"
@@ -317,7 +317,9 @@ void duk_module_node_register_builtin(duk_context *ctx, const char* id) {
 	 */
 
     int r = duk_module_node_peval_file(ctx, id, 0);
-    assert(r == DUK_EXEC_SUCCESS);
+    if (r != DUK_EXEC_SUCCESS) {
+        abort();
+    }
 
     duk__put_builtin_module(ctx);
     duk_pop_2(ctx);
