@@ -1,8 +1,8 @@
 
-#include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -255,7 +255,7 @@ static duk_ret_t io_setvbuf(duk_context* ctx) {
         mode = _IOLBF;
         size = BUFSIZ;
     } else {
-        assert(0);
+        abort();
     }
 
     /*
