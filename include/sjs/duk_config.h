@@ -2797,7 +2797,6 @@ typedef struct duk_hthread duk_context;
 #define DUK_USE_ENCODING_BUILTINS
 #undef DUK_USE_ERRCREATE
 #undef DUK_USE_ERRTHROW
-#undef DUK_USE_ES6_OBJECT_PROTO_PROPERTY
 #define DUK_USE_FATAL_HANDLER(udata,msg) do { const char *fatal_msg = (msg); fprintf(stderr, "*** FATAL ERROR: %s\n", fatal_msg ? fatal_msg : "no message"); fflush(stderr); *((volatile unsigned int *) 0) = (unsigned int) 0xdeadbeefUL; abort(); } while(0)
 #undef DUK_USE_GET_MONOTONIC_TIME_CLOCK_GETTIME
 #define DUK_USE_GET_MONOTONIC_TIME_CLOCK_GETTIME
@@ -2851,6 +2850,7 @@ typedef struct duk_hthread duk_context;
 #undef DUK_USE_DEBUG_WRITE
 #define DUK_USE_DOUBLE_LINKED_HEAP
 #define DUK_USE_ES6
+#define DUK_USE_ES6_OBJECT_PROTO_PROPERTY
 #define DUK_USE_ES6_OBJECT_SETPROTOTYPEOF
 #define DUK_USE_ES6_PROXY
 #define DUK_USE_ES6_REGEXP_SYNTAX
