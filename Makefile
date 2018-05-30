@@ -1,6 +1,6 @@
 
 MAKE?=make
-PYTHON?=python
+PYTHON?=python3
 
 CMAKE_MK=build/Makefile
 
