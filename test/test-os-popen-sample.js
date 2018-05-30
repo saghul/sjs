@@ -41,8 +41,10 @@ var data;
 var r = popen(path.join(__dirname, 'helper3.js'));
 os.write(r.stdin_fd, TEXT);
 data = os.read(r.stdout_fd);
+data = new TextDecoder().decode(data);
 assert.equal(data, TEXT);
 data = os.read(r.stderr_fd);
+data = new TextDecoder().decode(data);
 assert.equal(data, TEXT);
 
 os.close(r.stdin_fd);

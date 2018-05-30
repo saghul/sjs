@@ -114,17 +114,13 @@ static duk_ret_t io_fread(duk_context* ctx) {
     FILE* f;
     size_t nread, r;
     char* buf;
-    char* alloc_buf = NULL;
+    int create_buf = 0;
 
     f = duk_require_pointer(ctx, 0);
     if (duk_is_number(ctx, 1)) {
         nread = duk_require_int(ctx, 1);
-        alloc_buf = malloc(nread);
-        if (!alloc_buf) {
-            SJS_THROW_ERRNO_ERROR2(ENOMEM);
-            return -42;    /* control never returns here */
-        }
-        buf = alloc_buf;
+        buf = duk_push_dynamic_buffer(ctx, nread);
+        create_buf = 1;
     } else {
         buf = duk_require_buffer_data(ctx, 1, &nread);
         if (buf == NULL || nread == 0) {
@@ -135,22 +131,23 @@ static duk_ret_t io_fread(duk_context* ctx) {
 
     r = fread(buf, 1, nread, f);
     if (ferror(f)) {
-        free(alloc_buf);
+        if (create_buf) {
+            duk_pop(ctx);
+        }
         clearerr(f);
         SJS_THROW_ERRNO_ERROR2(EIO);
         return -42;    /* control never returns here */
-    } else {
-        if (alloc_buf) {
-            /* return the string we read */
-            duk_push_lstring(ctx, buf, r);
-        } else {
-            /* the data was written to the buffer, return how much we read */
-            duk_push_int(ctx, r);
-        }
-
-        free(alloc_buf);
-        return 1;
     }
+
+    if (create_buf) {
+        /* return the string we read */
+        duk_resize_buffer(ctx, -1, r);
+    } else {
+        /* the data was written to the buffer, return how much we read */
+        duk_push_int(ctx, r);
+    }
+
+    return 1;
 }
 
 

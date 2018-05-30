@@ -20,7 +20,7 @@ assert(f.closed);
 f = io.open(TEST_FILE, 'rb');
 var data = f.read();
 f.close();
-assert.equal(data, TEST_DATA);
+assert.equal(new TextDecoder().decode(data), TEST_DATA);
 
 f = io.open(TEST_FILE, 'rb');
 var databuf = Buffer(4096);
@@ -29,7 +29,7 @@ f.close();
 assert.equal(databuf.slice(0, TEST_DATA.length).toString(), TEST_DATA);
 
 var data = io.readFile(TEST_FILE);
-assert.equal(data, TEST_DATA);
+assert.equal(new TextDecoder().decode(data), TEST_DATA);
 
 safeUnlink(TEST_FILE);
 
