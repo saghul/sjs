@@ -19,6 +19,7 @@ os.close(fd);
 fd = os.open(TEST_FILE, 'r');
 assert(fd > -1);
 r = os.read(fd);
+r = new TextDecoder().decode(r);
 assert.equal(r, TEST_DATA);
 os.close(fd);
 

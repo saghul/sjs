@@ -451,17 +451,13 @@ static duk_ret_t sock_recv(duk_context* ctx) {
     ssize_t r;
     size_t nrecv;
     char* buf;
-    char* alloc_buf = NULL;
+    int create_buf = 0;
 
     fd = duk_require_int(ctx, 0);
     if (duk_is_number(ctx, 1)) {
         nrecv = duk_require_int(ctx, 1);
-        alloc_buf = malloc(nrecv);
-        if (!alloc_buf) {
-            SJS_THROW_ERRNO_ERROR2(ENOMEM);
-            return -42;    /* control never returns here */
-        }
-        buf = alloc_buf;
+        buf = duk_push_dynamic_buffer(ctx, nrecv);
+        create_buf = 1;
     } else {
         buf = duk_require_buffer_data(ctx, 1, &nrecv);
         if (buf == NULL || nrecv == 0) {
@@ -472,21 +468,19 @@ static duk_ret_t sock_recv(duk_context* ctx) {
 
     r = recv(fd, buf, nrecv, 0);
     if (r < 0) {
-        free(alloc_buf);
         SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
-    } else {
-        if (alloc_buf) {
-            /* return the string we read */
-            duk_push_lstring(ctx, buf, r);
-        } else {
-            /* the data was written to the buffer, return how much we read */
-            duk_push_int(ctx, r);
-        }
-
-        free(alloc_buf);
-        return 1;
     }
+
+    if (create_buf) {
+        /* return the string we read */
+        duk_resize_buffer(ctx, -1, r);
+    } else {
+        /* the data was written to the buffer, return how much we read */
+        duk_push_int(ctx, r);
+    }
+
+    return 1;
 }
 
 
@@ -533,18 +527,14 @@ static duk_ret_t sock_recvfrom(duk_context* ctx) {
     char* buf;
     struct sockaddr_storage ss;
     socklen_t addrlen;
-    char* alloc_buf = NULL;
+    int create_buf = 0;
 
     addrlen = sizeof(ss);
     fd = duk_require_int(ctx, 0);
     if (duk_is_number(ctx, 1)) {
         nrecv = duk_require_int(ctx, 1);
-        alloc_buf = malloc(nrecv);
-        if (!alloc_buf) {
-            SJS_THROW_ERRNO_ERROR2(ENOMEM);
-            return -42;    /* control never returns here */
-        }
-        buf = alloc_buf;
+        buf = duk_push_dynamic_buffer(ctx, nrecv);
+        create_buf = 1;
     } else {
         buf = duk_require_buffer_data(ctx, 1, &nrecv);
         if (buf == NULL || nrecv == 0) {
@@ -555,28 +545,27 @@ static duk_ret_t sock_recvfrom(duk_context* ctx) {
 
     r = recvfrom(fd, buf, nrecv, 0, (struct sockaddr*) &ss, &addrlen);
     if (r < 0) {
-        free(alloc_buf);
         SJS_THROW_ERRNO_ERROR();
         return -42;    /* control never returns here */
-    } else {
-        duk_push_object(ctx);
-        if (alloc_buf) {
-            duk_push_lstring(ctx, buf, r);
-            duk_put_prop_string(ctx, -2, "data");
-        } else {
-            duk_push_int(ctx, r);
-            duk_put_prop_string(ctx, -2, "nrecv");
-        }
-        if (addrlen > 0) {
-            sock__addr2obj(ctx, (const struct sockaddr*) &ss, addrlen);
-        } else {
-            duk_push_undefined(ctx);
-        }
-        duk_put_prop_string(ctx, -2, "address");
-
-        free(alloc_buf);
-        return 1;
     }
+
+    duk_push_object(ctx);
+    if (create_buf) {
+        duk_insert(ctx, -2);
+        duk_resize_buffer(ctx, -1, r);
+        duk_put_prop_string(ctx, -2, "data");
+    } else {
+        duk_push_int(ctx, r);
+        duk_put_prop_string(ctx, -2, "nrecv");
+    }
+    if (addrlen > 0) {
+        sock__addr2obj(ctx, (const struct sockaddr*) &ss, addrlen);
+    } else {
+        duk_push_undefined(ctx);
+    }
+    duk_put_prop_string(ctx, -2, "address");
+
+    return 1;
 }
 
 

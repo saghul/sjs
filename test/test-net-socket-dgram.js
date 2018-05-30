@@ -17,6 +17,7 @@ client.bind({host: '127.0.0.1', port: 0});
 
 client.sendto(TEST_DATA, TEST_ADDR);
 var res = server.recvfrom();
+res.data = Buffer(res.data.buffer);
 assert.equal(res.data, TEST_DATA);
 assert.deepEqual(res.address, client.getsockname());
 

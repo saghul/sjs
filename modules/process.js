@@ -204,13 +204,13 @@ Process.prototype.spawn = function() {
         // wait until child has started
         os.close(errorPipe[1]);
         var r = os.read(errorPipe[0]);
-        if (r === '') {
+        if (r.length === 0) {
             // child started succesfully
             r = 0;
         } else {
             var p = os.waitpid(pid, 0);
             assert.equal(p.pid, pid);
-            var errorno = Number.parseInt(r);
+            var errorno = Number.parseInt(new TextDecoder().decode(r));
             r = new Error('Faild to spawn child: [errno ' + errorno + '] ' + errno.strerror(errorno));
             r.errno = errorno;
         }

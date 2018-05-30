@@ -18,6 +18,7 @@ client.connect(TEST_ADDR);
 
 client.send(TEST_DATA);
 var res = server.recvfrom();
+res.data = Buffer(res.data.buffer);
 assert.equal(res.data, TEST_DATA);
 assert.deepEqual(res.address, client.getsockname());
 

@@ -16,6 +16,7 @@ assert.notEqual(wfd, -1);
 
 os.write(wfd, TEST_DATA);
 var data = os.read(rfd);
+data = new TextDecoder().decode(data);
 assert.equal(data, TEST_DATA);
 
 os.close(rfd);

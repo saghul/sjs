@@ -25,6 +25,7 @@ if (pid == 0) {
     var data = '';
     for (;;) {
         var chunk = os.read(rfd, 16834);
+        chunk = new TextDecoder().decode(chunk);
         if (chunk) {
             data += chunk;
         } else {

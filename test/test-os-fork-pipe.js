@@ -16,6 +16,7 @@ if (pid == 0) {
 } else {
     // parent
     var data = os.read(rfd);
+    data = new TextDecoder().decode(data);
     assert.equal(data, "HELLO");
     var r = os.waitpid(pid);
     assert.equal(r.pid, pid);

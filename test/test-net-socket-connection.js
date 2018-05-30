@@ -19,9 +19,11 @@ var connection = server.accept();
 
 connection.send(TEST_DATA);
 var data = client.recv();
+data = Buffer(data.buffer);
 assert.equal(data, TEST_DATA);
 client.send(TEST_DATA);
 var data = connection.recv();
+data = Buffer(data.buffer);
 assert.equal(data, TEST_DATA);
 
 server.close();
