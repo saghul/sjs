@@ -41,7 +41,8 @@ before_install:
   - test -n $MY_CC  && export CC=$MY_CC
   - test -n $MY_CXX  && export CXX=$MY_CXX
   - test -n $MY_LINK  && export LINK=$MY_LINK
-install: true
+install:
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then brew upgrade python; fi
 script: make && make test
 branches:
   only:
