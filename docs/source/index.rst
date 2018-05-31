@@ -12,12 +12,10 @@ Quickstart
 
 .. code-block:: shell
 
-    git clone https://github.com/saghul/sjs && cd sjs
-    make && make run
-
-.. raw:: html
-
-    <script type="text/javascript" src="https://asciinema.org/a/dxn9vxjod2kvk2hi5il0tn8zd.js" id="asciicast-dxn9vxjod2kvk2hi5il0tn8zd" async></script>
+    git clone https://github.com/saghul/sjs
+    cd sjs
+    make
+    ./build/sjs
 
 
 Documentation
@@ -63,6 +61,9 @@ The installation prefix can be specified by setting ``PREFIX``, it defaults to `
 Install
 ^^^^^^^
 
+`sjs` consists of a single binary, so if all you care about is the CLI itself, you can copy it anywhere in
+your filesystem. The build system provides some standard way to do this:
+
 .. code-block:: shell
 
     make install
@@ -72,7 +73,6 @@ following structure:
 
 * ``PREFIX``/bin: `sjs` binary
 * ``PREFIX``/lib: `libsjs` library
-* ``PREFIX``/lib/sjs/modules: modules
 
 The destination of the files can be further altered by setting ``DESTDIR``. This will be prepended to ``PREFIX``.
 Confusing, I know.
@@ -93,4 +93,4 @@ Run the CLI without installing
 
 .. code-block:: shell
 
-    make run
+    ./build/sjs

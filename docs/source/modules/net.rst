@@ -92,7 +92,7 @@ The `Socket` object is a thin object oriented wrapper around :man:`socket(2)` an
 
     :param nrecv: Maximum amount of data to receive. If not specified it defaults to 4096. Alternatively, a `Buffer`
         can be passed, and data will be read into it.
-    :returns: The data that was read as a string or the amount of data read as a number, if a `Buffer` was passed.
+    :returns: The data that was read as a `Uint8Array` or the amount of data read as a number, if a `Buffer` was passed.
 
     .. seealso::
         :man:`recv(2)`
@@ -112,7 +112,7 @@ The `Socket` object is a thin object oriented wrapper around :man:`socket(2)` an
     Similar to :js:func:`net.Socket.prototype.recv` but it can also be used in non-connected sockets.
 
     :returns: An object with 2 properties: `address`, which contains the address of the sender and `nread` if a
-        `Buffer` was used, or `data`, with the data as a string.
+        `Buffer` was used, or `data`, with the data as a `Uint8Array`.
 
     .. seealso::
         :man:`recvfrom(2)`

@@ -23,10 +23,6 @@ JavaScript runtime look like if there were no browsers?".
 
 See the full list [here](http://sjs.saghul.net/en/latest/features.html).
 
-# Demo
-
-[![asciicast](https://asciinema.org/a/dxn9vxjod2kvk2hi5il0tn8zd.png)](https://asciinema.org/a/dxn9vxjod2kvk2hi5il0tn8zd)
-
 # Documentation
 
 Check it out [here](http://sjs.saghul.net).
@@ -35,13 +31,13 @@ Check it out [here](http://sjs.saghul.net).
 
 # Building
 
-Skookum JS currently supports Linux and OSX. See compilation instructions [here](http://sjs.saghul.net/en/latest/#building).
+Skookum JS currently supports Linux and macOS. See compilation instructions [here](http://sjs.saghul.net/en/latest/#building).
 
 [![Build Status](https://travis-ci.org/saghul/sjs.svg?branch=master)](https://travis-ci.org/saghul/sjs)
 
 # License
 
-Check [the LICENSE file](https://github.com/saghul/sjs/blob/master/LICENSE). Hint: it's MIT.
+Check [the LICENSE file](https://github.com/saghul/sjs/blob/master/LICENSE).
 
 # Author
 

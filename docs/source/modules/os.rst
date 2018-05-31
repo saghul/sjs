@@ -211,7 +211,7 @@ Functions
 
     :param nread: Amount of data to receive. If not specified it defaults to 4096. Alternatively, a `Buffer`
         can be passed, and data will be read into it.
-    :returns: The data that was read as a string or the amount of data read as a number, if a `Buffer` was passed.
+    :returns: The data that was read as a `Uint8Array` or the amount of data read as a number, if a `Buffer` was passed.
 
     .. seealso::
         :man:`read(2)`
