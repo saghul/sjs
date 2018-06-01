@@ -1,3 +1,70 @@
+# 18.6.0 (01-06-2018)
+
+* 98d5d3d modules: add hash module
+* 08ed072 utils: fix typo
+* 2cf72e4 modules: add console module
+* 67ae323 vm: autoload module on bootstrap
+* 632f09d doc: update FAQ
+* 5eaeaca misc: update .gitignore
+* 904003d vm: ignore errors when running bootstrap code
+* 4b1edd0 vm: fix require.main
+* 06a50f1 io: add File.writeLine
+* 6ffdf5a io: simplified code
+* 7fd8038 core: set name of CommonJS wrapper to "main"
+* c3255b7 system: lazy load argv property
+* c18fc48 system,io: move std{in,out,err} to system
+* 13d72e4 system: add system.args
+* 6f7a727 vm: update Duktape Node module extra
+* 20432b6 core: use constant for maximum path length
+* 3d4b0f9 misc: style
+* 59c79ea doc: add asciinema demo
+* 35e00c6 doc: fix sphinx warning
+* 5fb3d3a modules: remove log module
+* 9e03d41 console: wrap in a Proxy object
+* a991ebd core: update Duktape to v2
+* ae5fc76 cli: fix greeting message
+* bd4acdd core: set version to 17.0.0 (alpha)
+* 2805716 core: switch to babel-polyfill for modern JS shimming
+* 0b8c672 ci: only test the master branch
+* 805f4cf misc: updated copyright years
+* b442884 core: update Duktape to v2.2.0
+* 0e8fe41 vm: remove custom global object
+* 75033aa time: remove no longer used time / hrtime
+* be858bf ci: use macOS 10.12 + Xcode 9.1 for testing
+* ce38fd9 modules: write error of module which couldn't be found
+* ccfe420 test: only run tests if they end in .js
+* d491a10 test: disable test/test-os-fork-execv
+* 48a6547 vm: remove globals which don't really work (yet)
+* ea574f4 core: refactor mechanism to bundle JS files
+* f274c5d ci: update CI environments
+* 4e763d6 test: fix test-os-stat
+* eeee6d6 vm: use fread arguments consistently across the code
+* cbff9ed os: add os.fstat
+* ed32691 io: add io.readFile
+* 9e00638 modules: remove unneeded code
+* 7e271f5 core: bundle all native modules
+* 03cad95 core: bundle all JavaScript code in libsjs
+* d4d60a1 build: statically link libsjs into the sjs binary
+* ab227da build: add shared library target
+* 5e331db ci: update apt before installing packages
+* 26463e8 core: update version
+* 8ace450 cli: remove no longer needed import
+* 6b1eb15 doc: updated Design section
+* ccf3c5f bootstrap: add missing require
+* 2b0a8dc cli: only show detailed build info on Debug builds
+* 3bdb4f9 build: speedup build
+* acd822c build: define DEBUG and NDEBUG depending on the build type
+* 97219f7 cli: fix compilation warning
+* 65acdfe io: fix compilation warning
+* 50d4255 core: update duktape
+* fe6c132 modules: fix compilation warning
+* da3742e io: normalize the path before opening files
+* bc35241 duktape: enable Object.prototype.__proto__
+* ed42ae3 duktape: update build
+* d2271c9 io,os,socket: return a binary buffer when reading data
+* 73d7f3c test: port runner to Python 3 and run tests with a timeout
+* 8196989 ci: install Python 3 in macOS
+* ad3d4b7 doc: update documentation
 
 # 0.4.0 (22-06-2016)
 
