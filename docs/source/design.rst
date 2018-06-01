@@ -8,7 +8,7 @@ Skookum JS is build by abstracting the undelying platform as little as possible 
 of low level POSIX APIs.
 
 .. note::
-    In release ``18.5.0`` SkookumJS went through a major internal redesign. The old design is still documented in this
+    In release ``18.6.0`` SkookumJS went through a major internal redesign. The old design is still documented in this
     page, for posterity.
 
 The SkookumJS VM is inspired by Node.js in the following ways:
