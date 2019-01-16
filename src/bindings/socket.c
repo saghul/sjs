@@ -799,6 +799,8 @@ static const duk_number_list_entry module_consts[] = {
     X(SO_OOBINLINE),
     X(SO_SNDBUF),
     X(SO_RCVBUF),
+    X(SO_SNDTIMEO),
+    X(SO_RCVTIMEO),
     X(SO_ERROR),
     X(TCP_NODELAY),
     X(TCP_KEEPCNT),
